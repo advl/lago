@@ -1,11 +1,16 @@
 export type {
   EmptyStateProps,
+  GroupHeadingProps,
+  GroupName,
+  HelpOverlayProps,
   KeyBarProps,
   LoadingProps,
   NoticeProps,
 } from "./component/index.js";
 export {
   EmptyState,
+  GroupHeading,
+  HelpOverlay,
   KeyBar,
   Loading,
   Notice,
@@ -38,6 +43,8 @@ export type {
   UseCommandsResult,
 } from "./keymap/index.js";
 export { createKeymap, Keys, useCommands } from "./keymap/index.js";
+export type { ScrolledListProps } from "./layout/index.js";
+export { ScrolledList } from "./layout/index.js";
 export type {
   ListBlock,
   ListBlockKind,
