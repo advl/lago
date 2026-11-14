@@ -1,0 +1,15 @@
+120x30
+|drawn at 40×4, the golden at 40×3; 2 lines differ: 1 in text, 1 in colour or …
+|
+|  1 ~ title
+|  4 −
+|    + third row
+
+1:1 "drawn at 40×4, the golden at 40×3; 2 lines differ: 1 in text, 1 in colour or …"
+3:3 "1" fg=7
+3:5 "~" fg=3
+3:7 "title"
+4:3 "4" fg=7
+4:5 "−" fg=1
+5:5 "+" fg=2
+5:7 "third row"
