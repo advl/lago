@@ -1,7 +1,7 @@
 {
   "name": "@aztlan/lago",
   "description": "A gallery of a project's stories, in a terminal",
-  "version": "0.0.0",
+  "version": "0.1.0-rc.0",
   "type": "module",
   "module": "dist/esm/index.js",
   "types": "dist/types/index.d.ts",
@@ -45,11 +45,11 @@
     "check:webarchitect": "webarchitect library --license MIT --prefix '@aztlan/'"
   },
   "dependencies": {
-    "@aztlan/lago-react": "0.0.0",
-    "@aztlan/tui": "0.0.0"
+    "@aztlan/lago-react": "0.1.0-rc.0",
+    "@aztlan/tui": "0.1.0-rc.0"
   },
   "devDependencies": {
-    "@aztlan/lago-config": "0.0.0",
+    "@aztlan/lago-config": "0.1.0-rc.0",
     "@biomejs/biome": "2.5.15",
     "@canonical/biome-config": "0.44.0",
     "@canonical/typescript-config-react": "0.45.0",
