@@ -13,6 +13,7 @@ export type {
   FitRule,
   FitRules,
   LineRule,
+  Piece,
   Run,
   Slot,
 } from "./types.js";

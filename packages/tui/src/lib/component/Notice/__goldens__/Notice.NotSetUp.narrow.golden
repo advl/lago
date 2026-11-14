@@ -1,0 +1,6 @@
+40x36
+|  ✗ git has no user name configured
+|  Recovery: run git config user.name
+
+1:3 "✗ git has no user name configured" fg=1
+2:3 "Recovery: run git config user.name"

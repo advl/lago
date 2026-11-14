@@ -1,0 +1,14 @@
+60x36
+|  ✗ the service refused the request: reviews may only be
+|  requested from collaborators of
+|  example-org/example-repository-with-a-long-name.
+|  Recovery: change what the service's reason names, then
+|  close the editor with esc, refresh with R, then open it
+|  again with r
+
+1:3 "✗ the service refused the request: reviews may only be" fg=1
+2:3 "requested from collaborators of" fg=1
+3:3 "example-org/example-repository-with-a-long-name." fg=1
+4:3 "Recovery: change what the service's reason names, then"
+5:3 "close the editor with esc, refresh with R, then open it"
+6:3 "again with r"
