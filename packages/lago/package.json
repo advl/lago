@@ -11,6 +11,9 @@
       "import": "./dist/esm/index.js"
     }
   },
+  "bin": {
+    "lago": "./dist/esm/bin.js"
+  },
   "files": [
     "dist"
   ],
