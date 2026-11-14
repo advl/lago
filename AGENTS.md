@@ -12,7 +12,7 @@ Instructions for whoever works on this repository. Everything here is true at th
 | `bun run build` | In every package, `tsc -p tsconfig.build.json`: modules under `dist/esm`, declarations under `dist/types`. |
 | `bun run check` | `check:repository`, then in every package: Biome's format and lint, then `tsc --noEmit`, then `webarchitect` holding the manifest and the configuration to its `library` rules. |
 | `bun run check:fix` | Biome's formatting and safe fixes applied at the root and in every package, then the type check. |
-| `bun run check:repository` | The gates that read the whole repository: Biome and `tsc --noEmit` over `scripts/`, `check:leakage`, `check:commits`, `check:workspace`, `check:structure`. |
+| `bun run check:repository` | The gates that read the whole repository: Biome and `tsc --noEmit` over `scripts/`, `check:leakage`, `check:commits`, `check:workspace`, `check:structure`, `check:audit`, `check:licences`. |
 | `bun run test` | In every package, `vitest run` on the Bun runtime. |
 | `bun run test:coverage` | The same under v8 coverage, with a floor of 100% on statements, branches, functions and lines. |
 | `bun run ci` | `check:repository`, then each package's `ci` target, which is made of its `build`, `check` and `test:coverage`. The one command the pipeline runs; run it before opening a pull request. |
@@ -24,6 +24,8 @@ The pipeline is `.github/workflows/ci.yml`. Its gate job installs with the lockf
 `check:commits` reads the subject of every commit reachable from `HEAD`, merges aside, and refuses one that is not a Conventional Commit with a known scope, runs past 72 characters, or does not open with a verb in the third person.
 
 `check:workspace` holds every package to the workspace's shape: the scripts the root runs, a `ci` target made of them, the shared version, the `@aztlan/` name and the licence. `check:structure` holds every file under a package's `src/` to the structure stated under Conventions. Each first proves it can fail.
+
+`check:audit` refuses a dependency with a published advisory, and needs the network. `check:licences` refuses a dependency that ships with a package under a licence that is not permissive; development tools never ship, so theirs bind nothing.
 
 ## Conventions
 
