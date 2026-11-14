@@ -35,14 +35,18 @@
     "check:fix": "bun run check:biome:fix && bun run check:ts",
     "check:biome": "biome check",
     "check:biome:fix": "biome check --write",
-    "check:ts": "tsc --noEmit"
+    "check:ts": "tsc --noEmit",
+    "test": "bunx --bun vitest run",
+    "test:coverage": "bunx --bun vitest run --coverage"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",
     "@canonical/biome-config": "0.44.0",
     "@canonical/typescript-config": "0.44.0",
+    "@vitest/coverage-v8": "5.1.0",
     "bun-types": "1.4.4",
-    "typescript": "7.0.2"
+    "typescript": "7.0.2",
+    "vitest": "5.1.0"
   },
   "engines": {
     "bun": ">=1.4.2"
@@ -56,7 +60,8 @@
         "executor": "nx:noop",
         "dependsOn": [
           "build",
-          "check"
+          "check",
+          "test:coverage"
         ]
       }
     }

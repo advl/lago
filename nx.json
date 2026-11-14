@@ -13,6 +13,15 @@
     },
     "check:fix": {
       "dependsOn": ["^build"]
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "cache": true
+    },
+    "test:coverage": {
+      "dependsOn": ["^build"],
+      "outputs": ["{projectRoot}/coverage"],
+      "cache": true
     }
   }
 }
