@@ -58,6 +58,7 @@ The pipeline is `.github/workflows/ci.yml`. Its gate job installs with the lockf
 - The packages are published under `@aztlan`. A dependency between two of them points one way; never add one that closes a circle.
 - What a package publishes is its manifest's `exports` map and nothing beside it.
 - `@aztlan/lago-config` depends on `@aztlan/lago-react`, which is built first.
+- `@aztlan/tui` takes the renderer, its keymap and React as peers: one copy of each must serve the application and the components, or a provider made by one is not seen by the other. It is tested by Lago, so `lago-react` and `lago-config` are among its development dependencies and never among its dependencies.
 
 ## Gotchas
 
@@ -79,3 +80,6 @@ The pipeline is `.github/workflows/ci.yml`. Its gate job installs with the lockf
 - In watch mode, an update of every snapshot reaches the tests and not the plugins, so whether a run updates is read in the test, from `expect.getState().snapshotState`.
 - Coverage counts every project in a run. `lago-react` counts its stories project on purpose, because those stories test the plugin; a project configured by `createConfig` measures its unit project alone.
 - A test that runs vitest in a scratch project gives it only `PATH`, `HOME`, `TMPDIR` and `LANG`, so no pipeline variable makes it a pipeline run, a `package.json` of type `module`, and a module cache inside the project.
+- A package configured by `createConfig` runs `vitest run --coverage --project unit`, then its stories with `vitest run --project stories`, as its `test:coverage`: a coverage run that includes the stories is refused.
+- Text is measured by asking the renderer's own text buffer, in both of its width methods, and taking the wider, so a line fitted to its width never runs past it in either kind of terminal. Bun's own measure counts some text narrower than the renderer draws it.
+- A value with a `then` property is taken for a promise by `await`, so no object a caller passes, such as a fitting rule, has one.

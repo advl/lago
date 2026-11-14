@@ -1,18 +1,8 @@
-import { defineConfig } from "vitest/config";
+import { createConfig } from "@aztlan/lago-config";
 
-export default defineConfig({
-  test: {
-    include: ["src/**/*.test.ts"],
-    coverage: {
-      provider: "v8",
-      include: ["src/**/*.ts"],
-      exclude: ["**/index.ts", "**/*.test.ts", "**/*.d.ts", "**/types.ts"],
-      thresholds: {
-        statements: 100,
-        branches: 100,
-        functions: 100,
-        lines: 100,
-      },
-    },
-  },
+// The components are tested as any project that uses them would test its
+// own: by Lago, configured by Lago's one function.
+export default createConfig({
+  viewports: { narrow: { cols: 40, rows: 36 }, wide: { cols: 60, rows: 36 } },
+  coverage: true,
 });
