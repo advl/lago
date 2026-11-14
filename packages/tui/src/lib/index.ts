@@ -19,5 +19,11 @@ export {
   measureText,
   noBreakSpace,
 } from "./fit/index.js";
+export type {
+  KeyCommand,
+  UseCommandsProps,
+  UseCommandsResult,
+} from "./keymap/index.js";
+export { createKeymap, Keys, useCommands } from "./keymap/index.js";
 export type { Tokens } from "./tokens/index.js";
 export { tokens } from "./tokens/index.js";
