@@ -15,7 +15,8 @@
     "lago": "./dist/esm/bin.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "skills"
   ],
   "sideEffects": false,
   "author": {
