@@ -49,7 +49,7 @@ The pipeline is `.github/workflows/ci.yml`. Its gate job installs with the lockf
 - A story's picture is kept beside its stories file as `__goldens__/<file>.<Story>.<viewport>.golden`. A run on a person's machine writes a golden that is missing, and a pipeline fails for it; `-u` rewrites every golden and removes those no story owns. A changed golden is reviewed in the diff like code.
 - An implementation file exports one value, as its default, at its declaration, and is named after it. `types.ts` exports only types and `constants.ts` only named constants.
 - A folder's `index.ts` is a barrel of named re-exports reaching a file beside it or a child folder's `index.js`. No `export *`, and no `#` alias.
-- Each domain is a folder under `src/lib/`. Code inside a domain imports its siblings by file; code in another domain imports through the barrel.
+- In a library, each domain is a folder under `src/lib/`. The gallery is an application, organised by what it does: each domain is a folder directly under `src/`. Code inside a domain imports its siblings by file; code in another domain imports through the barrel.
 - Every function name starts with a verb. A function that is not pure says so with `@note` and the reason. Indexed access uses `.at()`.
 
 ## Boundaries

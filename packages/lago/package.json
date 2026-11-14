@@ -37,10 +37,14 @@
     "check:biome:fix": "biome check --write",
     "check:ts": "tsc --noEmit",
     "test": "bunx --bun vitest run",
-    "test:coverage": "bunx --bun vitest run --coverage",
+    "test:coverage": "bunx --bun vitest run --coverage --project unit && bunx --bun vitest run --project stories --passWithNoTests",
     "check:webarchitect": "webarchitect library --license MIT --prefix '@aztlan/'"
   },
+  "dependencies": {
+    "@aztlan/lago-react": "0.0.0"
+  },
   "devDependencies": {
+    "@aztlan/lago-config": "0.0.0",
     "@biomejs/biome": "2.5.15",
     "@canonical/biome-config": "0.44.0",
     "@canonical/typescript-config": "0.44.0",

@@ -1,7 +1,11 @@
 {
   "extends": "@canonical/typescript-config",
   "compilerOptions": {
-    "types": ["bun-types"]
+    "types": ["bun-types"],
+    // The renderer's own declarations, which the stories' declarations
+    // reach, do not type-check, against themselves or against React's. This
+    // skips declaration files only.
+    "skipLibCheck": true
   },
-  "include": ["src/**/*.ts", "vitest.config.ts"]
+  "include": ["src/**/*.ts", "testing/**/*.ts", "vitest.config.ts"]
 }

@@ -18,7 +18,11 @@
     "packages/lago": {
       "name": "@aztlan/lago",
       "version": "0.0.0",
+      "dependencies": {
+        "@aztlan/lago-react": "0.0.0",
+      },
       "devDependencies": {
+        "@aztlan/lago-config": "0.0.0",
         "@biomejs/biome": "2.5.15",
         "@canonical/biome-config": "0.44.0",
         "@canonical/typescript-config": "0.44.0",
