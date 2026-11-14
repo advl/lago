@@ -1,0 +1,84 @@
+80x24
+|project                                         at terminal · as the room allows
+|component ───────────────── ┌─▸ ✓ Default──┐  ┌─± Long─────────────────────────┐
+|± KeyBar                  2 │↑↓ move ?     │  │↑↓ move  ←→ mode  / find  ? help│
+|✗ Notice                  2 │              │  │a longer bar                    │
+|layout ──────────────────── │  日本 wide   │  └────────────────────────────────┘
+|✓ Pane                    1 │ selected row │
+|                            │underlined    │
+|                            └──────────────┘
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|✓ 4 pass · ± 2 changed · + 1 new · ✗ 1 error · ✗ 1 file failed to load
+|/project/src/Broken.stories.tsx: Cannot find module './Missing.js'
+|↑↓ move ⏎ open / find p viewport v layout ? q quit
+
+1:1 "project                                         at terminal ·"
+1:63 "as the room allows" fg=7
+2:1 "component ───────────────── ┌─▸ ✓ Default──┐"
+2:47 "┌─± Long─────────────────────────┐" fg=7
+3:1 "± " fg=3 bg=8
+3:3 "KeyBar                  " bg=8
+3:27 "2" fg=7 bg=8
+3:29 "│↑↓"
+3:33 "move" fg=7
+3:38 "?" bold
+3:44 "│"
+3:47 "│" fg=7
+3:48 "↑↓ move  ←→ mode  / find  ? help"
+3:80 "│" fg=7
+4:1 "✗" fg=1
+4:3 "Notice"
+4:27 "2" fg=7
+4:29 "│              │"
+4:47 "│" fg=7
+4:48 "a longer bar"
+4:80 "│" fg=7
+5:1 "layout ──────────────────── │"
+5:32 "日本" w=4 fg=2
+5:37 "wide" fg=#ff8800
+5:44 "│"
+5:47 "└────────────────────────────────┘" fg=7
+6:1 "✓" fg=2
+6:3 "Pane"
+6:27 "1" fg=7
+6:29 "│"
+6:30 " selected row " bg=2 inverse
+6:44 "│"
+7:29 "│"
+7:30 "underlined" italic underline
+7:44 "│"
+8:29 "└──────────────┘"
+22:1 "✓ 4 pass"
+22:10 "·" fg=7
+22:12 "± 2 changed" fg=3
+22:24 "·" fg=7
+22:26 "+ 1 new" fg=3
+22:34 "·" fg=7
+22:36 "✗ 1 error" fg=1
+22:46 "·" fg=7
+22:48 "✗ 1 file failed to load" fg=1
+23:1 "/project/src/Broken.stories.tsx: Cannot find module './Missing.js'" fg=1
+24:1 "↑↓"
+24:4 "move" fg=7
+24:9 "⏎"
+24:11 "open" fg=7
+24:16 "/"
+24:18 "find" fg=7
+24:23 "p"
+24:25 "viewport" fg=7
+24:34 "v"
+24:36 "layout" fg=7
+24:43 "? q"
+24:47 "quit" fg=7

@@ -1,11 +1,15 @@
 export type { DifferenceProps } from "./Difference/index.js";
 export { Difference } from "./Difference/index.js";
+export type { GalleryProps } from "./Gallery/index.js";
+export { Gallery } from "./Gallery/index.js";
 export type { InspectProps } from "./Inspect/index.js";
 export { Inspect } from "./Inspect/index.js";
 export type { Cell, PictureProps } from "./Picture/index.js";
 export { Picture } from "./Picture/index.js";
 export type { RunReaderProps } from "./RunReader/index.js";
 export { RunReader } from "./RunReader/index.js";
+export type { StatusLineProps } from "./StatusLine/index.js";
+export { StatusLine } from "./StatusLine/index.js";
 export type { StoryBlockProps, StoryFrame } from "./StoryBlock/index.js";
 export { StoryBlock } from "./StoryBlock/index.js";
 export type { TalliesProps } from "./Tallies/index.js";

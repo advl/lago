@@ -1,0 +1,46 @@
+120x30
+|project
+|  no stories yet: write a …
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|✓ 0 pass · ± 0 changed · + 0 new · ✗ 0 error
+|watching the stories for changes
+|/ find ? q quit
+
+1:1 "project"
+2:3 "no stories yet: write a …"
+28:1 "✓ 0 pass"
+28:10 "·" fg=7
+28:12 "± 0 changed"
+28:24 "·" fg=7
+28:26 "+ 0 new"
+28:34 "·" fg=7
+28:36 "✗ 0 error"
+29:1 "watching the stories for changes" fg=7
+30:1 "/"
+30:3 "find" fg=7
+30:8 "? q"
+30:12 "quit" fg=7

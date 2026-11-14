@@ -1,0 +1,40 @@
+80x24
+|project
+|  no stories yet: write a …
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|✓ 0 pass · ± 0 changed · + 0 new · ✗ 0 error
+|watching the stories for changes
+|/ find ? q quit
+
+1:1 "project"
+2:3 "no stories yet: write a …"
+22:1 "✓ 0 pass"
+22:10 "·" fg=7
+22:12 "± 0 changed"
+22:24 "·" fg=7
+22:26 "+ 0 new"
+22:34 "·" fg=7
+22:36 "✗ 0 error"
+23:1 "watching the stories for changes" fg=7
+24:1 "/"
+24:3 "find" fg=7
+24:8 "? q"
+24:12 "quit" fg=7

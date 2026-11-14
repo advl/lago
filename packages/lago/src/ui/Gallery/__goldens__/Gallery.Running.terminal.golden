@@ -1,0 +1,33 @@
+80x24
+|project
+|running the stories…
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|running the stories…
+|/ find ? q quit
+
+1:1 "project"
+2:1 "running the stories…"
+23:1 "running the stories…"
+24:1 "/"
+24:3 "find" fg=7
+24:8 "? q"
+24:12 "quit" fg=7

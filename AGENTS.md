@@ -90,3 +90,8 @@ The pipeline is `.github/workflows/ci.yml`. Its gate job installs with the lockf
 - A screenshot keeps no blank cell before a run's first drawn character, so a fixture's run starts where its text does.
 - A box's border shows its title only when the title fits between the corners, so a frame is made wide enough for its story's name.
 - Biome takes a function named `fit` for a focused test.
+- A command's `enabled` is read from the screen last drawn, so a key acts on what the reader sees. `userEvent` settles the screen after each key; a test that drives a renderer by hand draws it again between keys.
+- The test keyboard sends a capital letter as a key of its own, where a terminal sends the letter with shift. A binding is written `shift+a`, and a test presses `{Shift>}a{/Shift}`.
+- Two commands may share a key while only one is enabled: Enter opens, or keeps what is typed.
+- The key bar names each hint by its words, so no two commands enabled at once share a description: Esc says "put the cursor away" where `c` says "stop reading cells".
+- Text typed into the filter or the search comes through `useKeyboard`, while every binding but Enter, Esc and Backspace is off. The reducer ignores typing when nothing is being typed, so the handler sends every printable key.

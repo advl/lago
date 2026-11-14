@@ -1,0 +1,62 @@
+80x24
+|component/KeyBar                                at terminal · as the room allows
+|┌─± Long at terminal · changed─────────────────────────────────────────────────┐
+|│↑↓ move  ←→ mode  / find  ? help                                              │
+|│a longer bar                                                                  │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|└──────────────────────────────────────────────────────────────────────────────┘
+|✓ 4 pass · ± 2 changed · + 1 new · ✗ 1 error · ✗ 1 file failed to load
+|accept Long at terminal as its golden? y accepts, Esc keeps the golden
+|esc back y accept
+
+1:1 "component/KeyBar                                at terminal ·"
+1:63 "as the room allows" fg=7
+2:1 "┌─± Long at terminal · changed─────────────────────────────────────────────────┐"
+3:1 "│↑↓ move  ←→ mode  / find  ? help                                              │"
+4:1 "│a longer bar                                                                  │"
+5:1 "│                                                                              │"
+6:1 "│                                                                              │"
+7:1 "│                                                                              │"
+8:1 "│                                                                              │"
+9:1 "│                                                                              │"
+10:1 "│                                                                              │"
+11:1 "│                                                                              │"
+12:1 "│                                                                              │"
+13:1 "│                                                                              │"
+14:1 "│                                                                              │"
+15:1 "│                                                                              │"
+16:1 "│                                                                              │"
+17:1 "│                                                                              │"
+18:1 "│                                                                              │"
+19:1 "│                                                                              │"
+20:1 "│                                                                              │"
+21:1 "└──────────────────────────────────────────────────────────────────────────────┘"
+22:1 "✓ 4 pass"
+22:10 "·" fg=7
+22:12 "± 2 changed" fg=3
+22:24 "·" fg=7
+22:26 "+ 1 new" fg=3
+22:34 "·" fg=7
+22:36 "✗ 1 error" fg=1
+22:46 "·" fg=7
+22:48 "✗ 1 file failed to load" fg=1
+23:1 "accept Long at terminal as its golden? y accepts, Esc keeps the golden"
+24:1 "esc"
+24:5 "back" fg=7
+24:10 "y"
+24:12 "accept" fg=7
