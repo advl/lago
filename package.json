@@ -1,0 +1,29 @@
+{
+  "name": "lago",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Stories for terminal interfaces drawn by OpenTUI: tested on every run, browsed in a terminal",
+  "author": {
+    "email": "47156835+advl@users.noreply.github.com",
+    "name": "advl"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/advl/lago"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/advl/lago/issues"
+  },
+  "homepage": "https://github.com/advl/lago#readme",
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "lerna": "10.1.1",
+    "nx": "23.3.2"
+  },
+  "engines": {
+    "bun": ">=1.4.2"
+  }
+}
