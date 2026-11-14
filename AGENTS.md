@@ -41,7 +41,7 @@ The pipeline is `.github/workflows/ci.yml`. Its gate job installs with the lockf
 - Markdown and commit bodies use one paragraph per line and are never hard-wrapped. Comments are code and wrap at the formatter's width.
 - A comment says why, in words a stranger can follow. Code that reads as what it does carries none.
 - Tests sit beside their source as `<name>.test.ts`, with a `describe` named for the export and `it` throughout. An `it` names what a caller can observe.
-- Fixtures that a package's tests share live in `testing/` at the package's root, outside what is built.
+- Fixtures that a package's tests share live in `testing/` at the package's root, outside what is built. A test that runs more than one domain together, such as vitest in a scratch project, lives under `src/testing/integration/`.
 - Tests run the renderer for real. Only the network, the file system outside a temporary folder, and timers are stood in for.
 - Coverage is a floor, not a target. Behaviour lands with the tests that pin it, and the fill comes after.
 - A package with components extends `@canonical/typescript-config-react` and takes its JSX runtime from `@opentui/react`, in `tsconfig.json` and in `vitest.config.ts`.
@@ -83,3 +83,7 @@ The pipeline is `.github/workflows/ci.yml`. Its gate job installs with the lockf
 - A package configured by `createConfig` runs `vitest run --coverage --project unit`, then its stories with `vitest run --project stories`, as its `test:coverage`: a coverage run that includes the stories is refused.
 - Text is measured by asking the renderer's own text buffer, in both of its width methods, and taking the wider, so a line fitted to its width never runs past it in either kind of terminal. Bun's own measure counts some text narrower than the renderer draws it.
 - A value with a `then` property is taken for a promise by `await`, so no object a caller passes, such as a fitting rule, has one.
+- The gallery starts the project's own vitest from code, with `update: "none"`: a run never writes a golden, so a missing one is reported as new, and only accepting it in the gallery writes it.
+- Vitest's own `start` refuses a project with no test file, so the gallery asks `globTestSpecifications` first and opens an empty gallery on a project with no stories yet.
+- Vitest started from code prints to the terminal the gallery draws on unless it is given streams of its own, so the gallery gives it streams that keep nothing.
+- Vitest tells a reporter of a removed test file with `onTestRemoved` and runs nothing after, so the gallery's reporter drops that file's stories there.
