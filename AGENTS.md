@@ -12,12 +12,18 @@ Instructions for whoever works on this repository. Everything here is true at th
 | `bun run build` | In every package, `tsc -p tsconfig.build.json`: modules under `dist/esm`, declarations under `dist/types`. |
 | `bun run check` | In every package, Biome's format and lint, then `tsc --noEmit`. |
 | `bun run check:fix` | Biome's formatting and safe fixes applied, then the type check. |
+| `bun run ci` | each package's `ci` target, which is made of its `build` and `check`. The one command the pipeline runs; run it before opening a pull request. |
+
+The pipeline is `.github/workflows/ci.yml`. Its gate job installs with the lockfile frozen and runs `bun run ci`, so what the pipeline enforces is decided in the manifests and not in the workflow. A second job runs `gitleaks` over the whole commit history, which is why its checkout is complete.
 
 ## Conventions
 
 - Licence MIT, author `advl`, declared in every manifest and carried in `LICENSE`.
 - TypeScript is strict and resolves modules as `NodeNext`: a relative import names its file with a `.js` extension. Every `tsconfig.json` extends `@canonical/typescript-config` and every `biome.json` extends `@canonical/biome-config`; neither is copied in or replaced.
 - The toolchain is pinned to exact versions. A range would let the installed tools drift, and a gate whose verdict depends on the day of the install is a different gate on every machine.
+- Commit subjects are Conventional Commits with a required scope: a package's short name (`lago-react`, `lago-config`, `tui`, `lago`), or `monorepo`, `deps` or `ci` for what belongs to no package. The subject is a verb phrase in the third person, under 72 characters.
+- Pull request titles follow the same rule, and `.github/workflows/pr-lint.yml` enforces it: merges are squash-only and take the title as the commit on `main`. `.github/PULL_REQUEST_TEMPLATE.md` is the body's shape.
+- Branches are `<type>/<slug>`, the type that of the commit the merge lands.
 
 ## Boundaries
 

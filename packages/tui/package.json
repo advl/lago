@@ -49,5 +49,16 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "nx": {
+    "targets": {
+      "ci": {
+        "executor": "nx:noop",
+        "dependsOn": [
+          "build",
+          "check"
+        ]
+      }
+    }
   }
 }

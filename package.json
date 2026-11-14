@@ -22,7 +22,8 @@
   "scripts": {
     "build": "nx run-many -t build",
     "check": "nx run-many -t check",
-    "check:fix": "nx run-many -t check:fix"
+    "check:fix": "nx run-many -t check:fix",
+    "ci": "nx run-many -t ci"
   },
   "devDependencies": {
     "lerna": "10.1.1",
