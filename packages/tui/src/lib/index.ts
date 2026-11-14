@@ -43,8 +43,14 @@ export type {
   UseCommandsResult,
 } from "./keymap/index.js";
 export { createKeymap, Keys, useCommands } from "./keymap/index.js";
-export type { ScrolledListProps } from "./layout/index.js";
-export { ScrolledList } from "./layout/index.js";
+export type {
+  PaneProps,
+  ScrolledListProps,
+} from "./layout/index.js";
+export {
+  Pane,
+  ScrolledList,
+} from "./layout/index.js";
 export type {
   ListBlock,
   ListBlockKind,

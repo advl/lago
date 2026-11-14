@@ -10,6 +10,7 @@ describe("the package's entry", () => {
       "Keys",
       "Loading",
       "Notice",
+      "Pane",
       "PaneHeader",
       "ScrolledList",
       "createKeymap",
