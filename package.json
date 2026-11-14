@@ -25,9 +25,10 @@
     "check": "bun run check:repository && nx run-many -t check",
     "check:biome": "cd scripts && biome check",
     "check:biome:fix": "cd scripts && biome check --write",
+    "check:commits": "bun scripts/check-commits.ts --self-test && bun scripts/check-commits.ts",
     "check:fix": "bun run check:biome:fix && nx run-many -t check:fix",
     "check:leakage": "bun scripts/check-leakage.ts",
-    "check:repository": "bun run check:biome && bun run check:ts && bun run check:leakage",
+    "check:repository": "bun run check:biome && bun run check:ts && bun run check:leakage && bun run check:commits",
     "check:ts": "tsc --noEmit",
     "ci": "bun run check:repository && nx run-many -t ci"
   },
