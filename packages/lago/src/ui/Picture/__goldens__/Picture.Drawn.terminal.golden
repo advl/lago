@@ -1,0 +1,14 @@
+80x24
+|↑↓ move ?
+|
+|  日本 wide
+| selected row
+|underlined
+
+1:1 "↑↓"
+1:4 "move" fg=7
+1:9 "?" bold
+3:3 "日本" w=4 fg=2
+3:8 "wide" fg=#ff8800
+4:1 " selected row " bg=2 inverse
+5:1 "underlined" italic underline
