@@ -54,6 +54,33 @@ describe("render", () => {
     );
   });
 
+  it("has a screenshot saved by vitest's snapshots as a golden's text", async () => {
+    const screen = await render(
+      <text fg="#00ff00">
+        saved <b>now</b>
+      </text>,
+      { cols: 12, rows: 2 },
+    );
+    expect(screen.screenshot()).toMatchInlineSnapshot(`
+      12x2
+      |saved now
+
+      1:1 "saved" fg=#00ff00
+      1:7 "now" fg=#00ff00 bold
+    `);
+    expect({
+      cols: 1,
+      rows: 1,
+      lines: "not a screenshot",
+    }).toMatchInlineSnapshot(`
+      {
+        "cols": 1,
+        "lines": "not a screenshot",
+        "rows": 1,
+      }
+    `);
+  });
+
   it("presses keys in the order they are written, each on the screen the last one drew", async () => {
     const screen = await render(<Keys />);
     await screen.userEvent.keyboard(

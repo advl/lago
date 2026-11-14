@@ -46,6 +46,9 @@
     "packages/lago-react": {
       "name": "@aztlan/lago-react",
       "version": "0.0.0",
+      "dependencies": {
+        "oxc-parser": "0.158.0",
+      },
       "devDependencies": {
         "@biomejs/biome": "2.5.15",
         "@canonical/biome-config": "0.44.0",

@@ -16,3 +16,5 @@ export type {
   StoryObj,
 } from "./story/index.js";
 export { composeStories } from "./story/index.js";
+export type { Options, StoryResult } from "./vitest/index.js";
+export { testStories } from "./vitest/index.js";

@@ -1,0 +1,5 @@
+24x4
+|a label longer than  0
+
+1:1 "a label longer than" fg=4 bold
+1:22 "0" fg=4

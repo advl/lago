@@ -6,6 +6,7 @@ import { defaultViewport } from "./constants.js";
 import createScreen from "./createScreen.js";
 import ErrorCatcher from "./ErrorCatcher.js";
 import flushReact from "./flushReact.js";
+import registerSerializer from "./registerSerializer.js";
 import type { Screen, Viewport } from "./types.js";
 
 /**
@@ -16,7 +17,8 @@ import type { Screen, Viewport } from "./types.js";
  * its first render is retried when what it waits for arrives. What the
  * component throws, while it draws or in an effect, rejects the call that
  * was settling the screen, this one or a later one. The screen is unmounted
- * when the test that made it ends.
+ * when the test that made it ends. A screenshot given to one of
+ * vitest's snapshot matchers is saved as a golden's text.
  *
  * @note Impure: creates a renderer and registers its removal on the running test.
  */
@@ -24,6 +26,7 @@ export default async function render(
   node: ReactNode,
   viewport: Viewport = defaultViewport,
 ): Promise<Screen> {
+  registerSerializer();
   const setup = await createTestRenderer({
     width: viewport.cols,
     height: viewport.rows,
