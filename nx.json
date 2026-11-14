@@ -1,4 +1,18 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
-  "neverConnectToCloud": true
+  "neverConnectToCloud": true,
+  "targetDefaults": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["{projectRoot}/dist"],
+      "cache": true
+    },
+    "check": {
+      "dependsOn": ["^build"],
+      "cache": true
+    },
+    "check:fix": {
+      "dependsOn": ["^build"]
+    }
+  }
 }

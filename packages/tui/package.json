@@ -1,0 +1,53 @@
+{
+  "name": "@aztlan/tui",
+  "description": "Terminal components for applications drawn by OpenTUI",
+  "version": "0.0.0",
+  "type": "module",
+  "module": "dist/esm/index.js",
+  "types": "dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "author": {
+    "email": "47156835+advl@users.noreply.github.com",
+    "name": "advl"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/advl/lago",
+    "directory": "packages/tui"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/advl/lago/issues"
+  },
+  "homepage": "https://github.com/advl/lago/tree/main/packages/tui#readme",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "check": "bun run check:biome && bun run check:ts",
+    "check:fix": "bun run check:biome:fix && bun run check:ts",
+    "check:biome": "biome check",
+    "check:biome:fix": "biome check --write",
+    "check:ts": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.15",
+    "@canonical/biome-config": "0.44.0",
+    "@canonical/typescript-config": "0.44.0",
+    "bun-types": "1.4.4",
+    "typescript": "7.0.2"
+  },
+  "engines": {
+    "bun": ">=1.4.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
