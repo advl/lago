@@ -47,6 +47,7 @@
     "@canonical/webarchitect": "0.44.0",
     "@vitest/coverage-v8": "5.1.0",
     "bun-types": "1.4.4",
+    "fast-check": "4.10.2",
     "typescript": "7.0.2",
     "vitest": "5.1.0"
   },

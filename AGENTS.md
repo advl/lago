@@ -41,6 +41,7 @@ The pipeline is `.github/workflows/ci.yml`. Its gate job installs with the lockf
 - Markdown and commit bodies use one paragraph per line and are never hard-wrapped. Comments are code and wrap at the formatter's width.
 - A comment says why, in words a stranger can follow. Code that reads as what it does carries none.
 - Tests sit beside their source as `<name>.test.ts`, with a `describe` named for the export and `it` throughout. An `it` names what a caller can observe.
+- Fixtures that a package's tests share live in `testing/` at the package's root, outside what is built.
 - Coverage is a floor, not a target. Behaviour lands with the tests that pin it, and the fill comes after.
 - An implementation file exports one value, as its default, at its declaration, and is named after it. `types.ts` exports only types and `constants.ts` only named constants.
 - A folder's `index.ts` is a barrel of named re-exports reaching a file beside it or a child folder's `index.js`. No `export *`, and no `#` alias.

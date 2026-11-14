@@ -1,2 +1,1 @@
-/** Stories for React components drawn by OpenTUI, tested on every run. */
-export {};
+export type { Attribute, Color, Run, Screenshot } from "./lib/index.js";
