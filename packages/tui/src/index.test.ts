@@ -12,6 +12,7 @@ describe("the package's entry", () => {
       "measurePieces",
       "measureText",
       "noBreakSpace",
+      "tokens",
     ]);
   });
 });

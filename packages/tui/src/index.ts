@@ -7,6 +7,7 @@ export type {
   LineRule,
   Run,
   Slot,
+  Tokens,
 } from "./lib/index.js";
 export {
   endRuns,
@@ -18,4 +19,5 @@ export {
   measurePieces,
   measureText,
   noBreakSpace,
+  tokens,
 } from "./lib/index.js";
