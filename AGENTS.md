@@ -96,3 +96,4 @@ The pipeline is `.github/workflows/ci.yml`. Its gate job installs with the lockf
 - The key bar names each hint by its words, so no two commands enabled at once share a description: Esc says "put the cursor away" where `c` says "stop reading cells".
 - Text typed into the filter or the search comes through `useKeyboard`, while every binding but Enter, Esc and Backspace is off. The reducer ignores typing when nothing is being typed, so the handler sends every printable key.
 - A package linked from a checkout imports the checkout's own React and renderer, and a second React has no component to call hooks from. `createConfig` has vitest read the `@aztlan` packages and resolve React and the renderer to the project's one copy.
+- `scripts/check-packages.ts` lists every name each entry exports. A change to what a package publishes changes that list in the same commit.

@@ -30,15 +30,17 @@
     "check:fix": "bun run check:biome:fix && nx run-many -t check:fix",
     "check:leakage": "bun scripts/check-leakage.ts",
     "check:licences": "bun scripts/check-licences.ts --self-test && bun scripts/check-licences.ts",
+    "check:packages": "bun scripts/check-packages.ts",
     "check:repository": "bun run check:biome && bun run check:ts && bun run check:leakage && bun run check:commits && bun run check:workspace && bun run check:structure && bun run check:audit && bun run check:licences",
     "check:structure": "bun scripts/check-structure.ts --self-test && bun scripts/check-structure.ts",
     "check:ts": "tsc --noEmit",
     "check:workspace": "bun scripts/check-workspace.ts --self-test && bun scripts/check-workspace.ts",
-    "ci": "bun run check:repository && nx run-many -t ci",
+    "ci": "bun run check:repository && nx run-many -t ci && bun run check:packages",
     "test": "nx run-many -t test",
     "test:coverage": "nx run-many -t test:coverage"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "0.18.5",
     "@biomejs/biome": "2.5.15",
     "@canonical/biome-config": "0.44.0",
     "@canonical/typescript-config": "0.44.0",
@@ -46,6 +48,7 @@
     "lerna": "10.1.1",
     "nx": "23.3.2",
     "oxc-parser": "0.158.0",
+    "publint": "0.3.25",
     "typescript": "7.0.2"
   },
   "engines": {
