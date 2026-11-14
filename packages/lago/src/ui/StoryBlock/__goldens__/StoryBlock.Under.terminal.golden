@@ -1,0 +1,29 @@
+80x24
+|┌─✓ Default──────┐
+|│↑↓ move ?       │
+|│                │
+|│  日本 wide     │
+|│ selected row   │
+|│underlined      │
+|└────────────────┘
+|The keys that work now, each with its hint.
+
+1:1 "┌─✓ Default──────┐" fg=7
+2:1 "│" fg=7
+2:2 "↑↓"
+2:5 "move" fg=7
+2:10 "?" bold
+2:18 "│" fg=7
+3:1 "│                │" fg=7
+4:1 "│" fg=7
+4:4 "日本" w=4 fg=2
+4:9 "wide" fg=#ff8800
+4:18 "│" fg=7
+5:1 "│" fg=7
+5:2 " selected row " bg=2 inverse
+5:18 "│" fg=7
+6:1 "│" fg=7
+6:2 "underlined" italic underline
+6:18 "│" fg=7
+7:1 "└────────────────┘" fg=7
+8:1 "The keys that work now, each with its hint." fg=7

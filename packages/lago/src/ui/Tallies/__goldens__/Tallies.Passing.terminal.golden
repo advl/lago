@@ -1,0 +1,10 @@
+80x24
+|✓ 2 pass · ± 0 changed · + 0 new · ✗ 0 error
+
+1:1 "✓ 2 pass"
+1:10 "·" fg=7
+1:12 "± 0 changed"
+1:24 "·" fg=7
+1:26 "+ 0 new"
+1:34 "·" fg=7
+1:36 "✗ 0 error"

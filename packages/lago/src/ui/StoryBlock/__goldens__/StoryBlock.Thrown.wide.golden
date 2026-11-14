@@ -1,0 +1,14 @@
+120x30
+|┌─✗ Thrown─────────────────────────────────────┐  ┌─Wide─────────────────────┐
+|│TypeError: cannot read properties of undefined│  │not drawn at this viewport│
+|│at src/Notice.tsx:4:12                        │  └──────────────────────────┘
+|└──────────────────────────────────────────────┘
+
+1:1 "┌─✗ Thrown─────────────────────────────────────┐  ┌─Wide─────────────────────┐" fg=7
+2:1 "│" fg=7
+2:2 "TypeError: cannot read properties of undefined" fg=1
+2:48 "│  │not drawn at this viewport│" fg=7
+3:1 "│" fg=7
+3:2 "at src/Notice.tsx:4:12" fg=1
+3:48 "│  └──────────────────────────┘" fg=7
+4:1 "└──────────────────────────────────────────────┘" fg=7

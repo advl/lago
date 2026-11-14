@@ -88,3 +88,4 @@ The pipeline is `.github/workflows/ci.yml`. Its gate job installs with the lockf
 - Vitest started from code prints to the terminal the gallery draws on unless it is given streams of its own, so the gallery gives it streams that keep nothing.
 - Vitest tells a reporter of a removed test file with `onTestRemoved` and runs nothing after, so the gallery's reporter drops that file's stories there.
 - A screenshot keeps no blank cell before a run's first drawn character, so a fixture's run starts where its text does.
+- A box's border shows its title only when the title fits between the corners, so a frame is made wide enough for its story's name.
