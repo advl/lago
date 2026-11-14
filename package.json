@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "description": "Stories for terminal interfaces drawn by OpenTUI: tested on every run, browsed in a terminal",
+  "type": "module",
   "author": {
     "email": "47156835+advl@users.noreply.github.com",
     "name": "advl"
@@ -21,13 +22,23 @@
   ],
   "scripts": {
     "build": "nx run-many -t build",
-    "check": "nx run-many -t check",
-    "check:fix": "nx run-many -t check:fix",
-    "ci": "nx run-many -t ci"
+    "check": "bun run check:repository && nx run-many -t check",
+    "check:biome": "cd scripts && biome check",
+    "check:biome:fix": "cd scripts && biome check --write",
+    "check:fix": "bun run check:biome:fix && nx run-many -t check:fix",
+    "check:leakage": "bun scripts/check-leakage.ts",
+    "check:repository": "bun run check:biome && bun run check:ts && bun run check:leakage",
+    "check:ts": "tsc --noEmit",
+    "ci": "bun run check:repository && nx run-many -t ci"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.5.15",
+    "@canonical/biome-config": "0.44.0",
+    "@canonical/typescript-config": "0.44.0",
+    "bun-types": "1.4.4",
     "lerna": "10.1.1",
-    "nx": "23.3.2"
+    "nx": "23.3.2",
+    "typescript": "7.0.2"
   },
   "engines": {
     "bun": ">=1.4.2"
