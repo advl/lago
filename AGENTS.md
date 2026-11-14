@@ -12,12 +12,14 @@ Instructions for whoever works on this repository. Everything here is true at th
 | `bun run build` | In every package, `tsc -p tsconfig.build.json`: modules under `dist/esm`, declarations under `dist/types`. |
 | `bun run check` | `check:repository`, then in every package: Biome's format and lint, then `tsc --noEmit`. |
 | `bun run check:fix` | Biome's formatting and safe fixes applied at the root and in every package, then the type check. |
-| `bun run check:repository` | The gates that read the whole repository: Biome and `tsc --noEmit` over `scripts/`, `check:leakage`. |
+| `bun run check:repository` | The gates that read the whole repository: Biome and `tsc --noEmit` over `scripts/`, `check:leakage`, `check:commits`. |
 | `bun run ci` | `check:repository`, then each package's `ci` target, which is made of its `build` and `check`. The one command the pipeline runs; run it before opening a pull request. |
 
 The pipeline is `.github/workflows/ci.yml`. Its gate job installs with the lockfile frozen and runs `bun run ci`, so what the pipeline enforces is decided in the manifests and not in the workflow. A second job runs `gitleaks` over the whole commit history, which is why its checkout is complete.
 
 `check:leakage` refuses any file a commit from this tree would contain that holds a home path, a local account or machine name, a personal e-mail address, a tracker or decision-record identifier, a session code, a path into a planning repository, or a word that places this code in relation to other code or marks it as unfinished; any markdown paragraph broken across lines; and any root entry, hidden directory or capitalised document the gate does not declare. Adding a root entry means declaring it in `scripts/check-leakage.ts` in the same commit. Before it scans, the gate runs every rule against an input built to break it, and fails if a rule stays silent.
+
+`check:commits` reads the subject of every commit reachable from `HEAD` and refuses one that is not a Conventional Commit with a known scope, runs past 72 characters, or does not open with a verb in the third person.
 
 ## Conventions
 
