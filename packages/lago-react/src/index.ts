@@ -1,10 +1,22 @@
 export type {
+  Annotations,
+  AnyComponent,
   Attribute,
   Color,
+  ComposedStories,
+  ComposedStory,
+  Decorator,
+  Meta,
+  Parameters,
+  PlayContext,
+  PropsOf,
   Run,
   Screen,
   Screenshot,
+  StoriesModule,
+  StoryContext,
+  StoryObj,
   UserEvent,
   Viewport,
 } from "./lib/index.js";
-export { render, waitFor } from "./lib/index.js";
+export { composeStories, render, waitFor } from "./lib/index.js";

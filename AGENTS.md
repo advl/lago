@@ -45,6 +45,7 @@ The pipeline is `.github/workflows/ci.yml`. Its gate job installs with the lockf
 - Tests run the renderer for real. Only the network, the file system outside a temporary folder, and timers are stood in for.
 - Coverage is a floor, not a target. Behaviour lands with the tests that pin it, and the fill comes after.
 - A package with components extends `@canonical/typescript-config-react` and takes its JSX runtime from `@opentui/react`, in `tsconfig.json` and in `vitest.config.ts`.
+- A stories file follows Component Story Format 3: the component imported as `Component`, `const meta = { … } satisfies Meta<typeof Component>`, and one named export per state with a documentation comment above it.
 - An implementation file exports one value, as its default, at its declaration, and is named after it. `types.ts` exports only types and `constants.ts` only named constants.
 - A folder's `index.ts` is a barrel of named re-exports reaching a file beside it or a child folder's `index.js`. No `export *`, and no `#` alias.
 - Each domain is a folder under `src/lib/`. Code inside a domain imports its siblings by file; code in another domain imports through the barrel.
