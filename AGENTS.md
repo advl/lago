@@ -13,7 +13,9 @@ Instructions for whoever works on this repository. Everything here is true at th
 | `bun run check` | `check:repository`, then in every package: Biome's format and lint, then `tsc --noEmit`. |
 | `bun run check:fix` | Biome's formatting and safe fixes applied at the root and in every package, then the type check. |
 | `bun run check:repository` | The gates that read the whole repository: Biome and `tsc --noEmit` over `scripts/`, `check:leakage`, `check:commits`. |
-| `bun run ci` | `check:repository`, then each package's `ci` target, which is made of its `build` and `check`. The one command the pipeline runs; run it before opening a pull request. |
+| `bun run test` | In every package, `vitest run` on the Bun runtime. |
+| `bun run test:coverage` | The same under v8 coverage, with a floor of 100% on statements, branches, functions and lines. |
+| `bun run ci` | `check:repository`, then each package's `ci` target, which is made of its `build`, `check` and `test:coverage`. The one command the pipeline runs; run it before opening a pull request. |
 
 The pipeline is `.github/workflows/ci.yml`. Its gate job installs with the lockfile frozen and runs `bun run ci`, so what the pipeline enforces is decided in the manifests and not in the workflow. A second job runs `gitleaks` over the whole commit history, which is why its checkout is complete.
 
@@ -34,6 +36,8 @@ The pipeline is `.github/workflows/ci.yml`. Its gate job installs with the lockf
 - Committed text describes this code as what it is: never in relation to other code it stands in for, and never as unfinished.
 - Markdown and commit bodies use one paragraph per line and are never hard-wrapped. Comments are code and wrap at the formatter's width.
 - A comment says why, in words a stranger can follow. Code that reads as what it does carries none.
+- Tests sit beside their source as `<name>.test.ts`, with a `describe` named for the export and `it` throughout. An `it` names what a caller can observe.
+- Coverage is a floor, not a target. Behaviour lands with the tests that pin it, and the fill comes after.
 
 ## Boundaries
 
@@ -43,4 +47,5 @@ The pipeline is `.github/workflows/ci.yml`. Its gate job installs with the lockf
 ## Gotchas
 
 - Nx before 23 cannot read the lockfile Bun 1.4 writes.
-- A package that imports another resolves it through the other's `dist`, so `check` builds a package's dependencies first.
+- A package that imports another resolves it through the other's `dist`, so `check` and the tests build a package's dependencies first.
+- Vitest's executable asks for Node. `bunx --bun` runs it on Bun, which is the runtime the packages are written for.
