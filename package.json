@@ -28,8 +28,10 @@
     "check:commits": "bun scripts/check-commits.ts --self-test && bun scripts/check-commits.ts",
     "check:fix": "bun run check:biome:fix && nx run-many -t check:fix",
     "check:leakage": "bun scripts/check-leakage.ts",
-    "check:repository": "bun run check:biome && bun run check:ts && bun run check:leakage && bun run check:commits",
+    "check:repository": "bun run check:biome && bun run check:ts && bun run check:leakage && bun run check:commits && bun run check:workspace && bun run check:structure",
+    "check:structure": "bun scripts/check-structure.ts --self-test && bun scripts/check-structure.ts",
     "check:ts": "tsc --noEmit",
+    "check:workspace": "bun scripts/check-workspace.ts --self-test && bun scripts/check-workspace.ts",
     "ci": "bun run check:repository && nx run-many -t ci",
     "test": "nx run-many -t test",
     "test:coverage": "nx run-many -t test:coverage"
@@ -41,6 +43,7 @@
     "bun-types": "1.4.4",
     "lerna": "10.1.1",
     "nx": "23.3.2",
+    "oxc-parser": "0.158.0",
     "typescript": "7.0.2"
   },
   "engines": {
