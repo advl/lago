@@ -57,6 +57,7 @@ The pipeline is `.github/workflows/ci.yml`. Its gate job installs with the lockf
 - `lerna.json` holds the one version every package shares.
 - The packages are published under `@aztlan`. A dependency between two of them points one way; never add one that closes a circle.
 - What a package publishes is its manifest's `exports` map and nothing beside it.
+- `@aztlan/lago-config` depends on `@aztlan/lago-react`, which is built first.
 
 ## Gotchas
 
@@ -76,5 +77,5 @@ The pipeline is `.github/workflows/ci.yml`. Its gate job installs with the lockf
 - The renderer reports an inverted cell with its two colours already exchanged, and the attribute kept.
 - Vitest keeps transformed modules between runs, keyed by their source. A plugin whose output depends on its options adds them to the key with `defineCacheKeyGenerator`, or a changed option is never seen.
 - In watch mode, an update of every snapshot reaches the tests and not the plugins, so whether a run updates is read in the test, from `expect.getState().snapshotState`.
-- Coverage counts every project in a run. `lago-react` counts its stories project on purpose, because those stories test the plugin.
+- Coverage counts every project in a run. `lago-react` counts its stories project on purpose, because those stories test the plugin; a project configured by `createConfig` measures its unit project alone.
 - A test that runs vitest in a scratch project gives it only `PATH`, `HOME`, `TMPDIR` and `LANG`, so no pipeline variable makes it a pipeline run, a `package.json` of type `module`, and a module cache inside the project.
