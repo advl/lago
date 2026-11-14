@@ -6,11 +6,16 @@ export type {
   HeldRuns,
   KeyCommand,
   LineRule,
+  ListBlock,
+  ListBlockKind,
+  ListPlacement,
   Run,
   Slot,
   Tokens,
   UseCommandsProps,
   UseCommandsResult,
+  UseListScrollProps,
+  UseListScrollResult,
 } from "./lib/index.js";
 export {
   createKeymap,
@@ -26,4 +31,5 @@ export {
   noBreakSpace,
   tokens,
   useCommands,
+  useListScroll,
 } from "./lib/index.js";

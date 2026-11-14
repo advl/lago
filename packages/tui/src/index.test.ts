@@ -16,6 +16,7 @@ describe("the package's entry", () => {
       "noBreakSpace",
       "tokens",
       "useCommands",
+      "useListScroll",
     ]);
   });
 });
