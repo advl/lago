@@ -1,0 +1,50 @@
+name: Version packages
+description: Bumps the shared version, writes the changelogs, then commits, tags and pushes the result.
+inputs:
+  release_type:
+    description: "'stable' graduates the version; any other value is the pre-release identifier to bump under."
+    required: true
+  tag_prefix:
+    description: "Prefix of the git tag."
+    required: false
+    default: "v"
+  force_publish:
+    description: "'true' bumps every package, changed or not."
+    required: false
+    default: "false"
+outputs:
+  VERSION:
+    description: "The version every package now shares."
+    value: ${{ steps.lerna_version.outputs.VERSION }}
+runs:
+  using: composite
+  steps:
+    - name: Version packages and write changelogs
+      shell: bash
+      id: lerna_version
+      run: ${{ github.action_path }}/version.sh ${{ inputs.release_type }} ${{ inputs.tag_prefix }} ${{ inputs.force_publish }}
+
+      # Lerna changes the manifests' versions and the ranges between siblings
+      # but leaves bun.lock as it was. One install records the new versions and
+      # a second the new ranges: with only one, the lockfile at the tag is not
+      # the one a frozen install would accept.
+    - name: Update the lockfile
+      shell: bash
+      run: |
+        bun install --ignore-scripts
+        bun install --ignore-scripts
+
+      # Lerna writes the manifests in its own layout, which the formatter
+      # then refuses.
+    - name: Format what Lerna wrote
+      shell: bash
+      run: bun run check:fix
+
+    - name: Setup Git CLI
+      uses: ./.github/actions/setup-git
+      with:
+        name: ${{ github.actor }}
+
+    - name: Commit and tag v${{ steps.lerna_version.outputs.VERSION }}
+      shell: bash
+      run: ${{ github.action_path }}/git-commit.sh ${{ inputs.tag_prefix }}${{ steps.lerna_version.outputs.VERSION }}
