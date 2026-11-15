@@ -11,6 +11,9 @@
       "import": "./dist/esm/index.js"
     }
   },
+  "bin": {
+    "lago": "./dist/esm/bin.js"
+  },
   "files": [
     "dist"
   ],
@@ -48,7 +51,7 @@
     "@aztlan/lago-config": "0.0.0",
     "@biomejs/biome": "2.5.15",
     "@canonical/biome-config": "0.44.0",
-    "@canonical/typescript-config": "0.44.0",
+    "@canonical/typescript-config-react": "0.45.0",
     "@canonical/webarchitect": "0.44.0",
     "@opentui/core": "0.8.4",
     "@opentui/keymap": "0.8.4",

@@ -1,11 +1,19 @@
 {
-  "extends": "@canonical/typescript-config",
+  "extends": "@canonical/typescript-config-react",
   "compilerOptions": {
     "types": ["bun-types"],
-    // The renderer's own declarations, which the stories' declarations
-    // reach, do not type-check, against themselves or against React's. This
-    // skips declaration files only.
+    // The gallery is drawn through the renderer's React reconciler, so JSX
+    // takes its runtime from there.
+    "jsxImportSource": "@opentui/react",
+    // The renderer's own declarations do not type-check, against themselves
+    // or against React's. This skips declaration files only.
     "skipLibCheck": true
   },
-  "include": ["src/**/*.ts", "testing/**/*.ts", "vitest.config.ts"]
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "testing/**/*.ts",
+    "testing/**/*.tsx",
+    "vitest.config.ts"
+  ]
 }

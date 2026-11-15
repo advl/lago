@@ -1,0 +1,47 @@
+80x24
+|project                                         at terminal · as the room allows
+|
+|Move ───────────────────────────────────────────────────────────────────────────
+|  ↑ ↓  k j scroll the help
+|  ← →  h l choose a story beside
+|  ⏎        open the component's stories
+|  esc      leave the help
+|
+|Find ───────────────────────────────────────────────────────────────────────────
+|  /        filter the components
+|  n N      next or previous match
+|  ⏎        keep what is typed
+|  backspace erase the last character
+|
+|Picture ────────────────────────────────────────────────────────────────────────
+|  p        show the next viewport
+|  v        set the stories as the room allows, in rows, or side by side
+|  d        show the golden over the picture
+|  c        read the cells under a cursor
+|  A        accept the picture as its golden
+|
+|App ────────────────────────────────────────────────────────────────────────────
+|  ?        close the help
+|  ↓ 1 below
+
+1:1 "project                                         at terminal ·"
+1:63 "as the room allows" fg=7
+3:1 "Move ───────────────────────────────────────────────────────────────────────────"
+4:3 "↑ ↓  k j scroll the help"
+5:3 "← →  h l choose a story beside"
+6:3 "⏎        open the component's stories"
+7:3 "esc      leave the help"
+9:1 "Find ───────────────────────────────────────────────────────────────────────────"
+10:3 "/        filter the components"
+11:3 "n N      next or previous match"
+12:3 "⏎        keep what is typed"
+13:3 "backspace erase the last character"
+15:1 "Picture ────────────────────────────────────────────────────────────────────────"
+16:3 "p        show the next viewport"
+17:3 "v        set the stories as the room allows, in rows, or side by side"
+18:3 "d        show the golden over the picture"
+19:3 "c        read the cells under a cursor"
+20:3 "A        accept the picture as its golden"
+22:1 "App ────────────────────────────────────────────────────────────────────────────"
+23:3 "?        close the help"
+24:3 "↓ 1 below" fg=7
