@@ -41,7 +41,10 @@ The pipeline is `.github/workflows/ci.yml`. Its gate job installs with the lockf
 - Markdown and commit bodies use one paragraph per line and are never hard-wrapped. Comments are code and wrap at the formatter's width.
 - A comment says why, in words a stranger can follow. Code that reads as what it does carries none.
 - Tests sit beside their source as `<name>.test.ts`, with a `describe` named for the export and `it` throughout. An `it` names what a caller can observe.
+- Fixtures that a package's tests share live in `testing/` at the package's root, outside what is built.
+- Tests run the renderer for real. Only the network, the file system outside a temporary folder, and timers are stood in for.
 - Coverage is a floor, not a target. Behaviour lands with the tests that pin it, and the fill comes after.
+- A package with components extends `@canonical/typescript-config-react` and takes its JSX runtime from `@opentui/react`, in `tsconfig.json` and in `vitest.config.ts`.
 - An implementation file exports one value, as its default, at its declaration, and is named after it. `types.ts` exports only types and `constants.ts` only named constants.
 - A folder's `index.ts` is a barrel of named re-exports reaching a file beside it or a child folder's `index.js`. No `export *`, and no `#` alias.
 - Each domain is a folder under `src/lib/`. Code inside a domain imports its siblings by file; code in another domain imports through the barrel.
@@ -59,3 +62,13 @@ The pipeline is `.github/workflows/ci.yml`. Its gate job installs with the lockf
 - A package that imports another resolves it through the other's `dist`, so `check` and the tests build a package's dependencies first.
 - Vitest's executable asks for Node. `bunx --bun` runs it on Bun, which is the runtime the packages are written for.
 - `webarchitect`'s `library` rules assume a `@canonical/` name and the LGPL-3.0 licence. Both are overridden by flag, not by a local copy of the rules.
+- Vitest must load the renderer's Bun build, which `ssr.resolve.conditions` in `vitest.config.ts` asks for. With two builds loaded, an object made by one is not recognised by the other.
+- The renderer's own declarations do not type-check, against themselves or against React's. `skipLibCheck` skips declaration files only.
+- The renderer's own `flush` waits on a timer, so it never returns while timers are faked. A screen settles by asking the scheduler's state and drawing on demand.
+- React's `act` waits on `setImmediate`. A test fakes the timers a component uses, the clock and the high-resolution clock among them, and leaves that one real, which `fakeTimers.toFake` in `vitest.config.ts` sets for every test.
+- React warns about an update outside `act` whenever `IS_REACT_ACT_ENVIRONMENT` is set, as when a timer a test moved sets state, so it is set for the length of `act` alone.
+- Ctrl+C closes a renderer unless it is made with `exitOnCtrlC: false`.
+- In the renderer's default key mode a lone Escape waits on a timer and joins the next key, and most modifiers are lost. A renderer made with `kittyKeyboard: true` sends every key at once, with its modifiers.
+- The renderer wraps every tree in a boundary that draws a caught error's stack as text. `render` mounts the component inside a boundary of its own, so a test fails with the error instead of drawing it.
+- Text given no colour is drawn in fixed white, not in the terminal's own colour.
+- The renderer reports an inverted cell with its two colours already exchanged, and the attribute kept.

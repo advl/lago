@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 describe("the package's entry", () => {
-  it("loads", async () => {
-    expect(await import("./index.js")).toBeDefined();
+  it("exports the values a test imports, and no other", async () => {
+    expect(Object.keys(await import("./index.js")).sort()).toEqual([
+      "render",
+      "waitFor",
+    ]);
   });
 });
