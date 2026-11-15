@@ -45,6 +45,8 @@ The pipeline is `.github/workflows/ci.yml`. Its gate job installs with the lockf
 - Tests run the renderer for real. Only the network, the file system outside a temporary folder, and timers are stood in for.
 - Coverage is a floor, not a target. Behaviour lands with the tests that pin it, and the fill comes after.
 - A package with components extends `@canonical/typescript-config-react` and takes its JSX runtime from `@opentui/react`, in `tsconfig.json` and in `vitest.config.ts`.
+- A stories file follows Component Story Format 3: the component imported as `Component`, `const meta = { … } satisfies Meta<typeof Component>`, and one named export per state with a documentation comment above it.
+- A story's picture is kept beside its stories file as `__goldens__/<file>.<Story>.<viewport>.golden`. A run on a person's machine writes a golden that is missing, and a pipeline fails for it; `-u` rewrites every golden and removes those no story owns. A changed golden is reviewed in the diff like code.
 - An implementation file exports one value, as its default, at its declaration, and is named after it. `types.ts` exports only types and `constants.ts` only named constants.
 - A folder's `index.ts` is a barrel of named re-exports reaching a file beside it or a child folder's `index.js`. No `export *`, and no `#` alias.
 - Each domain is a folder under `src/lib/`. Code inside a domain imports its siblings by file; code in another domain imports through the barrel.
@@ -55,6 +57,7 @@ The pipeline is `.github/workflows/ci.yml`. Its gate job installs with the lockf
 - `lerna.json` holds the one version every package shares.
 - The packages are published under `@aztlan`. A dependency between two of them points one way; never add one that closes a circle.
 - What a package publishes is its manifest's `exports` map and nothing beside it.
+- `@aztlan/lago-config` depends on `@aztlan/lago-react`, which is built first.
 
 ## Gotchas
 
@@ -72,3 +75,7 @@ The pipeline is `.github/workflows/ci.yml`. Its gate job installs with the lockf
 - The renderer wraps every tree in a boundary that draws a caught error's stack as text. `render` mounts the component inside a boundary of its own, so a test fails with the error instead of drawing it.
 - Text given no colour is drawn in fixed white, not in the terminal's own colour.
 - The renderer reports an inverted cell with its two colours already exchanged, and the attribute kept.
+- Vitest keeps transformed modules between runs, keyed by their source. A plugin whose output depends on its options adds them to the key with `defineCacheKeyGenerator`, or a changed option is never seen.
+- In watch mode, an update of every snapshot reaches the tests and not the plugins, so whether a run updates is read in the test, from `expect.getState().snapshotState`.
+- Coverage counts every project in a run. `lago-react` counts its stories project on purpose, because those stories test the plugin; a project configured by `createConfig` measures its unit project alone.
+- A test that runs vitest in a scratch project gives it only `PATH`, `HOME`, `TMPDIR` and `LANG`, so no pipeline variable makes it a pipeline run, a `package.json` of type `module`, and a module cache inside the project.

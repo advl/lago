@@ -1,0 +1,5 @@
+24x4
+|apples 4
+
+1:1 "apples" fg=4 bold
+1:8 "4" fg=4

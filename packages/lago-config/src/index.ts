@@ -1,2 +1,2 @@
-/** The vitest configuration a project with OpenTUI components and Lago stories needs. */
-export {};
+export type { Options } from "./lib/index.js";
+export { createConfig } from "./lib/index.js";

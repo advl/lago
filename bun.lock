@@ -32,20 +32,32 @@
     "packages/lago-config": {
       "name": "@aztlan/lago-config",
       "version": "0.0.0",
+      "dependencies": {
+        "@aztlan/lago-react": "0.0.0",
+      },
       "devDependencies": {
         "@biomejs/biome": "2.5.15",
         "@canonical/biome-config": "0.44.0",
         "@canonical/typescript-config": "0.44.0",
         "@canonical/webarchitect": "0.44.0",
+        "@opentui/core": "0.8.4",
+        "@opentui/react": "0.8.4",
         "@vitest/coverage-v8": "5.1.0",
         "bun-types": "1.4.4",
+        "react": "19.3.1",
         "typescript": "7.0.2",
         "vitest": "5.1.0",
+      },
+      "peerDependencies": {
+        "vitest": ">=5.0.0 <6.0.0",
       },
     },
     "packages/lago-react": {
       "name": "@aztlan/lago-react",
       "version": "0.0.0",
+      "dependencies": {
+        "oxc-parser": "0.158.0",
+      },
       "devDependencies": {
         "@biomejs/biome": "2.5.15",
         "@canonical/biome-config": "0.44.0",
