@@ -3,7 +3,7 @@ on:
   push:
     branches: [main]
   # No base-branch filter. A filter here matches the branch a pull request
-  # targets, so one opened against another branch, which is what every rung of
+  # targets, so one opened against another branch, as each pull request in
   # a stack is, would run nothing. A change is gated because it is a change.
   pull_request:
 
