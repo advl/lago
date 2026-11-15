@@ -1,0 +1,85 @@
+import { composeStories } from "@aztlan/lago-react";
+import { describe, expect, it } from "vitest";
+import draw from "../../../../testing/draw.js";
+import readColor from "../../../../testing/readColor.js";
+import readLook from "../../../../testing/readLook.js";
+import { tokens } from "../../tokens/index.js";
+import * as stories from "./Pane.stories.js";
+
+// Each story draws its lines at the size of the screen it is drawn on.
+const { Help, NoCounts, NothingOwed } = composeStories(stories);
+
+describe("Pane", () => {
+  it("draws the header, the list region, the counts, the status and the keys at 40 columns", async () => {
+    const screen = await draw(<NothingOwed />, 40, 8);
+    expect(screen.lines).toEqual([
+      "owed",
+      "",
+      "  nothing owed",
+      "",
+      "",
+      "0 over · 0 soon · 0 on track",
+      "synced 2m ago",
+      "←→ mode ↑↓ sel g grp ?",
+    ]);
+    expect(readLook(screen, "nothing owed")?.bg).toBe(
+      readColor(tokens["color.background"]),
+    );
+  });
+
+  it("gives the list region every line the terminal adds, at 60 columns", async () => {
+    const screen = await draw(<NothingOwed />, 60, 10);
+    expect(screen.lines.at(2)).toBe("  nothing owed");
+    expect(screen.lines.slice(7)).toEqual([
+      "0 over · 0 soon · 0 on track",
+      "synced 2m ago",
+      "←→ mode ↑↓ sel g grp ?",
+    ]);
+  });
+
+  it("keeps the counts line's place blank when there is none", async () => {
+    const screen = await draw(<NoCounts />, 40, 8);
+    expect(screen.lines.slice(5)).toEqual([
+      "",
+      "synced 2m ago",
+      "←→ mode ↑↓ sel g grp ?",
+    ]);
+  });
+
+  it("gives the help everything under the header", async () => {
+    const screen = await draw(<Help />, 40, 36);
+    expect(screen.lines.slice(0, 3)).toEqual([
+      "help",
+      "",
+      `Mode ${"─".repeat(35)}`,
+    ]);
+    expect(screen.lines).not.toContain("←→ mode ↑↓ sel g grp ?");
+    expect(screen.lines).not.toContain("synced 2m ago");
+  });
+
+  it("shows only the one line below 40 columns, and the screen again once wide enough", async () => {
+    const screen = await draw(<NothingOwed />, 39, 8);
+    expect(screen.lines.filter(Boolean)).toEqual(["the tool needs 40 columns"]);
+    const narrow = await draw(<NothingOwed />, 12, 8);
+    expect(narrow.lines.filter(Boolean)).toEqual([
+      "the tool",
+      "needs 40",
+      "columns",
+    ]);
+    const wide = await draw(<NothingOwed />, 40, 8);
+    expect(wide.lines.at(0)).toBe("owed");
+  });
+
+  it("shows only the one line below 8 lines, the width first, and the screen again once tall enough", async () => {
+    const short = await draw(<NothingOwed />, 40, 7);
+    expect(short.lines.filter(Boolean)).toEqual(["the tool needs 8 lines"]);
+    const narrow = await draw(<NothingOwed />, 12, 3);
+    expect(narrow.lines.filter(Boolean)).toEqual([
+      "the tool",
+      "needs 40",
+      "columns",
+    ]);
+    const tall = await draw(<NothingOwed />, 40, 8);
+    expect(tall.lines.at(0)).toBe("owed");
+  });
+});

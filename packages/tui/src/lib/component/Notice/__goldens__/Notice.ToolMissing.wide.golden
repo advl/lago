@@ -1,0 +1,8 @@
+60x36
+|  ✗ the tool needs git
+|  Recovery: install it from https://git.example.com, then
+|  run git init
+
+1:3 "✗ the tool needs git" fg=1
+2:3 "Recovery: install it from https://git.example.com, then"
+3:3 "run git init"

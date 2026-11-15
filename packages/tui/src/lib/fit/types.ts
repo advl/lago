@@ -1,3 +1,5 @@
+import type { ColorInput } from "@opentui/core";
+
 /**
  * Where a field is drawn: `line`, one line such as a row's, a heading or a
  * status line; or `block`, a place with room to wrap, such as a notice or
@@ -44,4 +46,11 @@ export interface Field {
 export interface Run {
   readonly text: string;
   readonly marked?: boolean;
+}
+
+/** A run of a line's text, in its own colour and, when it has one, attribute. */
+export interface Piece extends Run {
+  readonly fg: ColorInput;
+  /** The renderer's text attribute, such as bold. */
+  readonly attributes?: number;
 }
