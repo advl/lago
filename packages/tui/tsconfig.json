@@ -1,7 +1,14 @@
 {
-  "extends": "@canonical/typescript-config",
+  "extends": "@canonical/typescript-config-react",
   "compilerOptions": {
-    "types": ["bun-types"]
+    "types": ["bun-types"],
+    // The components are drawn through the renderer's React reconciler, so
+    // JSX takes its runtime from there.
+    "jsxImportSource": "@opentui/react",
+    // The renderer's own declarations do not type-check, against themselves
+    // or against React's. This skips declaration files only: every source
+    // file here is still checked in full.
+    "skipLibCheck": true
   },
-  "include": ["src/**/*.ts", "vitest.config.ts"]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "vitest.config.ts"]
 }
