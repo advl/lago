@@ -1,0 +1,35 @@
+name: Setup environment
+description: Installs Bun and Node, restores Bun's download cache, and installs the workspace with the lockfile frozen.
+inputs:
+  node-version:
+    # The task runner, the compiler and Lerna are Node programs. Publishing
+    # over OIDC needs npm 11.5.1 or later, which Node 24 carries.
+    default: "22"
+    description: Version of Node to use
+runs:
+  using: composite
+  steps:
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+      with:
+        bun-version: "1.4.4"
+
+    - name: Setup Node
+      uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+      with:
+        node-version: ${{ inputs.node-version }}
+        registry-url: https://registry.npmjs.org
+
+    # Only the download cache is restored: the install then copies from it,
+    # and a changed lockfile fetches what changed.
+    - name: Cache Bun's downloads
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
+      with:
+        path: ~/.bun/install/cache
+        key: bun-cache-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+        restore-keys: |
+          bun-cache-${{ runner.os }}-
+
+    - name: Install dependencies
+      shell: bash
+      run: bun install --frozen-lockfile

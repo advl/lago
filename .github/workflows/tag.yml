@@ -1,0 +1,126 @@
+name: Update package versions
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: "Release type. Any value but 'stable' bumps the current version as a pre-release under that identifier."
+        default: "rc"
+        required: false
+        type: choice
+        options:
+          - "experimental"
+          - "alpha"
+          - "beta"
+          - "rc"
+          - "stable"
+      force_publish:
+        description: "Bump and publish every package, changed or not. Use to release again after a failed publish when nothing changed since the stranded tag."
+        default: false
+        required: false
+        type: boolean
+      publish_version:
+        description: "Recovery only: publish this existing release (such as 0.1.0, no 'v') without building a new version. Leave empty for a normal release."
+        default: ""
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    name: Gate
+    # A publish-only recovery skips the whole bump: the version job needs this
+    # one, so skipping it skips them both.
+    if: inputs.publish_version == ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Refuse any branch but main
+        if: github.ref != 'refs/heads/main'
+        run: |
+          echo "A release runs from main only (got '${{ github.ref }}')."
+          exit 1
+
+      # The whole history, because the gate reads every commit's subject.
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+
+      - name: Setup environment
+        uses: ./.github/actions/setup-env
+
+      - name: Gate
+        run: bun run ci
+
+  version:
+    name: Bump package versions
+    runs-on: ubuntu-latest
+    needs: gate
+    outputs:
+      VERSION: ${{ steps.lerna_version.outputs.VERSION }}
+    steps:
+      # The deploy key pushes the version commit and its tag to main, which
+      # the branch's rules let it do without a pull request.
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ssh-key: ${{ secrets.DEPLOY_KEY }}
+          fetch-depth: 0
+
+      - name: Setup environment
+        uses: ./.github/actions/setup-env
+
+      - name: Bump package versions, commit, tag, and push to Git
+        id: lerna_version
+        uses: ./.github/actions/lerna-version
+        with:
+          release_type: ${{ inputs.release_type }}
+          force_publish: ${{ inputs.force_publish }}
+
+  publish:
+    name: Publish packages
+    runs-on: ubuntu-latest
+    needs: version
+    # Runs after a successful bump, or alone to publish an existing tag that a
+    # failed publish left behind; `from-package` makes either case safe to run
+    # again. The recovery lives in this workflow and not one of its own because
+    # npm's trusted publisher is bound to this file's name.
+    if: ${{ !cancelled() && (needs.version.result == 'success' || inputs.publish_version != '') }}
+    env:
+      VERSION: ${{ inputs.publish_version || needs.version.outputs.VERSION }}
+    # OIDC trusted publishing: GitHub mints a short-lived token that npm
+    # exchanges for the right to publish, so no npm token is stored, and npm
+    # signs the provenance of each package. contents:write lets the job create
+    # the GitHub Release for the tag.
+    permissions:
+      id-token: write
+      contents: write
+    steps:
+      - name: Checkout the release tag
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: v${{ env.VERSION }}
+          fetch-depth: 0
+
+      - name: Setup environment
+        uses: ./.github/actions/setup-env
+        with:
+          node-version: "24"
+
+      # A package publishes its `dist`, which is never committed.
+      - name: Build packages
+        run: bun run build
+
+      - name: Publish packages
+        uses: ./.github/actions/npm-publish
+        with:
+          version: ${{ env.VERSION }}
+
+      - name: Create GitHub Release
+        uses: ./.github/actions/github-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        with:
+          version: ${{ env.VERSION }}

@@ -1,0 +1,18 @@
+name: Setup Git CLI
+description: Names the committer of the version commit.
+inputs:
+  name:
+    required: true
+    description: Git username
+  email:
+    required: false
+    description: Git e-mail
+    default: "47156835+advl@users.noreply.github.com"
+runs:
+  using: composite
+  steps:
+    - name: Configure the committer
+      shell: bash
+      run: |
+        git config --global user.email "${{ inputs.email }}"
+        git config --global user.name "${{ inputs.name }}"
