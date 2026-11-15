@@ -1,18 +1,11 @@
-import { defineConfig } from "vitest/config";
+import { createConfig } from "@aztlan/lago-config";
 
-export default defineConfig({
-  test: {
-    include: ["src/**/*.test.ts"],
-    coverage: {
-      provider: "v8",
-      include: ["src/**/*.ts"],
-      exclude: ["**/index.ts", "**/*.test.ts", "**/*.d.ts", "**/types.ts"],
-      thresholds: {
-        statements: 100,
-        branches: 100,
-        functions: 100,
-        lines: 100,
-      },
-    },
+// The gallery's own screens are tested as any project's would be: by Lago,
+// configured by Lago's one function, at the size the gallery needs.
+export default createConfig({
+  viewports: {
+    terminal: { cols: 80, rows: 24 },
+    wide: { cols: 120, rows: 30 },
   },
+  coverage: true,
 });
