@@ -19,16 +19,16 @@
     },
     "packages/lago": {
       "name": "@aztlan/lago",
-      "version": "0.1.0-rc.0",
+      "version": "0.1.0-rc.1",
       "bin": {
         "lago": "./dist/esm/bin.js",
       },
       "dependencies": {
-        "@aztlan/lago-react": "0.1.0-rc.0",
-        "@aztlan/tui": "0.1.0-rc.0",
+        "@aztlan/lago-react": "^0.1.0-rc.1",
+        "@aztlan/tui": "^0.1.0-rc.1",
       },
       "devDependencies": {
-        "@aztlan/lago-config": "0.1.0-rc.0",
+        "@aztlan/lago-config": "^0.1.0-rc.1",
         "@biomejs/biome": "2.5.15",
         "@canonical/biome-config": "0.44.0",
         "@canonical/typescript-config-react": "0.45.0",
@@ -53,9 +53,9 @@
     },
     "packages/lago-config": {
       "name": "@aztlan/lago-config",
-      "version": "0.1.0-rc.0",
+      "version": "0.1.0-rc.1",
       "dependencies": {
-        "@aztlan/lago-react": "0.1.0-rc.0",
+        "@aztlan/lago-react": "^0.1.0-rc.1",
       },
       "devDependencies": {
         "@biomejs/biome": "2.5.15",
@@ -76,7 +76,7 @@
     },
     "packages/lago-react": {
       "name": "@aztlan/lago-react",
-      "version": "0.1.0-rc.0",
+      "version": "0.1.0-rc.1",
       "dependencies": {
         "oxc-parser": "0.158.0",
       },
@@ -104,10 +104,10 @@
     },
     "packages/tui": {
       "name": "@aztlan/tui",
-      "version": "0.1.0-rc.0",
+      "version": "0.1.0-rc.1",
       "devDependencies": {
-        "@aztlan/lago-config": "0.1.0-rc.0",
-        "@aztlan/lago-react": "0.1.0-rc.0",
+        "@aztlan/lago-config": "^0.1.0-rc.1",
+        "@aztlan/lago-react": "^0.1.0-rc.1",
         "@biomejs/biome": "2.5.15",
         "@canonical/biome-config": "0.44.0",
         "@canonical/typescript-config-react": "0.45.0",

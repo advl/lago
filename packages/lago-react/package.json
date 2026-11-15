@@ -1,7 +1,7 @@
 {
   "name": "@aztlan/lago-react",
   "description": "Stories for React components drawn by OpenTUI, tested on every run",
-  "version": "0.1.0-rc.0",
+  "version": "0.1.0-rc.1",
   "type": "module",
   "module": "dist/esm/index.js",
   "types": "dist/types/index.d.ts",
