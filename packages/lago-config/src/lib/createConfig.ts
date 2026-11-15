@@ -1,6 +1,6 @@
 import { testStories } from "@aztlan/lago-react/vitest";
 import type { ViteUserConfig } from "vitest/config";
-import { fakedTimers } from "./constants.js";
+import { fakedTimers, sharedPackages } from "./constants.js";
 import coverUnitsOnly from "./coverUnitsOnly.js";
 import type { Options } from "./types.js";
 
@@ -11,6 +11,8 @@ import type { Options } from "./types.js";
  *
  * It holds: JSX compiled against the renderer's React reconciler; the
  * renderer's Bun build, so that vitest and the runtime load the same classes;
+ * one copy of React and of the renderer, the project's, even for a Lago
+ * package linked from a checkout;
  * a `unit` project over the tests under `src/` and a `stories` project over
  * the stories files there; the plugin that makes each story a test; the
  * timers a test fakes; and, when asked, the coverage settings, which a run
@@ -27,7 +29,12 @@ export default function createConfig({
     // Bun build for what vitest leaves to it, so the files vitest reads take
     // it too: an object made by one build is not recognised by the other.
     ssr: { resolve: { conditions: ["bun"] } },
+    // Lago's own packages are read by vitest, so their imports of React and
+    // the renderer resolve from the project, to the project's one copy, even
+    // when a package is linked from a checkout of Lago.
+    resolve: { dedupe: [...sharedPackages] },
     test: {
+      server: { deps: { inline: [/^@aztlan\//] } },
       fakeTimers: { toFake: [...fakedTimers] },
       // Stories are a project of their own, so a run can leave them out, as
       // one that measures the unit tests' coverage does.

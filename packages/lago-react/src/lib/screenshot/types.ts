@@ -5,6 +5,7 @@
  */
 export type Color = "default" | number | `#${string}`;
 
+/** A text attribute a run is drawn with, by its name. */
 export type Attribute =
   | "blink"
   | "bold"

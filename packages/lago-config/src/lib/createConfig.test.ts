@@ -11,6 +11,18 @@ describe("createConfig", () => {
     });
   });
 
+  it("resolves React and the renderer to the project's one copy, Lago's packages included", () => {
+    const config = createConfig({ viewports });
+    expect(config.resolve?.dedupe).toEqual([
+      "react",
+      "react-reconciler",
+      "@opentui/core",
+      "@opentui/react",
+      "@opentui/keymap",
+    ]);
+    expect(config.test?.server?.deps?.inline).toEqual([/^@aztlan\//]);
+  });
+
   it("installs the plugin that makes each story a test, with the viewports", () => {
     const { plugins } = createConfig({ viewports });
     expect(plugins).toMatchObject([

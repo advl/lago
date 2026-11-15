@@ -85,6 +85,7 @@ const ROOT_ENTRIES = new Set([
   "LICENSE",
   "README.md",
   "bun.lock",
+  "docs",
   "lerna.json",
   "nx.json",
   "package.json",
@@ -131,6 +132,14 @@ const REPOSITORY_DOCUMENTS = new Set([
 ]);
 
 const SHOUTING_STEM = /^[A-Z][A-Z0-9_]{2,}$/;
+
+/**
+ * Where a skill is declared: a package ships each of its skills as
+ * `skills/<name>/SKILL.md`, the form agent harnesses read, and it is a
+ * deliverable like the package's code. Anywhere else the same name is a
+ * dropped-in instruction file, and refused.
+ */
+const SHIPPED_SKILL = /^packages\/[^/]+\/skills\/[^/]+\/SKILL\.md$/;
 
 const EMAIL = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g;
 
@@ -267,14 +276,16 @@ const NOT_PROSE = /^\s*(?:#{1,6}\s|[-*+]\s|\d+[.)]\s|\|)/;
  * Every second line of a paragraph broken across lines, in a markdown
  * document. Blank lines, headings, list items, table rows and fenced code
  * end a paragraph; anything else that follows a line of paragraph text is a
- * wrap.
+ * wrap. A document's front matter, the fields between its opening `---`
+ * lines that a skill's form requires, is data and not prose.
  */
 const wrappedParagraphs = (text: string): string[] => {
   const found: string[] = [];
   let fenced = false;
   let previousWasProse = false;
   const lines = text.split("\n");
-  for (let index = 0; index < lines.length; index += 1) {
+  const frontMatterEnd = lines[0] === "---" ? lines.indexOf("---", 1) : -1;
+  for (let index = frontMatterEnd + 1; index < lines.length; index += 1) {
     const line = lines[index] ?? "";
     if (FENCE.test(line)) {
       fenced = !fenced;
@@ -468,11 +479,16 @@ const pathRules: PathRule[] = [
       const addressesTheReader =
         SHOUTING_STEM.test(stem) &&
         (extensions.length === 0 || extensions.at(-1) === "md");
-      return addressesTheReader && !REPOSITORY_DOCUMENTS.has(base)
+      return addressesTheReader &&
+        !REPOSITORY_DOCUMENTS.has(base) &&
+        !SHIPPED_SKILL.test(file)
         ? [base]
         : [];
     },
-    probes: [["ZZZ", "md"].join(".")],
+    probes: [
+      ["ZZZ", "md"].join("."),
+      ["packages", "lago", ["SKILL", "md"].join(".")].join("/"),
+    ],
   },
 ];
 

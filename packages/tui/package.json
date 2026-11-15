@@ -1,7 +1,7 @@
 {
   "name": "@aztlan/tui",
   "description": "Terminal components for applications drawn by OpenTUI",
-  "version": "0.0.0",
+  "version": "0.1.0-rc.0",
   "type": "module",
   "module": "dist/esm/index.js",
   "types": "dist/types/index.d.ts",
@@ -21,7 +21,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/advl/lago",
+    "url": "git+https://github.com/advl/lago.git",
     "directory": "packages/tui"
   },
   "license": "MIT",
@@ -41,8 +41,8 @@
     "check:webarchitect": "webarchitect library --license MIT --prefix '@aztlan/'"
   },
   "devDependencies": {
-    "@aztlan/lago-config": "0.0.0",
-    "@aztlan/lago-react": "0.0.0",
+    "@aztlan/lago-config": "0.1.0-rc.0",
+    "@aztlan/lago-react": "0.1.0-rc.0",
     "@biomejs/biome": "2.5.15",
     "@canonical/biome-config": "0.44.0",
     "@canonical/typescript-config-react": "0.45.0",
