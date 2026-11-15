@@ -1,0 +1,52 @@
+# Separate from ci.yml on purpose: editing a pull request's title must not
+# start a build, and this needs neither a checkout nor an install.
+name: PR Lint
+# `synchronize` re-answers a question only `opened` and `edited` can change.
+# It is kept because a required check is recorded against the head commit, and
+# without it the check would be missing on the commit that is merged.
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened
+permissions:
+  pull-requests: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-pr-metadata:
+    name: Validate PR metadata
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # The title is what lands on main: merges are squash-only and take the
+      # pull request's title as the commit's subject.
+      - name: Verify the title is a conventional commit with a known scope
+        uses: amannn/action-semantic-pull-request@v6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          requireScope: true
+          scopes: |
+            lago-react
+            lago-config
+            tui
+            lago
+            monorepo
+            deps
+            ci
+
+      # The title reaches the shell as a variable and never as script text.
+      - name: Verify the title is under 72 characters
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          if [ "${#TITLE}" -gt 72 ]; then
+            echo "The title is ${#TITLE} characters long; a commit subject stays under 72."
+            exit 1
+          fi

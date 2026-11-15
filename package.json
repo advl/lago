@@ -1,0 +1,61 @@
+{
+  "name": "lago",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Stories for terminal interfaces drawn by OpenTUI: tested on every run, browsed in a terminal",
+  "type": "module",
+  "author": {
+    "email": "47156835+advl@users.noreply.github.com",
+    "name": "advl"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/advl/lago"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/advl/lago/issues"
+  },
+  "homepage": "https://github.com/advl/lago#readme",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "nx run-many -t build",
+    "check": "bun run check:repository && nx run-many -t check",
+    "check:audit": "bun scripts/check-audit.ts --self-test && bun scripts/check-audit.ts",
+    "check:biome": "cd scripts && biome check",
+    "check:biome:fix": "cd scripts && biome check --write",
+    "check:commits": "bun scripts/check-commits.ts --self-test && bun scripts/check-commits.ts",
+    "check:fix": "bun run check:biome:fix && nx run-many -t check:fix",
+    "check:leakage": "bun scripts/check-leakage.ts",
+    "check:licences": "bun scripts/check-licences.ts --self-test && bun scripts/check-licences.ts",
+    "check:repository": "bun run check:biome && bun run check:ts && bun run check:leakage && bun run check:commits && bun run check:workspace && bun run check:structure && bun run check:audit && bun run check:licences",
+    "check:structure": "bun scripts/check-structure.ts --self-test && bun scripts/check-structure.ts",
+    "check:ts": "tsc --noEmit",
+    "check:workspace": "bun scripts/check-workspace.ts --self-test && bun scripts/check-workspace.ts",
+    "ci": "bun run check:repository && nx run-many -t ci",
+    "test": "nx run-many -t test",
+    "test:coverage": "nx run-many -t test:coverage"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.15",
+    "@canonical/biome-config": "0.44.0",
+    "@canonical/typescript-config": "0.44.0",
+    "bun-types": "1.4.4",
+    "lerna": "10.1.1",
+    "nx": "23.3.2",
+    "oxc-parser": "0.158.0",
+    "typescript": "7.0.2"
+  },
+  "engines": {
+    "bun": ">=1.4.2"
+  },
+  "overrides": {
+    "brace-expansion": "5.0.12",
+    "glob": "14.0.6",
+    "js-yaml": "4.3.2",
+    "minimatch": "11.0.8",
+    "undici": "7.30.1"
+  }
+}

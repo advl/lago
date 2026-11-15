@@ -1,0 +1,86 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  # No base-branch filter. A filter here matches the branch a pull request
+  # targets, so one opened against another branch, which is what every rung of
+  # a stack is, would run nothing. A change is gated because it is a change.
+  pull_request:
+
+# A superseded run on a branch proves nothing and is cancelled. Runs on main
+# are kept: each one is the record that a merge was green.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+# The secret scan lists a pull request's commits, a call the default token
+# cannot make with the scope on contents alone.
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  gate:
+    name: Gate
+    runs-on: ubuntu-latest
+    # A full run is a few minutes; past this a process hangs, and the default
+    # limit is six hours of runner time.
+    timeout-minutes: 15
+    steps:
+      # The whole history, because the gate reads every commit's subject.
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.4"
+
+      # The task runner and the TypeScript compiler are Node programs. Naming
+      # the version makes it this repository's and not the runner image's.
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # Only the download cache is restored: the install below then copies
+      # from it, and a changed lockfile fetches what changed.
+      - name: Cache Bun's downloads
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-cache-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            bun-cache-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      # One command, and this file never names what it runs. `ci` is declared
+      # by the root manifest and by each package's own `ci` target, so a gate
+      # added there is enforced here without this file changing.
+      - name: Gate
+        run: bun run ci
+
+  # A job of its own: it reads the history and not the working tree, needs no
+  # install, and must still report when the install or the build fails.
+  secrets:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      # The action comments on the pull request unless told not to, which
+      # would need a write scope this workflow does not grant. A leak still
+      # fails the job, which is the gate.
+      - name: Scan for committed secrets
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_ENABLE_COMMENTS: "false"
