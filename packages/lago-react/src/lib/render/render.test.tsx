@@ -97,6 +97,31 @@ describe("render", () => {
     ]);
   });
 
+  it.each([
+    ["Enter", "return"],
+    ["Escape", "escape"],
+    ["Tab", "tab"],
+    ["Backspace", "backspace"],
+    ["Delete", "delete"],
+    ["Insert", "insert"],
+    ["Home", "home"],
+    ["End", "end"],
+    ["PageUp", "pageup"],
+    ["PageDown", "pagedown"],
+    ["ArrowUp", "up"],
+    ["ArrowDown", "down"],
+    ["ArrowLeft", "left"],
+    ["ArrowRight", "right"],
+    ...Array.from({ length: 12 }, (_, index) => [
+      `F${index + 1}`,
+      `f${index + 1}`,
+    ]),
+  ])("sends {%s} as the key the renderer calls %s", async (name, seen) => {
+    const screen = await render(<Keys />);
+    await screen.userEvent.keyboard(`{${name}}`);
+    expect(screen.lines.at(1)).toBe(seen);
+  });
+
   it("sends a lone Escape at once, even while time is stopped", async () => {
     vi.useFakeTimers();
     const screen = await render(<Keys />);

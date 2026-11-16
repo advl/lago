@@ -1,5 +1,5 @@
+import { defaultViewport } from "@aztlan/lago-core";
 import { createElement } from "react";
-import { defaultViewport } from "../render/index.js";
 import listStories from "./listStories.js";
 import runStory from "./runStory.js";
 import StoryFrame from "./StoryFrame.js";

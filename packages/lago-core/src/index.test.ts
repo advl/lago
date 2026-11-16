@@ -1,14 +1,17 @@
 import { describe, expect, it } from "vitest";
 
 describe("the package's entry", () => {
-  it("exports what a renderer's package reads a screen and a golden with, and no other", async () => {
+  it("exports what a renderer's package builds a screen and keeps a golden with, and no other", async () => {
     expect(Object.keys(await import("./index.js")).sort()).toEqual([
       "attributeNames",
+      "createScreen",
+      "defaultViewport",
       "formatGolden",
-      "getByText",
       "normalizeRuns",
       "parseGolden",
-      "readLines",
+      "registerSerializer",
+      "stoppedTimers",
+      "waitFor",
     ]);
   });
 });

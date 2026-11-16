@@ -1,5 +1,5 @@
+import { stoppedTimers } from "@aztlan/lago-core";
 import { act } from "react";
-import { stoppedTimers } from "./constants.js";
 
 /**
  * The scheduler's own turn, taken as this module loads, before a test fakes

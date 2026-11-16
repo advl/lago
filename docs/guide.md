@@ -6,7 +6,7 @@ Lago makes a terminal interface drawn by OpenTUI reviewable the way a web interf
 
 | Package | What it gives | What it stands for in Storybook |
 |---|---|---|
-| `@aztlan/lago-core` | the screenshot and the golden, which name no renderer; installed with `@aztlan/lago-react`, which re-exports the types a test names | none |
+| `@aztlan/lago-core` | the screen, the screenshot and the golden, which name no renderer; installed with `@aztlan/lago-react`, which re-exports the types a test names | none |
 | `@aztlan/lago-react` | the story types (`Meta`, `StoryObj`), `render`, `composeStories` and `waitFor` for tests; the vitest plugin `testStories` from `@aztlan/lago-react/vitest` | `@storybook/react` and its vitest add-on |
 | `@aztlan/lago-config` | `createConfig`, the vitest configuration a project needs | the project's own Storybook and vitest configuration |
 | `@aztlan/tui` | the components both an application and the gallery draw: the pane, its header, the scrolled list, the key bar and the help, notices, loading lines and empty states; the keymap and the text-fitting functions | none |

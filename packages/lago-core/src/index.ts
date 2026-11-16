@@ -1,9 +1,24 @@
-export type { Attribute, Color, Run, Screenshot } from "./lib/index.js";
+export type {
+  Attribute,
+  Color,
+  KeyName,
+  Modifiers,
+  Press,
+  Run,
+  Screen,
+  ScreenParts,
+  Screenshot,
+  UserEvent,
+  Viewport,
+} from "./lib/index.js";
 export {
   attributeNames,
+  createScreen,
+  defaultViewport,
   formatGolden,
-  getByText,
   normalizeRuns,
   parseGolden,
-  readLines,
+  registerSerializer,
+  stoppedTimers,
+  waitFor,
 } from "./lib/index.js";

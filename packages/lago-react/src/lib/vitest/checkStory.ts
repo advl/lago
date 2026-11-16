@@ -1,6 +1,6 @@
+import type { Viewport } from "@aztlan/lago-core";
 import { formatGolden } from "@aztlan/lago-core";
 import { expect, type TestContext } from "vitest";
-import type { Viewport } from "../render/index.js";
 import {
   type PreparedStory,
   readDescription,

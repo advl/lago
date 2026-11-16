@@ -1,7 +1,16 @@
 import { describe, expect, it } from "vitest";
 import parseKeyboard from "./parseKeyboard.js";
 
-const press = (key: string, modifiers = {}) => ({ key, modifiers });
+const press = (key: string, modifiers = {}) => ({
+  named: false,
+  key,
+  modifiers,
+});
+const named = (key: string, modifiers = {}) => ({
+  named: true,
+  key,
+  modifiers,
+});
 
 describe("parseKeyboard", () => {
   it("presses plain characters one by one, whole characters included", () => {
@@ -10,12 +19,12 @@ describe("parseKeyboard", () => {
     );
   });
 
-  it("presses a named key as the renderer names it, or as a terminal sends it", () => {
+  it("presses a named key by its name, for the renderer to send, and a braced character as itself", () => {
     expect(parseKeyboard("{Enter}{ArrowDown}{F5}{PageUp}{a}")).toEqual([
-      press("RETURN"),
-      press("ARROW_DOWN"),
-      press("F5"),
-      press("\x1b[5~"),
+      named("Enter"),
+      named("ArrowDown"),
+      named("F5"),
+      named("PageUp"),
       press("a"),
     ]);
   });
@@ -27,7 +36,7 @@ describe("parseKeyboard", () => {
       ),
     ).toEqual([
       press("c", { ctrl: true }),
-      press("TAB", { shift: true, meta: true }),
+      named("Tab", { shift: true, meta: true }),
       press("k", { super: true }),
       press("x"),
     ]);

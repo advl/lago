@@ -32,11 +32,14 @@ const surface: Readonly<
   "@aztlan/lago-core": {
     ".": [
       "attributeNames",
+      "createScreen",
+      "defaultViewport",
       "formatGolden",
-      "getByText",
       "normalizeRuns",
       "parseGolden",
-      "readLines",
+      "registerSerializer",
+      "stoppedTimers",
+      "waitFor",
     ],
   },
   "@aztlan/lago-react": {

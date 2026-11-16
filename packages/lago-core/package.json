@@ -1,6 +1,6 @@
 {
   "name": "@aztlan/lago-core",
-  "description": "What a terminal screen shows, and its golden, for any renderer Lago checks",
+  "description": "The screen, its screenshot and its golden, for any renderer Lago checks",
   "version": "0.1.0-rc.1",
   "type": "module",
   "module": "dist/esm/index.js",
@@ -68,5 +68,8 @@
         ]
       }
     }
+  },
+  "peerDependencies": {
+    "vitest": ">=5.0.0 <6.0.0"
   }
 }
