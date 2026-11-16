@@ -81,6 +81,24 @@ describe("prepareStory", () => {
     });
   });
 
+  it("fixes the file's globals and the story's, the story's winning, and keeps what the preview declares", () => {
+    const globalTypes = {
+      scheme: { values: ["light", "dark"], default: "light" },
+    };
+    const story = prepareStory(
+      { ...meta, globals: { scheme: "light", density: "compact" } },
+      "Dark",
+      { globals: { scheme: "dark" } },
+      { globalTypes },
+    );
+    expect(story.globals).toEqual({ scheme: "dark", density: "compact" });
+    expect(story.globalTypes).toBe(globalTypes);
+    expect(prepareStory(meta, "Bare", {})).toMatchObject({
+      globals: {},
+      globalTypes: {},
+    });
+  });
+
   it("draws the file's component with the args when nothing else is said", () => {
     const story = prepareStory(meta, "Default", {});
     expect(story.render({ text: "hi" }, {} as never)).toEqual(

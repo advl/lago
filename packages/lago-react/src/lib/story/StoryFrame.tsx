@@ -1,12 +1,14 @@
 import { type ReactNode, useContext, useMemo, useRef } from "react";
 import { ViewportContext } from "../render/index.js";
-import type { PreparedStory } from "./types.js";
+import type { Globals, PreparedStory } from "./types.js";
 
 interface Props {
   readonly story: PreparedStory;
   readonly args: Record<string, unknown>;
   /** What the story's loaders gave, run before it was mounted. */
   readonly loaded: Readonly<Record<string, unknown>>;
+  /** The value of every global the story is drawn with. */
+  readonly globals: Globals;
 }
 
 const refuseUnmounted = (title: string, name: string): never => {
@@ -22,7 +24,7 @@ const refuseUnmounted = (title: string, name: string): never => {
  * story was mounted at, which `render` gives; a story mounted any other way
  * has no screen to be told of, and is refused.
  */
-export default function StoryFrame({ story, args, loaded }: Props) {
+export default function StoryFrame({ story, args, loaded, globals }: Props) {
   const viewport =
     useContext(ViewportContext) ?? refuseUnmounted(story.title, story.name);
   // The args are read when the story draws, not built into the component:
@@ -37,12 +39,13 @@ export default function StoryFrame({ story, args, loaded }: Props) {
       args: latest.current,
       parameters: story.parameters,
       viewport,
+      globals,
       loaded,
     });
     return story.decorators.reduce<() => ReactNode>(
       (Story, decorate) => () => decorate(Story, readContext()),
       () => story.render(latest.current, readContext()),
     );
-  }, [story, viewport, loaded]);
+  }, [story, viewport, loaded, globals]);
   return <Decorated />;
 }

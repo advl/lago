@@ -13,6 +13,21 @@ describe("readPreview", () => {
     expect(readPreview(undefined, undefined)).toBeUndefined();
   });
 
+  it("refuses a preview whose globalTypes cannot be drawn with, naming it", () => {
+    expect(() =>
+      readPreview(
+        {
+          default: {
+            globalTypes: { scheme: { values: ["light"], default: "dark" } },
+          },
+        },
+        "/p/lago.preview.tsx",
+      ),
+    ).toThrow(
+      'The preview /p/lago.preview.tsx gives the global scheme the default "dark", which is not one of its values: light.',
+    );
+  });
+
   it("refuses a preview module with no default export, naming it", () => {
     expect(() => readPreview({}, "/p/lago.preview.tsx")).toThrow(
       "The preview /p/lago.preview.tsx has no default export. Export what every story shares as its default, as in export default { decorators: [withTheme] } satisfies Preview.",

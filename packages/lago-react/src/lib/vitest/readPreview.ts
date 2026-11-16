@@ -1,9 +1,10 @@
-import type { Preview } from "../story/index.js";
+import { checkGlobalTypes, type Preview } from "../story/index.js";
 
 /**
  * The annotations a project's preview module gives as its default export, or
  * nothing when the project has no preview. `path` names the module in the
- * error for one with no default export.
+ * error for one with no default export, or with `globalTypes` that cannot be
+ * drawn with.
  */
 export default function readPreview(
   module: { readonly default?: unknown } | undefined,
@@ -15,5 +16,7 @@ export default function readPreview(
       `The preview ${path} has no default export. Export what every story shares as its default, as in export default { decorators: [withTheme] } satisfies Preview.`,
     );
   }
-  return module.default;
+  const preview: Preview = module.default;
+  checkGlobalTypes(preview.globalTypes, `The preview ${path}`);
+  return preview;
 }

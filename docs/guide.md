@@ -105,11 +105,41 @@ const preview = {
 export default preview;
 ```
 
-`createConfig({ preview: "./src/lago.preview.tsx" })` names the module from the project's root, and every stories file is then set inside it; coverage leaves it out, as it leaves the stories. A project that writes its own configuration gives the same path to the plugin, as `testStories({ viewports, preview })`. A preview holds `args`, `parameters`, `decorators`, `loaders` and `tags`, and each is set around what the file and the story say:
+`createConfig({ preview: "./src/lago.preview.tsx" })` names the module from the project's root, and every stories file is then set inside it; coverage leaves it out, as it leaves the stories. A project that writes its own configuration gives the same path to the plugin, as `testStories({ viewports, preview })`. A preview holds `args`, `parameters`, `decorators`, `loaders`, `tags` and `globalTypes`, and each is set around what the file and the story say:
 
 - its args and parameters come first, so a file's or a story's win;
 - its decorators wrap all the others, the file's included;
 - its loaders run before the file's, and its tags are read before the file's.
+
+## Globals
+
+A setting that is not an arg, such as a colour scheme, a density or a set of glyphs, is a global. The preview declares each one with the values it takes and its default:
+
+```tsx
+// src/lago.preview.tsx
+import type { Preview } from "@aztlan/lago-react";
+import { SeatProvider, SCHEMES } from "./seat.js";
+
+const preview = {
+  globalTypes: {
+    scheme: { values: ["classic", "tokyo-night", "dracula", "iceberg"], default: "classic" },
+    tint: { values: ["16", "truecolor"], default: "16" },
+  },
+  decorators: [
+    (Story, { globals }) => (
+      <SeatProvider palette={SCHEMES[globals.scheme]} tint={globals.tint}>
+        {Story()}
+      </SeatProvider>
+    ),
+  ],
+} satisfies Preview;
+
+export default preview;
+```
+
+- `globals` in a story's context holds the value of every declared global, for `render`, the decorators, the loaders and `play`.
+- A story, or its file's default export, fixes a global with `globals: { scheme: "dracula" }`; the story's win over the file's.
+- A global the preview does not declare, or a value it does not take, fails the stories file, naming the file, the story and the declared choices.
 
 ## Goldens
 

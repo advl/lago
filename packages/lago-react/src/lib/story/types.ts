@@ -18,6 +18,25 @@ export type PropsOf<Component> = Component extends (
  */
 export type Parameters = Readonly<Record<string, unknown>>;
 
+/**
+ * One setting of a project's that is not an arg, such as a colour scheme: the
+ * values it takes, and the one a story is drawn with unless something fixes
+ * another.
+ */
+export interface GlobalType {
+  readonly values: readonly string[];
+  /** One of `values`. */
+  readonly default: string;
+  /** What the setting changes, for whoever reads the project. */
+  readonly description?: string;
+}
+
+/** The globals a project declares, by name. */
+export type GlobalTypes = Readonly<Record<string, GlobalType>>;
+
+/** Values of globals, by the global's name. */
+export type Globals = Readonly<Record<string, string>>;
+
 /** What a story's `render` and its decorators are given. */
 export interface StoryContext<Args = Record<string, unknown>> {
   readonly title: string;
@@ -26,6 +45,11 @@ export interface StoryContext<Args = Record<string, unknown>> {
   readonly parameters: Parameters;
   /** The size of the screen the story is drawn on. */
   readonly viewport: Viewport;
+  /**
+   * The value of every global the preview declares: the story's own when it
+   * fixes one, else the mode's it is drawn in, else the global's default.
+   */
+  readonly globals: Globals;
   /** What the story's loaders gave, merged in their order. */
   readonly loaded: Readonly<Record<string, unknown>>;
 }
@@ -71,6 +95,12 @@ export interface Annotations<Args> {
   decorators?: readonly Decorator<Args>[];
   /** Run before the story is first drawn, the file's before the story's. */
   loaders?: readonly Loader<Args>[];
+  /**
+   * Globals fixed for the story, whatever mode it is drawn in: the story's
+   * win over the file's. Each must be one the preview declares, at one of its
+   * values.
+   */
+  globals?: Globals;
   render?: (args: Args, context: StoryContext<Args>) => ReactNode;
   /** Runs once the story is mounted, to bring it to the state it shows. */
   play?: (context: PlayContext<Args>) => void | Promise<void>;
@@ -93,6 +123,8 @@ export interface Preview {
   readonly decorators?: readonly Decorator[];
   readonly loaders?: readonly Loader[];
   readonly tags?: readonly string[];
+  /** The globals every story is drawn with, each with its values and its default. */
+  readonly globalTypes?: GlobalTypes;
 }
 
 /** A stories file's default export: the component and what all its stories share. */
@@ -146,6 +178,10 @@ export interface PreparedStory {
   readonly parameters: Parameters;
   readonly decorators: readonly Decorator[];
   readonly loaders: readonly Loader[];
+  /** The globals the preview declares. */
+  readonly globalTypes: GlobalTypes;
+  /** The globals the file and the story fix, the story's last. */
+  readonly globals: Globals;
   readonly render: (
     args: Record<string, unknown>,
     context: StoryContext,
