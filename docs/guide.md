@@ -141,18 +141,24 @@ export default preview;
 - A story, or its file's default export, fixes a global with `globals: { scheme: "dracula" }`; the story's win over the file's.
 - A global the preview does not declare, or a value it does not take, fails the stories file, naming the file, the story and the declared choices.
 
-A mode is a named set of globals every story is also drawn in. The plugin takes the modes beside the viewports:
+A mode is a named set of globals every story is also drawn in. The configuration names the modes beside the viewports:
 
 ```ts
-testStories({
+// vitest.config.ts
+import { createConfig } from "@aztlan/lago-config";
+
+export default createConfig({
   viewports,
   preview: "./src/lago.preview.tsx",
   modes: {
     dracula: { globals: { scheme: "dracula" }, expect: { tags: ["coloured"] } },
     truecolor: { globals: { tint: "truecolor" } },
   },
+  matrix: { max: 400 },
 });
 ```
+
+A project that writes its own configuration gives the same to the plugin, as `testStories({ viewports, preview, modes, matrix })`.
 
 - A mode's name becomes part of a golden's file name, so it holds letters, digits, `-` and `_`. A mode sets at least one global, and only globals the preview declares, at their values.
 - Every story is drawn at every viewport in the base, which sets nothing, and then in each mode. A value resolves as the story's own, then the mode's, then the default.
@@ -174,7 +180,7 @@ Matrix: 450 pictures covered, 50 in the base and 400 in 8 modes: 14 distinct · 
 - **expected but equal**: equal pictures of stories the mode expects to change, each a failed test;
 - **excluded**: cells a story leaves out with `parameters.modes`.
 
-A run with no modes prints nothing of the kind. What equality saves is files and review, not time: each mode draws every story once more. `matrix: { max: 400 }` beside the modes bounds that cost. It counts the matrix's cells from the stories files as they are written: every story they export, at every configured viewport, in the base and in each mode, the stories and modes a story leaves out included and the viewports a story adds not. A project with more cells is refused before anything is drawn, with its count.
+A run with no modes prints nothing of the kind. What equality saves is files and review, not time: each mode draws every story once more. `matrix: { max: 400 }` bounds that cost. It counts the matrix's cells from the stories files as they are written: every story they export, at every configured viewport, in the base and in each mode, the stories and modes a story leaves out included and the viewports a story adds not. A project with more cells is refused before anything is drawn, with its count.
 
 ## Goldens
 

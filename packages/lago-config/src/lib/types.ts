@@ -1,3 +1,5 @@
+import type { Mode } from "@aztlan/lago-react/vitest";
+
 /** What `createConfig` is given. */
 export interface Options {
   /**
@@ -19,4 +21,16 @@ export interface Options {
    * `"./src/lago.preview.tsx"`. It is story setup, so coverage leaves it out.
    */
   readonly preview?: string;
+  /**
+   * Modes every story is drawn in as well as the base, each a named set of
+   * globals the preview declares, as in
+   * `{ dracula: { globals: { scheme: "dracula" } } }`. A mode's picture keeps
+   * a golden only where it differs from the base's.
+   */
+  readonly modes?: Readonly<Record<string, Mode>>;
+  /**
+   * A bound on the matrix's cells: every story the stories files export, at
+   * every viewport, in the base and in each mode.
+   */
+  readonly matrix?: { readonly max: number };
 }

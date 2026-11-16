@@ -13,17 +13,18 @@ import type { Options } from "./types.js";
  * It holds: JSX compiled against the renderer's React reconciler; the
  * renderer's Bun build, so that vitest and the runtime load the same classes;
  * one copy of React and of the renderer, the project's, even for a Lago
- * package linked from a checkout;
- * a `unit` project over the tests under `src/` and a `stories` project over
- * the stories files there; the plugin that makes each story a test, inside
- * the project's preview when one is named; the timers a test fakes; and,
- * when asked, the coverage settings, which a run applies to the unit project
- * alone.
+ * package linked from a checkout; a `unit` project over the tests under
+ * `src/` and a `stories` project over the stories files there; the plugin
+ * that makes each story a test, inside the project's preview when one is
+ * named and in each of its modes; the timers a test fakes; and, when asked,
+ * the coverage settings, which a run applies to the unit project alone.
  */
 export default function createConfig({
   viewports,
   coverage = false,
   preview,
+  modes,
+  matrix,
 }: Options = {}): ViteUserConfig {
   // Coverage matches what it leaves out against paths from the project's
   // root, so an absolute path would leave the preview measured.
@@ -33,7 +34,10 @@ export default function createConfig({
     );
   }
   return {
-    plugins: [testStories({ viewports, preview }), coverUnitsOnly],
+    plugins: [
+      testStories({ viewports, preview, modes, matrix }),
+      coverUnitsOnly,
+    ],
     // What names the renderer comes from the renderer's own package: where
     // JSX takes its runtime, the build vitest must load, and what is kept to
     // one copy.

@@ -51,6 +51,26 @@ describe("createConfig", () => {
     });
   });
 
+  it("hands the modes and the matrix's bound to the plugin", () => {
+    const [plugin] = createConfig({
+      viewports,
+      modes: { dark: { globals: { scheme: "dark" } } },
+    }).plugins as { transform: (...given: unknown[]) => unknown }[];
+    const result = plugin?.transform.call(
+      { environment: { config: { root: "/project" } } },
+      "export const Default = {};\n",
+      "/project/src/Row.stories.tsx",
+    );
+    expect(result).toMatchObject({
+      code: expect.stringContaining(
+        '"modes":{"dark":{"globals":{"scheme":"dark"}}}',
+      ),
+    });
+    expect(() => createConfig({ matrix: { max: 0 } })).toThrow(
+      "matrix.max must be a whole number above 0",
+    );
+  });
+
   it("needs no options at all", () => {
     expect(createConfig().plugins).toMatchObject([
       { name: "lago:test-stories" },

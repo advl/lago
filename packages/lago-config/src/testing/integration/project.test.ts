@@ -179,4 +179,41 @@ it("draws a story as its stories file does", async () => {
     expect(output).not.toContain("lago.preview");
     expect(output).not.toContain("does not meet global threshold");
   });
+
+  it("draws every story in each mode it names, and prints the matrix once", async () => {
+    const { outcomes, output, exists } = await runProject({
+      ...project,
+      "vitest.config.ts": configure(
+        ', preview: "./src/lago.preview.tsx", modes: { dark: { globals: { scheme: "dark" } } }, matrix: { max: 2 }',
+      ),
+      "src/lago.preview.tsx": `import type { Preview } from "@aztlan/lago-react";
+
+const preview = {
+  globalTypes: { scheme: { values: ["light", "dark"], default: "light" } },
+  decorators: [
+    (Story, { globals }) => (
+      <box flexDirection="column">
+        <text>{globals.scheme}</text>
+        <Story />
+      </box>
+    ),
+  ],
+} satisfies Preview;
+
+export default preview;
+`,
+    });
+    expect([...outcomes].sort(), output).toEqual([
+      ["draws a component and stops its clock with the defaults", "passed"],
+      ["scratch/Label Hello at small", "passed"],
+      ["scratch/Label Hello at small@dark", "passed"],
+      ["scratch/Label keeps no golden that no story owns", "passed"],
+      ["uses a story as a fixture", "passed"],
+    ]);
+    expect(exists("src/__goldens__/Label.Hello.small@dark.golden")).toBe(true);
+    expect(output.match(/Matrix: /g)).toEqual(["Matrix: "]);
+    expect(output).toContain(
+      "Matrix: 2 pictures covered, 1 in the base and 1 in 1 mode: 1 distinct",
+    );
+  });
 });
