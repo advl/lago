@@ -82,6 +82,7 @@ const ROOT_ENTRIES = new Set([
   ".github",
   ".gitignore",
   "AGENTS.md",
+  "CHANGELOG.md",
   "LICENSE",
   "README.md",
   "bun.lock",
