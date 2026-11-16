@@ -16,7 +16,10 @@ export interface ReportedError {
 
 /** What the engine reads of one test of a stories file. */
 export interface ReportedTest {
-  /** The test's own name: `<Story> at <viewport>`, or the orphan check's. */
+  /**
+   * The test's own name: `<Story> at <viewport>`, `<Story> at
+   * <viewport>@<mode>` in a mode, or the orphan check's.
+   */
   readonly name: string;
   /** The name of the suite around it: the file's title. */
   readonly suite: string;

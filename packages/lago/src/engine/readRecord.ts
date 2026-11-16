@@ -21,7 +21,9 @@ function placeError(
  * story's. A test that passed is `pass`. One that failed before its story
  * was drawn is `error`, with the first error's message and its place. One
  * whose picture was drawn and failed is `new` when its golden does not
- * exist, as `exists` tells, and `changed` otherwise.
+ * exist, as `exists` tells, and `changed` otherwise. A story's test in a
+ * mode, named `<Story> at <viewport>@<mode>`, is not read: the gallery shows
+ * the base pictures.
  */
 export default function readRecord(
   test: ReportedTest,
@@ -29,7 +31,7 @@ export default function readRecord(
   exists: (path: string) => boolean,
 ): StoryRecord | undefined {
   const at = test.name.lastIndexOf(" at ");
-  if (at < 0) return undefined;
+  if (at < 0 || test.name.includes("@", at)) return undefined;
   const { story } = test;
   const base = {
     file: test.file,

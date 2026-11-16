@@ -102,6 +102,22 @@ describe("readRecord", () => {
     );
   });
 
+  it("reads nothing from a story's test in a mode, drawn or not", () => {
+    const moded = {
+      ...test,
+      name: "Default at narrow@dark",
+      story: { ...story, mode: "dark" },
+    };
+    expect(readRecord(moded, "/project", exists)).toBeUndefined();
+    expect(
+      readRecord(
+        { ...moded, state: "failed", story: undefined },
+        "/project",
+        exists,
+      ),
+    ).toBeUndefined();
+  });
+
   it("reads nothing from a test that is no story's", () => {
     const orphans = { ...test, name: "keeps no golden that no story owns" };
     expect(readRecord(orphans, "/project", exists)).toBeUndefined();
