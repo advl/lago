@@ -1,5 +1,5 @@
+import type { Screenshot } from "@aztlan/lago-core";
 import type { Viewport } from "../render/index.js";
-import type { Screenshot } from "../screenshot/index.js";
 
 /** What the plugin is given. */
 export interface Options {

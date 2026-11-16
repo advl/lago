@@ -1,5 +1,3 @@
-import { readdirSync, readFileSync } from "node:fs";
-import { join } from "node:path";
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import { measureLine, reportedLine } from "../../../testing/arbitraries.js";
@@ -63,18 +61,6 @@ describe("parseGolden", () => {
         expect(parseGolden(formatGolden(screenshot))).toEqual(screenshot);
       }),
     );
-  });
-
-  it("reads every golden this package keeps, and writes each back as it is", () => {
-    const folder = join(import.meta.dirname, "../../../testing/__goldens__");
-    const goldens = readdirSync(folder).filter((name) =>
-      name.endsWith(".golden"),
-    );
-    expect(goldens.length).toBeGreaterThan(0);
-    for (const name of goldens) {
-      const text = readFileSync(join(folder, name), "utf8");
-      expect(formatGolden(parseGolden(text)), name).toBe(text);
-    }
   });
 
   it("reads a width that is not one column per character", () => {

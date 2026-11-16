@@ -1,6 +1,6 @@
+import type { Screenshot } from "@aztlan/lago-core";
+import { formatGolden } from "@aztlan/lago-core";
 import { expect } from "vitest";
-import { formatGolden } from "../golden/index.js";
-import type { Screenshot } from "../screenshot/index.js";
 
 let registered = false;
 

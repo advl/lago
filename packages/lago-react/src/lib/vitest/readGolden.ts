@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
-import { parseGolden } from "../golden/index.js";
-import type { Screenshot } from "../screenshot/index.js";
+import type { Screenshot } from "@aztlan/lago-core";
+import { parseGolden } from "@aztlan/lago-core";
 
 /**
  * What a golden file holds, when there is one and it reads as a golden. One

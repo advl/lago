@@ -1,4 +1,4 @@
-import type { Run, Screenshot } from "../screenshot/index.js";
+import type { Run, Screenshot } from "@aztlan/lago-core";
 
 /** The size of a screen, in columns and lines. */
 export interface Viewport {

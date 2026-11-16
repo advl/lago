@@ -1,6 +1,6 @@
+import { getByText, readLines } from "@aztlan/lago-core";
 import type { TestRendererSetup } from "@opentui/core/testing";
 import type { Root } from "@opentui/react";
-import { getByText, readLines } from "../screenshot/index.js";
 import captureScreenshot from "./captureScreenshot.js";
 import flushReact from "./flushReact.js";
 import parseKeyboard from "./parseKeyboard.js";

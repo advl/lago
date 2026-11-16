@@ -1,11 +1,11 @@
-import { type CapturedFrame, type RGBA, TextAttributes } from "@opentui/core";
 import {
   type Attribute,
   attributeNames,
   type Color,
   normalizeRuns,
   type Screenshot,
-} from "../screenshot/index.js";
+} from "@aztlan/lago-core";
+import { type CapturedFrame, type RGBA, TextAttributes } from "@opentui/core";
 
 const attributeBits: Readonly<Record<Attribute, number>> = {
   blink: TextAttributes.BLINK,
