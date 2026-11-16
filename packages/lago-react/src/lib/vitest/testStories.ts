@@ -1,6 +1,6 @@
 import { fileURLToPath } from "node:url";
+import { defaultViewport } from "@aztlan/lago-core";
 import type { Plugin } from "vitest/config";
-import { defaultViewport } from "../render/index.js";
 import { storiesFile, viewportName } from "./constants.js";
 import readComments from "./readComments.js";
 import type { Options, Registration } from "./types.js";

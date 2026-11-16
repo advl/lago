@@ -1,5 +1,5 @@
+import { stoppedTimers } from "@aztlan/lago-core";
 import { defineConfig } from "vitest/config";
-import { stoppedTimers } from "./src/lib/render/constants.js";
 import testStories from "./src/lib/vitest/testStories.js";
 
 export default defineConfig({

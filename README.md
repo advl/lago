@@ -6,6 +6,7 @@ Each state a component can be in is a story. Every story is drawn on every test 
 
 | Package | |
 |---|---|
+| [`@aztlan/lago-core`](packages/lago-core) | the screen, the screenshot and the golden, which name no renderer |
 | [`@aztlan/lago-react`](packages/lago-react) | the story types, `render`, `composeStories`, `waitFor`, and the vitest plugin |
 | [`@aztlan/lago-config`](packages/lago-config) | `createConfig`, the vitest configuration a project needs |
 | [`@aztlan/tui`](packages/tui) | the terminal components an application and the gallery share |

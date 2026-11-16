@@ -1,7 +1,4 @@
-import type { Modifiers, Viewport } from "./types.js";
-
-/** The size of a screen whose test names none: a terminal's usual one. */
-export const defaultViewport: Viewport = { cols: 80, rows: 24 };
+import type { KeyName } from "@aztlan/lago-core";
 
 /**
  * How many frames a screen may draw while settling. A component that still
@@ -10,14 +7,11 @@ export const defaultViewport: Viewport = { cols: 80, rows: 24 };
  */
 export const frameLimit = 100;
 
-/** The pause between two tries of a check that is waited for, in milliseconds. */
-export const tryPause = 10;
-
 /**
- * The keys Testing Library's notation names, each as the renderer's name for
- * it or, where the renderer has none, as what a terminal sends.
+ * Each key Testing Library's notation names, as the renderer names it or,
+ * where the renderer has none, as what a terminal sends.
  */
-export const namedKeys: Readonly<Record<string, string>> = {
+export const rendererKeys: Readonly<Record<KeyName, string>> = {
   Enter: "RETURN",
   Escape: "ESCAPE",
   Tab: "TAB",
@@ -45,30 +39,3 @@ export const namedKeys: Readonly<Record<string, string>> = {
   F11: "F11",
   F12: "F12",
 };
-
-/**
- * The keys that can be held, each as the renderer names it. A terminal sends
- * Alt as its meta key, and the key a keyboard labels Meta, Command or Windows
- * as super.
- */
-export const heldKeys: Readonly<Record<string, keyof Modifiers>> = {
-  Control: "ctrl",
-  Shift: "shift",
-  Alt: "meta",
-  Meta: "super",
-};
-
-/**
- * The timers stopped while a story is drawn, and those a test fakes: the
- * ones a component can wait on, the clock and the high-resolution clock
- * included, so a picture never depends on when it was drawn. `setImmediate` is left running, because
- * React waits on it to know that an update has been committed.
- */
-export const stoppedTimers = [
-  "setTimeout",
-  "clearTimeout",
-  "setInterval",
-  "clearInterval",
-  "Date",
-  "performance",
-] as const;

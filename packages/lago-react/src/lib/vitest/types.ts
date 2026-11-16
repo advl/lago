@@ -1,5 +1,24 @@
-import type { Viewport } from "../render/index.js";
-import type { Screenshot } from "../screenshot/index.js";
+import type { Screenshot, Viewport } from "@aztlan/lago-core";
+
+/**
+ * What a vitest configuration needs to know of the renderer a project's
+ * components and stories are drawn with.
+ */
+export interface Renderer {
+  /** Where JSX takes its runtime from: the renderer's React reconciler. */
+  readonly jsxImportSource: string;
+  /**
+   * The packages a project and Lago's packages must share one copy of. A
+   * second copy of React has no component to call hooks from, and an object
+   * made by one copy of a renderer is not one the other recognises.
+   */
+  readonly sharedPackages: readonly string[];
+  /**
+   * The export conditions a module is resolved with, so that vitest and the
+   * runtime load the same build of the renderer.
+   */
+  readonly conditions: readonly string[];
+}
 
 /** What the plugin is given. */
 export interface Options {

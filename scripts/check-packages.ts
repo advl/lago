@@ -2,7 +2,7 @@
  * Checks the packages as a project outside this repository receives them.
  *
  * `bun scripts/check-packages.ts` packs each package under `packages/`,
- * which must be built, and installs the four tarballs into an empty project
+ * which must be built, and installs the five tarballs into an empty project
  * with the renderer, React and vitest beside them. There it checks that
  * each entry exports exactly the names listed here, that a stories file
  * drawing one of the shared components is drawn, kept as a golden and then
@@ -29,9 +29,22 @@ import { join, resolve } from "node:path";
 const surface: Readonly<
   Record<string, Readonly<Record<string, readonly string[]>>>
 > = {
+  "@aztlan/lago-core": {
+    ".": [
+      "attributeNames",
+      "createScreen",
+      "defaultViewport",
+      "formatGolden",
+      "normalizeRuns",
+      "parseGolden",
+      "registerSerializer",
+      "stoppedTimers",
+      "waitFor",
+    ],
+  },
   "@aztlan/lago-react": {
     ".": ["composeStories", "render", "waitFor"],
-    "./vitest": ["testStories"],
+    "./vitest": ["renderer", "testStories"],
   },
   "@aztlan/lago-config": { ".": ["createConfig"] },
   "@aztlan/tui": {
@@ -104,11 +117,10 @@ for (const folder of readdirSync(join(repository, "packages"))) {
   const at = join(repository, "packages", folder);
   const manifest = JSON.parse(readFileSync(join(at, "package.json"), "utf8"));
   run("bun", ["pm", "pack", "--destination", scratch, "--quiet"], at);
-  const tarball = readdirSync(scratch).find(
-    (file) =>
-      file.startsWith(manifest.name.replace("@", "").replace("/", "-")) &&
-      file.endsWith(".tgz"),
-  );
+  // The whole name, version included: one package's name can begin
+  // another's, as `aztlan-lago` begins `aztlan-lago-core`.
+  const expected = `${manifest.name.replace("@", "").replace("/", "-")}-${manifest.version}.tgz`;
+  const tarball = readdirSync(scratch).find((file) => file === expected);
   if (!tarball) fail(`${manifest.name} did not pack`);
   tarballs[manifest.name] = `file:${join(scratch, String(tarball))}`;
   Object.assign(versions, manifest.devDependencies);
@@ -148,7 +160,7 @@ const files: Record<string, string> = {
           versions[name] ?? fail(`no version of ${name} to install`),
         ]),
       ]),
-      // A package's dependency on another of the four is met by its tarball.
+      // A package's dependency on another of them is met by its tarball.
       overrides: tarballs,
     },
     null,

@@ -33,6 +33,7 @@ jobs:
         with:
           requireScope: true
           scopes: |
+            lago-core
             lago-react
             lago-config
             tui

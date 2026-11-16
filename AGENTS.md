@@ -33,7 +33,7 @@ The pipeline is `.github/workflows/ci.yml`. Its gate job installs with the lockf
 - TypeScript is strict and resolves modules as `NodeNext`: a relative import names its file with a `.js` extension. Every `tsconfig.json` extends `@canonical/typescript-config` and every `biome.json` extends `@canonical/biome-config`; neither is copied in or replaced.
 - Each package has its own `biome.json`, and the root's scripts have theirs in `scripts/`. There is none at the root, because Biome allows one root configuration per tree.
 - The toolchain is pinned to exact versions. A range would let the installed tools drift, and a gate whose verdict depends on the day of the install is a different gate on every machine.
-- Commit subjects are Conventional Commits with a required scope: a package's short name (`lago-react`, `lago-config`, `tui`, `lago`), or `monorepo`, `deps` or `ci` for what belongs to no package. The subject is a verb phrase in the third person, under 72 characters.
+- Commit subjects are Conventional Commits with a required scope: a package's short name (`lago-core`, `lago-react`, `lago-config`, `tui`, `lago`), or `monorepo`, `deps` or `ci` for what belongs to no package. The subject is a verb phrase in the third person, under 72 characters.
 - Pull request titles follow the same rule, and `.github/workflows/pr-lint.yml` enforces it: merges are squash-only and take the title as the commit on `main`. `.github/PULL_REQUEST_TEMPLATE.md` is the body's shape.
 - Branches are `<type>/<slug>`, the type that of the commit the merge lands.
 - Nothing in this repository points outward, and nothing in it names a person or a machine. Where a decision has a reason worth keeping, the reason is written where it applies.
@@ -57,7 +57,7 @@ The pipeline is `.github/workflows/ci.yml`. Its gate job installs with the lockf
 - `lerna.json` holds the one version every package shares.
 - The packages are published under `@aztlan`. A dependency between two of them points one way; never add one that closes a circle.
 - What a package publishes is its manifest's `exports` map and nothing beside it.
-- `@aztlan/lago-config` depends on `@aztlan/lago-react`, which is built first.
+- `@aztlan/lago-core` names no renderer: it imports neither React nor `@opentui/*`, and no other Lago package. Nothing `lago-react`'s `story/` ships imports the renderer either; a story learns its screen's size from what mounts it. `check:structure` refuses both. `@aztlan/lago-react` depends on it, and `@aztlan/lago-config` on `@aztlan/lago-react`; each is built after what it depends on.
 - `@aztlan/tui` takes the renderer, its keymap and React as peers: one copy of each must serve the application and the components, or a provider made by one is not seen by the other. It is tested by Lago, so `lago-react` and `lago-config` are among its development dependencies and never among its dependencies.
 
 ## Gotchas

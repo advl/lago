@@ -1,13 +1,20 @@
+import {
+  createScreen,
+  defaultViewport,
+  registerSerializer,
+  type Screen,
+  type Viewport,
+} from "@aztlan/lago-core";
 import { createTestRenderer } from "@opentui/core/testing";
 import { createRoot } from "@opentui/react";
 import { createElement, type ReactNode } from "react";
 import { onTestFinished } from "vitest";
-import { defaultViewport } from "./constants.js";
-import createScreen from "./createScreen.js";
+import captureScreenshot from "./captureScreenshot.js";
+import { rendererKeys } from "./constants.js";
 import ErrorCatcher from "./ErrorCatcher.js";
 import flushReact from "./flushReact.js";
-import registerSerializer from "./registerSerializer.js";
-import type { Screen, Viewport } from "./types.js";
+import settleScreen from "./settleScreen.js";
+import ViewportContext from "./ViewportContext.js";
 
 /**
  * Mounts `node` on a screen of the given size, drawn by the renderer's own
@@ -40,14 +47,35 @@ export default async function render(
   });
   const root = createRoot(setup.renderer);
   const errors: unknown[] = [];
-  const screen = createScreen(setup, root, errors);
+  const screen = createScreen({
+    capture: () => captureScreenshot(setup.captureSpans()),
+    // Once the component has thrown, every settle fails with what it threw:
+    // nothing of it is left on the screen to read.
+    settle: async () => {
+      await settleScreen(setup);
+      if (errors.length > 0) throw errors.at(0);
+    },
+    press: ({ named, key, modifiers }) =>
+      flushReact(() =>
+        setup.mockInput.pressKey(named ? rendererKeys[key] : key, modifiers),
+      ),
+    paste: (text) => flushReact(() => setup.mockInput.pasteBracketedText(text)),
+    close: async () => {
+      await flushReact(() => root.unmount());
+      setup.renderer.destroy();
+    },
+  });
   onTestFinished(screen.unmount);
   await flushReact(() =>
     root.render(
       createElement(
-        ErrorCatcher,
-        { onError: (error) => errors.push(error) },
-        node,
+        ViewportContext.Provider,
+        { value: viewport },
+        createElement(
+          ErrorCatcher,
+          { onError: (error) => errors.push(error) },
+          node,
+        ),
       ),
     ),
   );

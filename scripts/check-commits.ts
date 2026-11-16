@@ -38,6 +38,7 @@ const types = [
 
 /** A package's short name, or what belongs to no package. */
 const scopes = [
+  "lago-core",
   "lago-react",
   "lago-config",
   "tui",

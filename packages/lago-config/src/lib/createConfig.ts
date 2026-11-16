@@ -1,6 +1,6 @@
-import { testStories } from "@aztlan/lago-react/vitest";
+import { renderer, testStories } from "@aztlan/lago-react/vitest";
 import type { ViteUserConfig } from "vitest/config";
-import { fakedTimers, sharedPackages } from "./constants.js";
+import { fakedTimers } from "./constants.js";
 import coverUnitsOnly from "./coverUnitsOnly.js";
 import type { Options } from "./types.js";
 
@@ -24,15 +24,17 @@ export default function createConfig({
 }: Options = {}): ViteUserConfig {
   return {
     plugins: [testStories({ viewports }), coverUnitsOnly],
-    oxc: { jsx: { runtime: "automatic", importSource: "@opentui/react" } },
-    // The renderer ships one build for Bun and one for Node. Bun loads the
-    // Bun build for what vitest leaves to it, so the files vitest reads take
-    // it too: an object made by one build is not recognised by the other.
-    ssr: { resolve: { conditions: ["bun"] } },
+    // What names the renderer comes from the renderer's own package: where
+    // JSX takes its runtime, the build vitest must load, and what is kept to
+    // one copy.
+    oxc: {
+      jsx: { runtime: "automatic", importSource: renderer.jsxImportSource },
+    },
+    ssr: { resolve: { conditions: [...renderer.conditions] } },
     // Lago's own packages are read by vitest, so their imports of React and
     // the renderer resolve from the project, to the project's one copy, even
     // when a package is linked from a checkout of Lago.
-    resolve: { dedupe: [...sharedPackages] },
+    resolve: { dedupe: [...renderer.sharedPackages] },
     test: {
       server: { deps: { inline: [/^@aztlan\//] } },
       fakeTimers: { toFake: [...fakedTimers] },

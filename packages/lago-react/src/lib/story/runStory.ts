@@ -1,11 +1,7 @@
+import { type Screen, stoppedTimers, type Viewport } from "@aztlan/lago-core";
 import { createElement } from "react";
 import { onTestFinished, vi } from "vitest";
-import {
-  render,
-  type Screen,
-  stoppedTimers,
-  type Viewport,
-} from "../render/index.js";
+import { render } from "../render/index.js";
 import StoryFrame from "./StoryFrame.js";
 import type { PreparedStory } from "./types.js";
 
