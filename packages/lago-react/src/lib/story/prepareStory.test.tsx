@@ -37,6 +37,16 @@ describe("prepareStory", () => {
     });
   });
 
+  it("runs the file's loaders before the story's", () => {
+    const fromFile = () => ({ from: "file" });
+    const fromStory = () => ({ from: "story" });
+    const story = prepareStory({ ...meta, loaders: [fromFile] }, "Loaded", {
+      loaders: [fromStory],
+    });
+    expect(story.loaders).toEqual([fromFile, fromStory]);
+    expect(prepareStory(meta, "Bare", {}).loaders).toEqual([]);
+  });
+
   it("draws the file's component with the args when nothing else is said", () => {
     const story = prepareStory(meta, "Default", {});
     expect(story.render({ text: "hi" }, {} as never)).toEqual(

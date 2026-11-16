@@ -13,10 +13,13 @@ const story = prepareStory({ title: "frame/Sized" }, "Sized", {
 
 describe("StoryFrame", () => {
   it("draws a story at the size of the screen it is mounted on", async () => {
-    const screen = await render(<StoryFrame story={story} args={{}} />, {
-      cols: 14,
-      rows: 2,
-    });
+    const screen = await render(
+      <StoryFrame story={story} args={{}} loaded={{}} />,
+      {
+        cols: 14,
+        rows: 2,
+      },
+    );
     expect(screen.lines.at(0)).toBe("14 by 2");
   });
 
@@ -26,7 +29,7 @@ describe("StoryFrame", () => {
         createElement(
           ViewportContext.Provider,
           { value: undefined },
-          <StoryFrame story={story} args={{}} />,
+          <StoryFrame story={story} args={{}} loaded={{}} />,
         ),
       ),
     ).rejects.toThrow(

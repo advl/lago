@@ -27,7 +27,8 @@ function readAnnotations(
 /**
  * A story with what its file's default export gives it: args merged key by
  * key, parameters object into object, the story's decorators inside the
- * file's, and the story's own `render` and `play` before the file's.
+ * file's, the file's loaders before the story's, and the story's own `render`
+ * and `play` before the file's.
  */
 export default function prepareStory(
   meta: Meta,
@@ -51,6 +52,7 @@ export default function prepareStory(
     args: { ...meta.args, ...story.args },
     parameters: mergeParameters(meta.parameters, story.parameters),
     decorators: [...(story.decorators ?? []), ...(meta.decorators ?? [])],
+    loaders: [...(meta.loaders ?? []), ...(story.loaders ?? [])],
     render,
     play: story.play ?? meta.play,
     tags: resolveTags(meta.tags, story.tags),

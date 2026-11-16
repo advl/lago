@@ -6,6 +6,7 @@ export type {
   ComposedStories,
   ComposedStory,
   Decorator,
+  Loader,
   Meta,
   Parameters,
   PlayContext,

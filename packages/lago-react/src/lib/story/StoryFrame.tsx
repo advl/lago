@@ -5,6 +5,8 @@ import type { PreparedStory } from "./types.js";
 interface Props {
   readonly story: PreparedStory;
   readonly args: Record<string, unknown>;
+  /** What the story's loaders gave, run before it was mounted. */
+  readonly loaded: Readonly<Record<string, unknown>>;
 }
 
 const refuseUnmounted = (title: string, name: string): never => {
@@ -20,7 +22,7 @@ const refuseUnmounted = (title: string, name: string): never => {
  * story was mounted at, which `render` gives; a story mounted any other way
  * has no screen to be told of, and is refused.
  */
-export default function StoryFrame({ story, args }: Props) {
+export default function StoryFrame({ story, args, loaded }: Props) {
   const viewport =
     useContext(ViewportContext) ?? refuseUnmounted(story.title, story.name);
   // The args are read when the story draws, not built into the component:
@@ -35,11 +37,12 @@ export default function StoryFrame({ story, args }: Props) {
       args: latest.current,
       parameters: story.parameters,
       viewport,
+      loaded,
     });
     return story.decorators.reduce<() => ReactNode>(
       (Story, decorate) => () => decorate(Story, readContext()),
       () => story.render(latest.current, readContext()),
     );
-  }, [story, viewport]);
+  }, [story, viewport, loaded]);
   return <Decorated />;
 }

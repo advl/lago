@@ -86,6 +86,7 @@ export const Long: Story = {
 - A story drawn otherwise says so in `parameters.viewports`: an entry under one of the project's names changes that viewport, so `{ narrow: { rows: 12 } }` draws it on 12 lines, and an entry under a new name adds one, with both its size and its lines.
 - A state reached by keys is a story with `play`, which presses them: `play: async ({ userEvent }) => { await userEvent.keyboard("{ArrowDown}{Enter}"); }`.
 - A provider is a decorator: `decorators: [(Story) => <Keys>{Story()}</Keys>]`.
+- Data a story needs before it is drawn comes from a loader: `loaders: [async () => ({ user: await readUser() })]`. Loaders run one after another, the file's before the story's, each once the one before it has finished, on the stopped clock, where no timer fires: a loader awaits promises, never a delay, or its story's test ends still waiting for it and says so. What they give is merged into `loaded`, which `render`, the decorators and `play` read from their context, a later loader's value winning under the same name.
 - `tags: ["!test"]` leaves a story out of the test run, and keeps its goldens.
 
 ## Goldens
@@ -112,7 +113,7 @@ it("opens the recovery with its label", async () => {
 });
 ```
 
-`composeStories` gives each story as a component with its args and decorators, so a test starts from the state the story shows. `waitFor` retries an assertion until it passes or times out, for what arrives after a timer or a promise.
+`composeStories` gives each story as a component with its args and decorators, so a test starts from the state the story shows. A story with loaders is mounted once `await Story.load()` has run them, on the test's own clock, and is refused before; its `run()` runs them itself, on the stopped clock. `waitFor` retries an assertion until it passes or times out, for what arrives after a timer or a promise.
 
 ## The gallery
 

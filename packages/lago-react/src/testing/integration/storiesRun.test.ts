@@ -166,6 +166,24 @@ export const Default = { args: { text: "untitled" } };
     );
   });
 
+  it("fail a story whose loader waits on a timer, saying the clock is stopped", async () => {
+    const delayed = stories.replace(
+      'args: { text: "bye" },',
+      'args: { text: "bye" },\n  loaders: [() => new Promise((done) => setTimeout(done, 1))],',
+    );
+    const { outcomes } = await runProject(
+      { ...project, "Label.stories.tsx": delayed },
+      "--testTimeout=500",
+    );
+    const bye = outcomes.find(({ name }) =>
+      name.startsWith("scratch/Label Bye"),
+    );
+    expect(bye?.status).toBe("failed");
+    expect(bye?.failures.join("\n")).toContain(
+      'The story "scratch/Label Bye" was still running its loaders when its test ended. Loaders run on the stopped clock, where no timer fires',
+    );
+  });
+
   it("leave a story tagged !test out of the run, keeping its golden", async () => {
     const tagged = stories.replace(
       'args: { text: "bye" },',
