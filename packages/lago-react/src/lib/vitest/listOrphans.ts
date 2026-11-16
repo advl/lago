@@ -1,10 +1,12 @@
 import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
+import { goldenCell } from "./constants.js";
 
 /**
  * The goldens in `folder` that belong to the stories file named `base` and to
- * none of its stories. A golden is `<base>.<Story>.<viewport>.golden`, and
- * neither a story's name nor a viewport's holds a dot, so a file of another
+ * none of its stories. A golden is `<base>.<Story>.<viewport>.golden`, or
+ * `<base>.<Story>.<viewport>@<mode>.golden` for a mode's, and neither a
+ * story's name, a viewport's nor a mode's holds a dot, so a file of another
  * stories file whose name merely starts the same is not taken for one.
  *
  * @note Impure: reads the folder.
@@ -17,12 +19,13 @@ export default function listOrphans(
   if (!existsSync(folder)) return [];
   return readdirSync(folder)
     .filter((entry) => {
-      const [story, viewport, extension, ...rest] = entry
+      const [story, cell = "", extension, ...rest] = entry
         .slice(base.length + 1)
         .split(".");
       return (
         entry.startsWith(`${base}.`) &&
-        Boolean(story && viewport) &&
+        Boolean(story) &&
+        goldenCell.test(cell) &&
         extension === "golden" &&
         rest.length === 0
       );

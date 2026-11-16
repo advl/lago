@@ -61,6 +61,57 @@ describe("testStories", () => {
     });
   });
 
+  it("makes a stories file hand the modes to its registration", () => {
+    const modes = {
+      dark: { globals: { scheme: "dark" }, expect: { tags: ["themed"] } },
+    };
+    const result = callHook(
+      testStories({ viewports, modes }),
+      "transform",
+      "export const Default = {};\n",
+      "/project/src/Row.stories.tsx",
+    );
+    expect(result).toMatchObject({
+      code: expect.stringContaining(
+        '{"viewports":{"narrow":{"cols":40,"rows":36}},"comments":{"Default":""},"modes":{"dark":{"globals":{"scheme":"dark"},"expect":{"tags":["themed"]}}}});',
+      ),
+    });
+  });
+
+  it("refuses a mode whose name cannot be part of a file's name", () => {
+    expect(() =>
+      testStories({ modes: { "dark.mode": { globals: { scheme: "dark" } } } }),
+    ).toThrow(
+      'The mode name "dark.mode" cannot be part of a file\'s name. Use letters, digits, - and _.',
+    );
+  });
+
+  it.each([
+    ["no globals", {}],
+    ["empty globals", { globals: {} }],
+    ["no object", null],
+  ])("refuses a mode with %s, which would draw as the base does", (_, mode) => {
+    expect(() => testStories({ modes: { dark: mode as never } })).toThrow(
+      'The mode dark sets no global, so it would draw every story as the base does. Give it the globals it sets, as in dark: { globals: { scheme: "dark" } }.',
+    );
+  });
+
+  it.each([
+    ["a text", { tags: "themed" }],
+    ["no tags", {}],
+    ["a tag that is no text", { tags: [1] }],
+  ])("refuses a mode that expects by %s", (_, expected) => {
+    expect(() =>
+      testStories({
+        modes: {
+          dark: { globals: { scheme: "dark" }, expect: expected as never },
+        },
+      }),
+    ).toThrow(
+      'The mode dark expects to change stories by tags that are not a list of text. Name the tags, as in dark: { globals: { scheme: "dark" }, expect: { tags: ["coloured"] } }.',
+    );
+  });
+
   it("refuses a preview that is not a file, naming where it was looked for", () => {
     const plugin = testStories({ preview: "./src/missing.tsx" });
     expect(() =>
@@ -134,6 +185,22 @@ describe("testStories", () => {
     };
     expect(readKeys("./one.tsx")).not.toBe(readKeys("./other.tsx"));
     expect(readKeys("./one.tsx")).not.toBe(readKeys());
+  });
+
+  it("has vitest transform a stories file again when its modes change", () => {
+    const readKeys = (scheme?: string) => {
+      let readKey = (_: { id: string }): unknown => "never defined";
+      const modes =
+        scheme === undefined ? undefined : { dark: { globals: { scheme } } };
+      callHook(testStories({ viewports, modes }), "configureVitest", {
+        defineCacheKeyGenerator: (generator: typeof readKey) => {
+          readKey = generator;
+        },
+      });
+      return readKey({ id: "/project/Row.stories.tsx" });
+    };
+    expect(readKeys("dark")).not.toBe(readKeys("dim"));
+    expect(readKeys("dark")).not.toBe(readKeys());
   });
 
   it("refuses an empty set of viewports", () => {

@@ -59,6 +59,12 @@ const ALLOWED_EMAILS = new Set(["47156835+advl@users.noreply.github.com"]);
 /** Reserved-neutral domains are always fine in fixtures. */
 const NEUTRAL_EMAIL = /@example\.(com|org|net)$/;
 
+/**
+ * A mode's golden is named `<file>.<Story>.<viewport>@<mode>.golden`, which
+ * has an address's shape and is none: no address ends in `.golden`.
+ */
+const GOLDEN_NAME = /\.golden$/;
+
 /** Files whose whole purpose is to name a copyright holder. */
 const EXEMPT_FILES = new Set(["LICENSE"]);
 
@@ -349,7 +355,10 @@ const rules: Rule[] = [
     label: "e-mail address",
     hits: matching(
       EMAIL,
-      (hit) => ALLOWED_EMAILS.has(hit) || NEUTRAL_EMAIL.test(hit),
+      (hit) =>
+        ALLOWED_EMAILS.has(hit) ||
+        NEUTRAL_EMAIL.test(hit) ||
+        GOLDEN_NAME.test(hit),
     ),
     probes: [["someone", "@", "elsewhere", ".", "invalid"].join("")],
   },

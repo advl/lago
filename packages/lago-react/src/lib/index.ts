@@ -21,5 +21,11 @@ export type {
   StoryObj,
 } from "./story/index.js";
 export { composeStories, setProjectAnnotations } from "./story/index.js";
-export type { Options, Renderer, StoryResult } from "./vitest/index.js";
+export type {
+  Comparison,
+  Mode,
+  Options,
+  Renderer,
+  StoryResult,
+} from "./vitest/index.js";
 export { renderer, testStories } from "./vitest/index.js";

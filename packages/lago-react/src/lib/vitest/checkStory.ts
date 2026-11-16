@@ -4,6 +4,7 @@ import { expect, type TestContext } from "vitest";
 import {
   type PreparedStory,
   readDescription,
+  resolveGlobals,
   runStory,
 } from "../story/index.js";
 import readGolden from "./readGolden.js";
@@ -15,6 +16,8 @@ interface Subject {
   readonly viewportName: string;
   readonly viewport: Viewport;
   readonly golden: string;
+  /** Told what was drawn, as a golden's text, before it is compared. */
+  readonly onDrawn?: (text: string) => void;
 }
 
 /**
@@ -26,12 +29,13 @@ interface Subject {
  * @note Impure: mounts on a renderer and reads the golden.
  */
 export default async function checkStory(
-  { file, story, comment, viewportName, viewport, golden }: Subject,
+  { file, story, comment, viewportName, viewport, golden, onDrawn }: Subject,
   task: TestContext["task"],
 ): Promise<void> {
   const screen = await runStory(story, viewport);
   const actual = screen.screenshot();
   const text = formatGolden(actual);
+  onDrawn?.(text);
   task.meta.lago = {
     file,
     title: story.title,
@@ -39,6 +43,7 @@ export default async function checkStory(
     description: readDescription(story.parameters) ?? (comment || undefined),
     tags: story.tags,
     viewportName,
+    globals: resolveGlobals(story),
     golden,
     actual,
     text,

@@ -10,6 +10,7 @@ const story = {
   description: "A row.",
   tags: ["dev", "test"],
   viewportName: "narrow",
+  globals: {},
   golden: "/project/src/__goldens__/Row.Default.narrow.golden",
   actual: drawPicture(["row"]),
   text: '40x1\n|row\n\n1:1 "row"\n',

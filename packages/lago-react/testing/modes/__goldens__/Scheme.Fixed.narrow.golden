@@ -1,0 +1,5 @@
+24x4
+|dark 0
+
+1:1 "dark" fg=4 bold
+1:6 "0" fg=4

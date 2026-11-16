@@ -111,7 +111,7 @@ export default preview;
 - its decorators wrap all the others, the file's included;
 - its loaders run before the file's, and its tags are read before the file's.
 
-## Globals
+## Globals and modes
 
 A setting that is not an arg, such as a colour scheme, a density or a set of glyphs, is a global. The preview declares each one with the values it takes and its default:
 
@@ -141,11 +141,33 @@ export default preview;
 - A story, or its file's default export, fixes a global with `globals: { scheme: "dracula" }`; the story's win over the file's.
 - A global the preview does not declare, or a value it does not take, fails the stories file, naming the file, the story and the declared choices.
 
+A mode is a named set of globals every story is also drawn in. The plugin takes the modes beside the viewports:
+
+```ts
+testStories({
+  viewports,
+  preview: "./src/lago.preview.tsx",
+  modes: {
+    dracula: { globals: { scheme: "dracula" }, expect: { tags: ["coloured"] } },
+    truecolor: { globals: { tint: "truecolor" } },
+  },
+});
+```
+
+- A mode's name becomes part of a golden's file name, so it holds letters, digits, `-` and `_`. A mode sets at least one global, and only globals the preview declares, at their values.
+- Every story is drawn at every viewport in the base, which sets nothing, and then in each mode. A value resolves as the story's own, then the mode's, then the default.
+- A mode's test is named `<Story> at <viewport>@<mode>`, after the base's `<Story> at <viewport>`.
+- A mode's picture is compared with the base picture at the same viewport, drawn in the same run. Equal, it keeps no golden. Different, it is compared with its own golden, `<file>.<Story>.<viewport>@<mode>.golden`, written on a person's machine and missing in a pipeline like any other.
+- A mode names the stories it is meant to change with `expect.tags`, a list of tags. Such a story whose picture comes out equal to the base's fails, naming the mode: the mode's globals did not reach it, or the story fixes them itself.
+- A story leaves a mode out with `parameters.modes: { dracula: { disable: true } }`.
+
+What equality saves is files and review, not time: each mode draws every story once more.
+
 ## Goldens
 
-The first run of a story on a person's machine writes its picture beside the stories file, as `__goldens__/<file>.<Story>.<viewport>.golden`: the screen's text, then each run's colours and attributes. Every later run compares the picture with it. In a pipeline, a missing golden fails the run, so a story without one never passes unseen.
+The first run of a story on a person's machine writes its picture beside the stories file, as `__goldens__/<file>.<Story>.<viewport>.golden`: the screen's text, then each run's colours and attributes. A mode's picture that differs from the base's is kept beside it as `<file>.<Story>.<viewport>@<mode>.golden`, so the two sort together. Every later run compares the picture with it. In a pipeline, a missing golden fails the run, so a story without one never passes unseen.
 
-A golden is text, and a changed one is read in the pull request's diff like code. Accepting a new picture is deliberate: `A` on that picture in the gallery, or `vitest run --project stories -u` on a named file. `-u` also removes the goldens no story owns.
+A golden is text, and a changed one is read in the pull request's diff like code. Accepting a new picture is deliberate: `A` on that picture in the gallery, or `vitest run --project stories -u` on a named file. `-u` also removes the goldens no story owns, a mode's whose picture has come to equal the base's among them.
 
 ## Testing a component
 
