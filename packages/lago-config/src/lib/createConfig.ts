@@ -3,6 +3,7 @@ import { renderer, testStories } from "@aztlan/lago-react/vitest";
 import type { ViteUserConfig } from "vitest/config";
 import { fakedTimers } from "./constants.js";
 import coverUnitsOnly from "./coverUnitsOnly.js";
+import createGalleryPlugin from "./createGalleryPlugin.js";
 import type { Options } from "./types.js";
 
 /**
@@ -16,8 +17,9 @@ import type { Options } from "./types.js";
  * package linked from a checkout; a `unit` project over the tests under
  * `src/` and a `stories` project over the stories files there; the plugin
  * that makes each story a test, inside the project's preview when one is
- * named and in each of its modes; the timers a test fakes; and, when asked,
- * the coverage settings, which a run applies to the unit project alone.
+ * named and in each of its modes; the timers a test fakes; when asked, the
+ * coverage settings, which a run applies to the unit project alone; and,
+ * when given, the gallery's settings, which only `lago` reads.
  */
 export default function createConfig({
   viewports,
@@ -25,6 +27,7 @@ export default function createConfig({
   preview,
   modes,
   matrix,
+  gallery,
 }: Options = {}): ViteUserConfig {
   // Coverage matches what it leaves out against paths from the project's
   // root, so an absolute path would leave the preview measured.
@@ -37,6 +40,7 @@ export default function createConfig({
     plugins: [
       testStories({ viewports, preview, modes, matrix }),
       coverUnitsOnly,
+      ...(gallery ? [createGalleryPlugin(gallery)] : []),
     ],
     // What names the renderer comes from the renderer's own package: where
     // JSX takes its runtime, the build vitest must load, and what is kept to

@@ -24,12 +24,7 @@ import {
   readSelection,
   reduceGallery,
 } from "../../state/index.js";
-import {
-  chromeLines,
-  minColumns,
-  minLines,
-  treeColumns,
-} from "../constants.js";
+import { barLines, minColumns, minLines, treeColumns } from "../constants.js";
 import Inspect from "../Inspect/Inspect.js";
 import measureInspected from "../Inspect/measureInspected.js";
 import StatusLine from "../StatusLine/StatusLine.js";
@@ -90,7 +85,7 @@ const Gallery = ({
   const selection = readSelection(state, known);
   const { component, viewportName, record, confirming } = selection;
   const story = component?.stories.at(selection.story);
-  const lines = height - chromeLines;
+  const lines = height - barLines;
   const inspected =
     state.inspecting && story && viewportName !== undefined
       ? measureInspected({

@@ -1,0 +1,79 @@
+80x24
+|component/KeyBar                                at terminal · as the room allows
+|┌─± Long at terminal · changed─────────────────────────────────────────────────┐
+|│1 line differs: 1 in text.                                                    │
+|│                                                                              │
+|│  2 − a long bar                                                              │
+|│    + a longer bar                                                            │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|└──────────────────────────────────────────────────────────────────────────────┘
+|✓ 4 pass · ± 2 changed · + 1 new · ✗ 1 error · ✗ 1 file failed to load
+|/project/src/Broken.stories.tsx: Cannot find module './Missing.js'
+|↑↓ scroll esc back / find p viewport d diff c cells A accept ? q quit
+
+1:1 "component/KeyBar                                at terminal · " fg=#1c1c1c bg=#fafafa
+1:63 "as the room allows" fg=#545454 bg=#fafafa
+2:1 "┌─± Long at terminal · changed─────────────────────────────────────────────────┐" fg=#1c1c1c bg=#fafafa
+3:1 "│1 line differs: 1 in text.                                                    │" fg=#1c1c1c bg=#fafafa
+4:1 "│                                                                              │" fg=#1c1c1c bg=#fafafa
+5:1 "│  " fg=#1c1c1c bg=#fafafa
+5:4 "2 " fg=#545454 bg=#fafafa
+5:6 "− " fg=#b3261e bg=#fafafa
+5:8 "a long bar                                                              │" fg=#1c1c1c bg=#fafafa
+6:1 "│    " fg=#1c1c1c bg=#fafafa
+6:6 "+ " fg=#1b6e30 bg=#fafafa
+6:8 "a longer bar                                                            │" fg=#1c1c1c bg=#fafafa
+7:1 "│                                                                              │" fg=#1c1c1c bg=#fafafa
+8:1 "│                                                                              │" fg=#1c1c1c bg=#fafafa
+9:1 "│                                                                              │" fg=#1c1c1c bg=#fafafa
+10:1 "│                                                                              │" fg=#1c1c1c bg=#fafafa
+11:1 "│                                                                              │" fg=#1c1c1c bg=#fafafa
+12:1 "│                                                                              │" fg=#1c1c1c bg=#fafafa
+13:1 "│                                                                              │" fg=#1c1c1c bg=#fafafa
+14:1 "│                                                                              │" fg=#1c1c1c bg=#fafafa
+15:1 "│                                                                              │" fg=#1c1c1c bg=#fafafa
+16:1 "│                                                                              │" fg=#1c1c1c bg=#fafafa
+17:1 "│                                                                              │" fg=#1c1c1c bg=#fafafa
+18:1 "│                                                                              │" fg=#1c1c1c bg=#fafafa
+19:1 "│                                                                              │" fg=#1c1c1c bg=#fafafa
+20:1 "│                                                                              │" fg=#1c1c1c bg=#fafafa
+21:1 "└──────────────────────────────────────────────────────────────────────────────┘" fg=#1c1c1c bg=#fafafa
+22:1 "✓ 4 pass " fg=#1c1c1c bg=#fafafa
+22:10 "· " fg=#545454 bg=#fafafa
+22:12 "± 2 changed " fg=#7f4d00 bg=#fafafa
+22:24 "· " fg=#545454 bg=#fafafa
+22:26 "+ 1 new " fg=#7f4d00 bg=#fafafa
+22:34 "· " fg=#545454 bg=#fafafa
+22:36 "✗ 1 error " fg=#b3261e bg=#fafafa
+22:46 "· " fg=#545454 bg=#fafafa
+22:48 "✗ 1 file failed to load          " fg=#b3261e bg=#fafafa
+23:1 "/project/src/Broken.stories.tsx: Cannot find module './Missing.js'              " fg=#b3261e bg=#fafafa
+24:1 "↑↓ " fg=#1c1c1c bg=#fafafa
+24:4 "scroll " fg=#545454 bg=#fafafa
+24:11 "esc " fg=#1c1c1c bg=#fafafa
+24:15 "back " fg=#545454 bg=#fafafa
+24:20 "/ " fg=#1c1c1c bg=#fafafa
+24:22 "find " fg=#545454 bg=#fafafa
+24:27 "p " fg=#1c1c1c bg=#fafafa
+24:29 "viewport " fg=#545454 bg=#fafafa
+24:38 "d " fg=#1c1c1c bg=#fafafa
+24:40 "diff " fg=#545454 bg=#fafafa
+24:45 "c " fg=#1c1c1c bg=#fafafa
+24:47 "cells " fg=#545454 bg=#fafafa
+24:53 "A " fg=#1c1c1c bg=#fafafa
+24:55 "accept " fg=#545454 bg=#fafafa
+24:62 "? q " fg=#1c1c1c bg=#fafafa
+24:66 "quit           " fg=#545454 bg=#fafafa

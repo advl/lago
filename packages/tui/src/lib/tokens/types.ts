@@ -1,10 +1,12 @@
 import type { RGBA } from "@opentui/core";
+import type { ReactNode } from "react";
 
 /**
  * The terminal's semantic tokens. Each names a meaning on screen, never a
  * colour or a shape, so a theme can change every value without a component
  * noticing. An application with meanings of its own extends this interface
- * and spreads `tokens` into its own set.
+ * and spreads `tokens` into its own set; one that draws in colours of its
+ * own gives its set to `TokensProvider`.
  */
 export interface Tokens {
   /** Ordinary text. */
@@ -42,4 +44,11 @@ export interface Tokens {
   readonly "glyph.cut": string;
   /** Separates fields on a line. */
   readonly "glyph.separator": string;
+}
+
+/** What `TokensProvider` is given. */
+export interface TokensProviderProps {
+  /** The set every component under it draws with. */
+  readonly tokens: Tokens;
+  readonly children: ReactNode;
 }

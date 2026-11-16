@@ -2,7 +2,7 @@ import { type ReactNode, useEffect } from "react";
 import { GroupHeading } from "../../component/index.js";
 import { fitField } from "../../fit/index.js";
 import { useListScroll } from "../../list/index.js";
-import { tokens } from "../../tokens/index.js";
+import { useTokens } from "../../tokens/index.js";
 import type { ScrolledListProps } from "./types.js";
 
 /**
@@ -21,6 +21,7 @@ const ScrolledList = ({
   width,
   rules,
 }: ScrolledListProps): ReactNode => {
+  const tokens = useTokens();
   const { shown, first, pinned, below } = useListScroll({
     blocks,
     from,

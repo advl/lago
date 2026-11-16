@@ -1,4 +1,5 @@
 import type { StoryResult } from "@aztlan/lago-react/vitest";
+import type { Tokens } from "@aztlan/tui";
 import type { Catalog, StoryRecord } from "../catalog/index.js";
 
 /** A frame of a stack, as vitest parses one. */
@@ -44,6 +45,11 @@ export interface Engine {
 export interface EngineOptions {
   /** The project's root, where its vitest configuration is found. */
   readonly root: string;
+  /**
+   * Called once with the chrome the project's configuration names, the
+   * terminal's own when it names none, before the first run.
+   */
+  readonly onChrome: (chrome: Tokens) => void;
   /** Called with the whole catalog after every run, the first included. */
   readonly onCatalog: (catalog: Catalog) => void;
 }

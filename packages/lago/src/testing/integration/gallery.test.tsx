@@ -3,7 +3,9 @@ import { join } from "node:path";
 import { createTestRenderer } from "@opentui/core/testing";
 import { describe, expect, it } from "vitest";
 import makeProject from "../../../testing/makeProject.js";
+import writeChromeConfig from "../../../testing/writeChromeConfig.js";
 import { openGallery } from "../../app/index.js";
+import { chromes } from "../../chrome/index.js";
 
 type Setup = Awaited<ReturnType<typeof createTestRenderer>>;
 
@@ -36,7 +38,7 @@ const stories = {
 };
 
 describe("openGallery", { timeout: 60_000 }, () => {
-  it("draws the gallery at once, shows the project's stories once drawn, and closes on q", async () => {
+  it("draws the gallery before the stories run, shows the project's stories once drawn, and closes on q", async () => {
     const root = makeProject(stories);
     let setup: Setup | undefined;
     const closed = openGallery(root, async (config) => {
@@ -86,5 +88,33 @@ describe("openGallery", { timeout: 60_000 }, () => {
         ),
       ),
     ).rejects.toThrow("a broken configuration");
+  });
+
+  it("draws in the chrome the project's configuration names, from its first frame", async () => {
+    const root = makeProject({
+      ...stories,
+      "vitest.config.ts": writeChromeConfig('"light"'),
+    });
+    let setup: Setup | undefined;
+    const closed = openGallery(root, async (config) => {
+      setup = await createTestRenderer({ ...config, width: 80, height: 24 });
+      return setup.renderer;
+    });
+    while (!setup) await new Promise((resolve) => setTimeout(resolve, 10));
+    await waitForFrame(setup, "lago-gallery-project-");
+    const shades = new Set(
+      setup
+        .captureSpans()
+        .lines.flatMap(({ spans }) => spans.map(({ bg }) => bg.toString())),
+    );
+    // The tree's selected row may already be drawn, in the chrome's shade.
+    const { "color.background": paint, "color.background.selected": shade } =
+      chromes.light;
+    expect(shades).toContain(paint.toString());
+    expect(new Set([...shades, shade.toString()])).toEqual(
+      new Set([paint.toString(), shade.toString()]),
+    );
+    setup.mockInput.pressKey("q");
+    expect(await closed).toBe(0);
   });
 });

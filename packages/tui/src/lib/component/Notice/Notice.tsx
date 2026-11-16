@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { tokens } from "../../tokens/index.js";
+import { useTokens } from "../../tokens/index.js";
 import type { NoticeProps } from "./types.js";
 import wrapNotice from "./wrapNotice.js";
 
@@ -14,6 +14,7 @@ const indent = 2;
  * words of each command after `run` stay on one line.
  */
 const Notice = ({ reason, recovery, width }: NoticeProps): ReactNode => {
+  const tokens = useTokens();
   const lines = wrapNotice(reason, recovery, width - indent);
   return (
     <box flexDirection="column" paddingLeft={indent}>

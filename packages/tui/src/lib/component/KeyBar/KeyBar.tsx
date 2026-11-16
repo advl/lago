@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { fitRuns, measurePieces } from "../../fit/index.js";
 import type { KeyCommand } from "../../keymap/index.js";
-import { tokens } from "../../tokens/index.js";
+import { useTokens } from "../../tokens/index.js";
 import type { KeyBarProps } from "./types.js";
 
 /** A run of the bar's text: a key, its label, or the gap between hints. */
@@ -28,6 +28,7 @@ const describeHints = (commands: readonly KeyCommand[]): Piece[] =>
  * the order given, and `?`, which lists every key, leaves last.
  */
 const KeyBar = ({ commands, width }: KeyBarProps): ReactNode => {
+  const tokens = useTokens();
   const hinted = commands.filter(({ hint }) => hint !== undefined);
   const shown = [...hinted];
   let pieces = describeHints(shown);

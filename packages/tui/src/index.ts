@@ -23,6 +23,7 @@ export type {
   ScrolledListProps,
   Slot,
   Tokens,
+  TokensProviderProps,
   UseCommandsProps,
   UseCommandsResult,
   UseListScrollProps,
@@ -49,7 +50,9 @@ export {
   Pane,
   PaneHeader,
   ScrolledList,
+  TokensProvider,
   tokens,
   useCommands,
   useListScroll,
+  useTokens,
 } from "./lib/index.js";

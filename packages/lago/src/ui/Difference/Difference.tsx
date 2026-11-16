@@ -1,4 +1,4 @@
-import { fitField, tokens } from "@aztlan/tui";
+import { fitField, useTokens } from "@aztlan/tui";
 import type { ReactNode } from "react";
 import { statusLooks } from "../constants.js";
 import compareScreens from "./compareScreens.js";
@@ -21,6 +21,7 @@ const Difference = ({
   lines,
   cols,
 }: DifferenceProps): ReactNode => {
+  const tokens = useTokens();
   const differing = compareScreens(expected, actual);
   const fitText = (text: string) =>
     fitField({ text, kind: "quote" }, "line", cols - gutterColumns);
@@ -33,7 +34,7 @@ const Difference = ({
               key: `${line}~`,
               number,
               mark: "~",
-              fg: statusLooks.changed.color,
+              fg: tokens[statusLooks.changed.color],
               text: after,
             },
           ]
@@ -42,14 +43,14 @@ const Difference = ({
               key: `${line}−`,
               number,
               mark: "−",
-              fg: statusLooks.error.color,
+              fg: tokens[statusLooks.error.color],
               text: before,
             },
             {
               key: `${line}+`,
               number: "   ",
               mark: "+",
-              fg: statusLooks.pass.color,
+              fg: tokens[statusLooks.pass.color],
               text: after,
             },
           ];

@@ -33,4 +33,23 @@ export interface Options {
    * every viewport, in the base and in each mode.
    */
   readonly matrix?: { readonly max: number };
+  /** How the gallery, `lago`, looks when it opens on the project. */
+  readonly gallery?: GalleryOptions;
+}
+
+/**
+ * A chrome the gallery has built in: `terminal`, the terminal's own colours
+ * and the default, or `light` or `dark`, which fix every colour.
+ */
+export type ChromeName = "terminal" | "light" | "dark";
+
+/** What `createConfig` is given for the gallery. */
+export interface GalleryOptions {
+  /**
+   * The gallery's own look: a built-in chrome by its name, or a set of
+   * `@aztlan/tui`'s tokens holding every one of them, as
+   * `{ ...tokens, "color.text": RGBA.fromHex("#202020") }`. The gallery
+   * refuses one it cannot read. It never changes a story's picture.
+   */
+  readonly chrome?: ChromeName | { readonly [token: string]: unknown };
 }

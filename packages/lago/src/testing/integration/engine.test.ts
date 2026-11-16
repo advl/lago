@@ -1,8 +1,12 @@
 import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { type Tokens, tokens } from "@aztlan/tui";
+import { RGBA } from "@opentui/core";
 import { describe, expect, it } from "vitest";
 import makeProject from "../../../testing/makeProject.js";
+import writeChromeConfig from "../../../testing/writeChromeConfig.js";
 import type { Catalog } from "../../catalog/index.js";
+import { chromes } from "../../chrome/index.js";
 import { startEngine } from "../../engine/index.js";
 
 const files = {
@@ -36,6 +40,7 @@ describe("startEngine", { timeout: 60_000 }, () => {
     const catalogs: Catalog[] = [];
     const engine = await startEngine({
       root,
+      onChrome: () => {},
       onCatalog: (catalog) => catalogs.push(catalog),
     });
     try {
@@ -82,6 +87,7 @@ describe("startEngine", { timeout: 60_000 }, () => {
     const catalogs: Catalog[] = [];
     const engine = await startEngine({
       root,
+      onChrome: () => {},
       onCatalog: (catalog) => catalogs.push(catalog),
     });
     try {
@@ -112,6 +118,7 @@ describe("startEngine", { timeout: 60_000 }, () => {
     await expect(
       startEngine({
         root,
+        onChrome: () => {},
         onCatalog: () => {
           calls += 1;
           throw new Error("the gallery could not take the catalog");
@@ -124,5 +131,56 @@ describe("startEngine", { timeout: 60_000 }, () => {
     );
     await new Promise((resolve) => setTimeout(resolve, 1500));
     expect(calls).toBe(1);
+  });
+
+  it("gives the chrome the project's configuration names before the first run", async () => {
+    const root = makeProject({
+      ...files,
+      "vitest.config.ts": writeChromeConfig('"dark"'),
+    });
+    const seen: unknown[] = [];
+    const engine = await startEngine({
+      root,
+      onChrome: (chrome) => seen.push(chrome),
+      onCatalog: (catalog) => seen.push(catalog),
+    });
+    try {
+      await nextCatalog(seen as Catalog[], 1);
+      expect(seen.at(0)).toBe(chromes.dark);
+    } finally {
+      await engine.close();
+    }
+  });
+
+  it("takes a project's own set of tokens through its configuration whole", async () => {
+    const root = makeProject({
+      ...files,
+      "vitest.config.ts": writeChromeConfig(
+        '{ ...tokens, "color.text": RGBA.fromHex("#123456") }',
+      ),
+    });
+    const seen: Tokens[] = [];
+    const engine = await startEngine({
+      root,
+      onChrome: (chrome) => seen.push(chrome),
+      onCatalog: () => {},
+    });
+    await engine.close();
+    expect(seen.at(0)?.["color.text"].toString()).toBe(
+      RGBA.fromHex("#123456").toString(),
+    );
+    expect(seen.at(0)?.["glyph.rule"]).toBe(tokens["glyph.rule"]);
+  });
+
+  it("refuses to start on a chrome it cannot read, naming the configuration's file", async () => {
+    const root = makeProject({
+      ...files,
+      "vitest.config.ts": writeChromeConfig('"sepia"'),
+    });
+    await expect(
+      startEngine({ root, onChrome: () => {}, onCatalog: () => {} }),
+    ).rejects.toThrow(
+      `${join(root, "vitest.config.ts")} sets gallery.chrome to "sepia", which is no chrome`,
+    );
   });
 });

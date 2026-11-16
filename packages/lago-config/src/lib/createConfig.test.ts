@@ -78,6 +78,18 @@ describe("createConfig", () => {
     ]);
   });
 
+  it("carries the gallery's settings in a plugin of its own, only when given them", () => {
+    const { plugins } = createConfig({
+      viewports,
+      gallery: { chrome: "dark" },
+    });
+    expect(plugins?.at(-1)).toEqual({
+      name: "lago:gallery",
+      api: { chrome: "dark" },
+    });
+    expect(createConfig({ viewports }).plugins).toHaveLength(2);
+  });
+
   it("keeps tests and stories in a project each, so a run can leave one out", () => {
     expect(createConfig({ viewports }).test?.projects).toEqual([
       {

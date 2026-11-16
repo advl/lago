@@ -1,0 +1,91 @@
+120x30
+|component/KeyBar                                                                        at terminal · as the room allows
+|┌─± Long at terminal · changed─────────────────────────────────────────────────────────────────────────────────────────┐
+|│1 line differs: 1 in text.                                                                                            │
+|│                                                                                                                      │
+|│  2 − a long bar                                                                                                      │
+|│    + a longer bar                                                                                                    │
+|│                                                                                                                      │
+|│                                                                                                                      │
+|│                                                                                                                      │
+|│                                                                                                                      │
+|│                                                                                                                      │
+|│                                                                                                                      │
+|│                                                                                                                      │
+|│                                                                                                                      │
+|│                                                                                                                      │
+|│                                                                                                                      │
+|│                                                                                                                      │
+|│                                                                                                                      │
+|│                                                                                                                      │
+|│                                                                                                                      │
+|│                                                                                                                      │
+|│                                                                                                                      │
+|│                                                                                                                      │
+|│                                                                                                                      │
+|│                                                                                                                      │
+|│                                                                                                                      │
+|└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+|✓ 4 pass · ± 2 changed · + 1 new · ✗ 1 error · ✗ 1 file failed to load
+|/project/src/Broken.stories.tsx: Cannot find module './Missing.js'
+|↑↓ scroll esc back / find p viewport d diff c cells A accept ? q quit
+
+1:1 "component/KeyBar                                                                        at terminal · " fg=#e4e4e4 bg=#1b1b1b
+1:103 "as the room allows" fg=#a8a8a8 bg=#1b1b1b
+2:1 "┌─± Long at terminal · changed─────────────────────────────────────────────────────────────────────────────────────────┐" fg=#e4e4e4 bg=#1b1b1b
+3:1 "│1 line differs: 1 in text.                                                                                            │" fg=#e4e4e4 bg=#1b1b1b
+4:1 "│                                                                                                                      │" fg=#e4e4e4 bg=#1b1b1b
+5:1 "│  " fg=#e4e4e4 bg=#1b1b1b
+5:4 "2 " fg=#a8a8a8 bg=#1b1b1b
+5:6 "− " fg=#ff8278 bg=#1b1b1b
+5:8 "a long bar                                                                                                      │" fg=#e4e4e4 bg=#1b1b1b
+6:1 "│    " fg=#e4e4e4 bg=#1b1b1b
+6:6 "+ " fg=#72c476 bg=#1b1b1b
+6:8 "a longer bar                                                                                                    │" fg=#e4e4e4 bg=#1b1b1b
+7:1 "│                                                                                                                      │" fg=#e4e4e4 bg=#1b1b1b
+8:1 "│                                                                                                                      │" fg=#e4e4e4 bg=#1b1b1b
+9:1 "│                                                                                                                      │" fg=#e4e4e4 bg=#1b1b1b
+10:1 "│                                                                                                                      │" fg=#e4e4e4 bg=#1b1b1b
+11:1 "│                                                                                                                      │" fg=#e4e4e4 bg=#1b1b1b
+12:1 "│                                                                                                                      │" fg=#e4e4e4 bg=#1b1b1b
+13:1 "│                                                                                                                      │" fg=#e4e4e4 bg=#1b1b1b
+14:1 "│                                                                                                                      │" fg=#e4e4e4 bg=#1b1b1b
+15:1 "│                                                                                                                      │" fg=#e4e4e4 bg=#1b1b1b
+16:1 "│                                                                                                                      │" fg=#e4e4e4 bg=#1b1b1b
+17:1 "│                                                                                                                      │" fg=#e4e4e4 bg=#1b1b1b
+18:1 "│                                                                                                                      │" fg=#e4e4e4 bg=#1b1b1b
+19:1 "│                                                                                                                      │" fg=#e4e4e4 bg=#1b1b1b
+20:1 "│                                                                                                                      │" fg=#e4e4e4 bg=#1b1b1b
+21:1 "│                                                                                                                      │" fg=#e4e4e4 bg=#1b1b1b
+22:1 "│                                                                                                                      │" fg=#e4e4e4 bg=#1b1b1b
+23:1 "│                                                                                                                      │" fg=#e4e4e4 bg=#1b1b1b
+24:1 "│                                                                                                                      │" fg=#e4e4e4 bg=#1b1b1b
+25:1 "│                                                                                                                      │" fg=#e4e4e4 bg=#1b1b1b
+26:1 "│                                                                                                                      │" fg=#e4e4e4 bg=#1b1b1b
+27:1 "└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘" fg=#e4e4e4 bg=#1b1b1b
+28:1 "✓ 4 pass " fg=#e4e4e4 bg=#1b1b1b
+28:10 "· " fg=#a8a8a8 bg=#1b1b1b
+28:12 "± 2 changed " fg=#e0b040 bg=#1b1b1b
+28:24 "· " fg=#a8a8a8 bg=#1b1b1b
+28:26 "+ 1 new " fg=#e0b040 bg=#1b1b1b
+28:34 "· " fg=#a8a8a8 bg=#1b1b1b
+28:36 "✗ 1 error " fg=#ff8278 bg=#1b1b1b
+28:46 "· " fg=#a8a8a8 bg=#1b1b1b
+28:48 "✗ 1 file failed to load                                                  " fg=#ff8278 bg=#1b1b1b
+29:1 "/project/src/Broken.stories.tsx: Cannot find module './Missing.js'                                                      " fg=#ff8278 bg=#1b1b1b
+30:1 "↑↓ " fg=#e4e4e4 bg=#1b1b1b
+30:4 "scroll " fg=#a8a8a8 bg=#1b1b1b
+30:11 "esc " fg=#e4e4e4 bg=#1b1b1b
+30:15 "back " fg=#a8a8a8 bg=#1b1b1b
+30:20 "/ " fg=#e4e4e4 bg=#1b1b1b
+30:22 "find " fg=#a8a8a8 bg=#1b1b1b
+30:27 "p " fg=#e4e4e4 bg=#1b1b1b
+30:29 "viewport " fg=#a8a8a8 bg=#1b1b1b
+30:38 "d " fg=#e4e4e4 bg=#1b1b1b
+30:40 "diff " fg=#a8a8a8 bg=#1b1b1b
+30:45 "c " fg=#e4e4e4 bg=#1b1b1b
+30:47 "cells " fg=#a8a8a8 bg=#1b1b1b
+30:53 "A " fg=#e4e4e4 bg=#1b1b1b
+30:55 "accept " fg=#a8a8a8 bg=#1b1b1b
+30:62 "? q " fg=#e4e4e4 bg=#1b1b1b
+30:66 "quit                                                   " fg=#a8a8a8 bg=#1b1b1b

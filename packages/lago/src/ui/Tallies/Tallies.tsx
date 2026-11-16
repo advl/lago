@@ -1,4 +1,4 @@
-import { fitRuns, type Piece, tokens } from "@aztlan/tui";
+import { fitRuns, type Piece, useTokens } from "@aztlan/tui";
 import type { ReactNode } from "react";
 import { statusLooks } from "../constants.js";
 import type { TalliesProps } from "./types.js";
@@ -11,17 +11,18 @@ const order = ["pass", "changed", "new", "error"] as const;
  * any did.
  */
 const Tallies = ({ tallies, failures, width }: TalliesProps): ReactNode => {
+  const tokens = useTokens();
   const counts: Piece[] = order.map((status) => ({
     text: `${statusLooks[status].glyph} ${tallies[status]} ${statusLooks[status].word}`,
     fg:
       tallies[status] > 0 && status !== "pass"
-        ? statusLooks[status].color
+        ? tokens[statusLooks[status].color]
         : tokens["color.text"],
   }));
   if (failures > 0) {
     counts.push({
       text: `${statusLooks.error.glyph} ${failures} ${failures === 1 ? "file" : "files"} failed to load`,
-      fg: statusLooks.error.color,
+      fg: tokens[statusLooks.error.color],
     });
   }
   const pieces = counts.flatMap((piece, place) =>

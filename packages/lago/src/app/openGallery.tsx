@@ -1,5 +1,5 @@
 import { basename } from "node:path";
-import { Keys } from "@aztlan/tui";
+import { Keys, TokensProvider } from "@aztlan/tui";
 import type { CliRenderer, CliRendererConfig } from "@opentui/core";
 import { createRoot, useTerminalDimensions } from "@opentui/react";
 import { useSyncExternalStore } from "react";
@@ -35,10 +35,12 @@ function Live({ name, subscribe, read, accept, quit }: LiveProps) {
 }
 
 /**
- * Opens the gallery on the project at `root`: draws it at once, then starts
- * the project's own vitest and shows each run's catalog as it comes. `q`,
- * or ctrl+c, closes the renderer, which stops vitest. When vitest cannot
- * start, the renderer is closed and the error given.
+ * Opens the gallery on the project at `root`: starts the project's own
+ * vitest, draws the gallery in the chrome its configuration names as soon as
+ * that is read, before any story runs, and shows each run's catalog as it
+ * comes. `q`, or ctrl+c, closes the renderer, which stops vitest. When
+ * vitest cannot start, or the chrome cannot be read, the renderer is closed
+ * and the error given.
  *
  * @note Impure: takes over the terminal and runs the project's vitest until the gallery is closed.
  * @param createRenderer Makes the renderer the gallery draws on.
@@ -71,28 +73,33 @@ export default async function openGallery(
         .then(() => (failure === undefined ? resolve(0) : reject(failure)));
     },
   });
+  const tree = createRoot(renderer);
   engine = startEngine({
     root,
+    // Drawn only once the chrome is known, so a chrome that paints the
+    // background never follows a first frame in the terminal's own.
+    onChrome: (chrome) =>
+      tree.render(
+        <TokensProvider tokens={chrome}>
+          <Keys>
+            <Live
+              name={basename(root)}
+              subscribe={store.subscribe}
+              read={store.read}
+              accept={async (record) => (await engine).accept(record)}
+              quit={() => {
+                tree.unmount();
+                renderer.destroy();
+              }}
+            />
+          </Keys>
+        </TokensProvider>,
+      ),
     onCatalog: store.give,
   });
   engine.catch((error: unknown) => {
     failure = error;
     renderer.destroy();
   });
-  const tree = createRoot(renderer);
-  tree.render(
-    <Keys>
-      <Live
-        name={basename(root)}
-        subscribe={store.subscribe}
-        read={store.read}
-        accept={async (record) => (await engine).accept(record)}
-        quit={() => {
-          tree.unmount();
-          renderer.destroy();
-        }}
-      />
-    </Keys>,
-  );
   return promise;
 }

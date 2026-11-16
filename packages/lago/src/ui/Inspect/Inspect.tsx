@@ -1,4 +1,4 @@
-import { fitField, tokens } from "@aztlan/tui";
+import { fitField, useTokens } from "@aztlan/tui";
 import type { ReactNode } from "react";
 import { statusLooks } from "../constants.js";
 import Difference from "../Difference/Difference.js";
@@ -14,6 +14,7 @@ import type { InspectProps } from "./types.js";
  * The scroll is held within what is shown.
  */
 const Inspect = (props: InspectProps): ReactNode => {
+  const tokens = useTokens();
   const { name, viewportName, record, scroll, cell, width, height } = props;
   const view = measureInspected(props);
   const { room } = view;
@@ -53,7 +54,7 @@ const Inspect = (props: InspectProps): ReactNode => {
     const fg =
       record?.error === undefined
         ? tokens["color.text.muted"]
-        : statusLooks.error.color;
+        : tokens[statusLooks.error.color];
     inside = (
       <box flexDirection="column">
         {view.message.slice(from, from + room.lines).map((line, place) => (

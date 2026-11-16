@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { fitField } from "../../fit/index.js";
-import { tokens } from "../../tokens/index.js";
+import { useTokens } from "../../tokens/index.js";
 import type { LoadingProps } from "./types.js";
 
 /**
@@ -8,8 +8,11 @@ import type { LoadingProps } from "./types.js";
  * measured, wherever a region waits on one. The caller names what is
  * being read, and places the line at its indent.
  */
-const Loading = ({ label, width }: LoadingProps): ReactNode => (
-  <text fg={tokens["color.text"]}>{fitField(label, "line", width)}</text>
-);
+const Loading = ({ label, width }: LoadingProps): ReactNode => {
+  const tokens = useTokens();
+  return (
+    <text fg={tokens["color.text"]}>{fitField(label, "line", width)}</text>
+  );
+};
 
 export default Loading;
