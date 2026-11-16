@@ -3,11 +3,14 @@ export type {
   Color,
   KeyName,
   Modifiers,
+  Mount,
+  MountTarget,
   Press,
   Run,
   Screen,
   ScreenParts,
   Screenshot,
+  Unmount,
   UserEvent,
   Viewport,
 } from "./lib/index.js";
@@ -19,6 +22,8 @@ export {
   normalizeRuns,
   parseGolden,
   registerSerializer,
+  renderStream,
+  screenshotFromBytes,
   stoppedTimers,
   waitFor,
 } from "./lib/index.js";

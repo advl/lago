@@ -38,6 +38,8 @@ const surface: Readonly<
       "normalizeRuns",
       "parseGolden",
       "registerSerializer",
+      "renderStream",
+      "screenshotFromBytes",
       "stoppedTimers",
       "waitFor",
     ],
