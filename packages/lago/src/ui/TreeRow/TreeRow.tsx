@@ -1,4 +1,4 @@
-import { fitField, measureText, tokens } from "@aztlan/tui";
+import { fitField, measureText, useTokens } from "@aztlan/tui";
 import type { ReactNode } from "react";
 import { statusLooks } from "../constants.js";
 import type { TreeRowProps } from "./types.js";
@@ -8,6 +8,7 @@ import type { TreeRowProps } from "./types.js";
  * stories it has, at the row's right edge. The selected row is shaded.
  */
 const TreeRow = ({ component, selected, width }: TreeRowProps): ReactNode => {
+  const tokens = useTokens();
   const look = statusLooks[component.status];
   const count = String(component.stories.length);
   const name = fitField(
@@ -24,7 +25,7 @@ const TreeRow = ({ component, selected, width }: TreeRowProps): ReactNode => {
           : tokens["color.background"]
       }
     >
-      <span fg={look.color}>{look.glyph} </span>
+      <span fg={tokens[look.color]}>{look.glyph} </span>
       <span fg={tokens["color.text"]}>{name + " ".repeat(gap)}</span>
       <span fg={tokens["color.text.muted"]}>{count}</span>
     </text>

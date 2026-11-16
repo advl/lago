@@ -1,4 +1,4 @@
-import { fitField, Loading, tokens } from "@aztlan/tui";
+import { fitField, Loading, useTokens } from "@aztlan/tui";
 import type { ReactNode } from "react";
 import type { Selection } from "../../state/index.js";
 import RunReader from "../RunReader/RunReader.js";
@@ -23,6 +23,7 @@ const StatusLine = ({
   message,
   width,
 }: StatusLineProps): ReactNode => {
+  const tokens = useTokens();
   const say = (text: string, fg = tokens["color.text"]) => (
     <text fg={fg}>{fitField({ text, kind: "quote" }, "line", width)}</text>
   );

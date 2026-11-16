@@ -1,5 +1,6 @@
 import { render } from "@aztlan/lago-react";
-import { tokens } from "@aztlan/tui";
+import { TokensProvider, tokens } from "@aztlan/tui";
+import { RGBA } from "@opentui/core";
 import { describe, expect, it } from "vitest";
 import { sampleCatalog } from "../../../testing/catalogs.js";
 import TreeRow from "./TreeRow.js";
@@ -36,5 +37,23 @@ describe("TreeRow", () => {
     expect(screen.getByText("2").bg).toBe(
       tokens["color.background.selected"].slot,
     );
+  });
+
+  it("takes its status's colour and its shade from the tokens it is drawn under", async () => {
+    if (!keyBar) throw new Error("no component");
+    const screen = await render(
+      <TokensProvider
+        tokens={{
+          ...tokens,
+          "color.text.warning": RGBA.fromHex("#8a5a00"),
+          "color.background.selected": RGBA.fromHex("#dddddd"),
+        }}
+      >
+        <TreeRow component={keyBar} selected width={27} />
+      </TokensProvider>,
+      { cols: 27, rows: 1 },
+    );
+    expect(screen.getByText("±").fg).toBe("#8a5a00");
+    expect(screen.getByText("KeyBar").bg).toBe("#dddddd");
   });
 });
