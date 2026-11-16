@@ -61,6 +61,7 @@ const surface: Readonly<
       "Pane",
       "PaneHeader",
       "ScrolledList",
+      "TokensProvider",
       "createKeymap",
       "endRuns",
       "fitBlock",
@@ -74,6 +75,7 @@ const surface: Readonly<
       "tokens",
       "useCommands",
       "useListScroll",
+      "useTokens",
     ],
   },
   // The gallery is its binary. Its entry exports nothing, and is there only

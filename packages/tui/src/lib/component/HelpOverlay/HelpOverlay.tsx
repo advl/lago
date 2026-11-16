@@ -3,7 +3,7 @@ import { fitField, measureText } from "../../fit/index.js";
 import type { KeyCommand } from "../../keymap/index.js";
 import { ScrolledList } from "../../layout/index.js";
 import type { ListBlock } from "../../list/index.js";
-import { tokens } from "../../tokens/index.js";
+import { useTokens } from "../../tokens/index.js";
 import GroupHeading from "../GroupHeading/GroupHeading.js";
 import type { GroupName } from "../GroupHeading/types.js";
 import type { HelpOverlayProps } from "./types.js";
@@ -46,6 +46,7 @@ const HelpOverlay = ({
   first = 0,
   onShown = () => {},
 }: HelpOverlayProps): ReactNode => {
+  const tokens = useTokens();
   const pad = " ".repeat(indent);
   const notePad = " ".repeat(indent + keyColumn);
   const groups = groupCommands(commands);

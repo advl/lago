@@ -13,6 +13,7 @@ describe("the package's entry", () => {
       "Pane",
       "PaneHeader",
       "ScrolledList",
+      "TokensProvider",
       "createKeymap",
       "endRuns",
       "fitBlock",
@@ -26,6 +27,7 @@ describe("the package's entry", () => {
       "tokens",
       "useCommands",
       "useListScroll",
+      "useTokens",
     ]);
   });
 });

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { fitField, fitRules, measurePieces } from "../../fit/index.js";
-import { tokens } from "../../tokens/index.js";
+import { useTokens } from "../../tokens/index.js";
 import type { GroupHeadingProps } from "./types.js";
 
 /**
@@ -20,6 +20,7 @@ const GroupHeading = ({
   width,
   rules = fitRules,
 }: GroupHeadingProps): ReactNode => {
+  const tokens = useTokens();
   const counted =
     count === undefined ? "" : ` · ${fitField(count, "line", width, rules)}`;
   // A space and one cell of rule always follow the name and its count.

@@ -61,5 +61,5 @@ export type {
 export { useListScroll } from "./list/index.js";
 export type { PaneHeaderProps } from "./subcomponent/index.js";
 export { PaneHeader } from "./subcomponent/index.js";
-export type { Tokens } from "./tokens/index.js";
-export { tokens } from "./tokens/index.js";
+export type { Tokens, TokensProviderProps } from "./tokens/index.js";
+export { TokensProvider, tokens, useTokens } from "./tokens/index.js";

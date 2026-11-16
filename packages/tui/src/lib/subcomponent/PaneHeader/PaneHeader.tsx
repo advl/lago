@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { fitField, measureText } from "../../fit/index.js";
-import { tokens } from "../../tokens/index.js";
+import { useTokens } from "../../tokens/index.js";
 import type { PaneHeaderProps } from "./types.js";
 
 /**
@@ -19,6 +19,7 @@ const PaneHeader = ({
   sort,
   width,
 }: PaneHeaderProps): ReactNode => {
+  const tokens = useTokens();
   const left = fitField(title, "line", width);
   const separator = ` ${tokens["glyph.separator"]} `;
   const parts = address

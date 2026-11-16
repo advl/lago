@@ -9,7 +9,7 @@ Lago makes a terminal interface drawn by OpenTUI reviewable the way a web interf
 | `@aztlan/lago-core` | the screen, the screenshot and the golden, which name no renderer; installed with `@aztlan/lago-react`, which re-exports the types a test names | none |
 | `@aztlan/lago-react` | the story types (`Meta`, `StoryObj`, `Preview`), `render`, `composeStories`, `setProjectAnnotations` and `waitFor` for tests; the vitest plugin `testStories` from `@aztlan/lago-react/vitest` | `@storybook/react` and its vitest add-on |
 | `@aztlan/lago-config` | `createConfig`, the vitest configuration a project needs | the project's own Storybook and vitest configuration |
-| `@aztlan/tui` | the components both an application and the gallery draw: the pane, its header, the scrolled list, the key bar and the help, notices, loading lines and empty states; the keymap and the text-fitting functions | none |
+| `@aztlan/tui` | the components both an application and the gallery draw: the pane, its header, the scrolled list, the key bar and the help, notices, loading lines and empty states; the keymap and the text-fitting functions; the tokens they draw with, and `TokensProvider` to draw them in other colours | none |
 | `@aztlan/lago` | the `lago` binary, the gallery | `storybook` |
 
 ## Requirements
@@ -250,7 +250,7 @@ A story that throws shows its message and its place in the source; no other stor
 2. Every component has a story whose text is longer than it holds.
 3. Viewports are project data: the narrowest terminal the application supports, and one wider.
 4. Time, randomness and data come in as args. The clock stands at zero.
-5. Colours are palette entries or the terminal's defaults, through tokens. Text given no colour is drawn fixed white.
+5. Colours are palette entries or the terminal's defaults, through tokens. A component reads them with `useTokens`, as it draws, so a `TokensProvider` above it changes them; outside any provider they are `tokens`, the terminal's own. Text given no colour is drawn fixed white.
 6. Providers are decorators. Those every story needs are written once, in the project's preview.
 7. Keys go in `play`. A callback is asserted with `expect(args.onChoose)`.
 8. Stories run in their own vitest project, so that pictures are not counted as coverage. `createConfig` sets this up.
