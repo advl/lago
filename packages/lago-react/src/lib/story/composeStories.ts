@@ -1,6 +1,7 @@
 import { defaultViewport } from "@aztlan/lago-core";
 import { createElement } from "react";
 import listStories from "./listStories.js";
+import projectAnnotations from "./projectAnnotations.js";
 import runLoaders from "./runLoaders.js";
 import runStory from "./runStory.js";
 import StoryFrame from "./StoryFrame.js";
@@ -55,11 +56,17 @@ function composeStory(story: PreparedStory): ComposedStory {
  * a test to use as its fixtures: `import * as stories` from the file and pass
  * the module. A story is a component to mount with `render`, once `load` has
  * run its loaders if it has any, and `run` mounts it and plays it through.
+ * Each is set inside the preview `setProjectAnnotations` gave, as the stories
+ * file's own test sets it.
  */
 export default function composeStories<Module extends StoriesModule>(
   module: Module,
 ): ComposedStories<Module> {
-  const stories = listStories(module, "The module given to composeStories");
+  const stories = listStories(
+    module,
+    "The module given to composeStories",
+    projectAnnotations.current,
+  );
   const composed = Object.fromEntries(
     stories.map((story) => [story.name, composeStory(story)]),
   );

@@ -45,7 +45,7 @@ const surface: Readonly<
     ],
   },
   "@aztlan/lago-react": {
-    ".": ["composeStories", "render", "waitFor"],
+    ".": ["composeStories", "render", "setProjectAnnotations", "waitFor"],
     "./vitest": ["renderer", "testStories"],
   },
   "@aztlan/lago-config": { ".": ["createConfig"] },

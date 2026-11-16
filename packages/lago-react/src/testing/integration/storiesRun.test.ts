@@ -270,6 +270,29 @@ describe("a project's stories under the plugin with a preview", {
     );
   });
 
+  it("draw in a test what they draw in their own, once the test sets the same preview", async () => {
+    const { outcomes, output } = await runProject({
+      ...previewed,
+      "Label.test.tsx": `import { expect, it } from "vitest";
+import { composeStories, setProjectAnnotations } from ${entry};
+import preview from "./lago.preview.js";
+import * as stories from "./Label.stories.js";
+
+setProjectAnnotations(preview);
+
+it("draws a story inside the preview", async () => {
+  const { Preset } = composeStories(stories);
+  expect((await Preset.run({ cols: 20, rows: 3 })).lines).toEqual(["[story]", "file", "preset"]);
+});
+`,
+    });
+    expect(
+      outcomes.find(({ name }) => name === "draws a story inside the preview")
+        ?.status,
+      output,
+    ).toBe("passed");
+  });
+
   it("fail the stories files when the preview has no default export, naming it", async () => {
     const { outcomes, errors } = await runProject({
       ...previewed,

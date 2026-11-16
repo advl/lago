@@ -7,7 +7,7 @@ Lago makes a terminal interface drawn by OpenTUI reviewable the way a web interf
 | Package | What it gives | What it stands for in Storybook |
 |---|---|---|
 | `@aztlan/lago-core` | the screen, the screenshot and the golden, which name no renderer; installed with `@aztlan/lago-react`, which re-exports the types a test names | none |
-| `@aztlan/lago-react` | the story types (`Meta`, `StoryObj`), `render`, `composeStories` and `waitFor` for tests; the vitest plugin `testStories` from `@aztlan/lago-react/vitest` | `@storybook/react` and its vitest add-on |
+| `@aztlan/lago-react` | the story types (`Meta`, `StoryObj`, `Preview`), `render`, `composeStories`, `setProjectAnnotations` and `waitFor` for tests; the vitest plugin `testStories` from `@aztlan/lago-react/vitest` | `@storybook/react` and its vitest add-on |
 | `@aztlan/lago-config` | `createConfig`, the vitest configuration a project needs | the project's own Storybook and vitest configuration |
 | `@aztlan/tui` | the components both an application and the gallery draw: the pane, its header, the scrolled list, the key bar and the help, notices, loading lines and empty states; the keymap and the text-fitting functions | none |
 | `@aztlan/lago` | the `lago` binary, the gallery | `storybook` |
@@ -136,6 +136,20 @@ it("opens the recovery with its label", async () => {
 ```
 
 `composeStories` gives each story as a component with its args and decorators, so a test starts from the state the story shows. A story with loaders is mounted once `await Story.load()` has run them, on the test's own clock, and is refused before; its `run()` runs them itself, on the stopped clock. `waitFor` retries an assertion until it passes or times out, for what arrives after a timer or a promise.
+
+A test draws a story inside the project's preview once it hands `composeStories` the same preview with `setProjectAnnotations`, at the top of the test file, before it composes:
+
+```ts
+import { composeStories, setProjectAnnotations } from "@aztlan/lago-react";
+import preview from "../lago.preview.js";
+import * as stories from "./Notice.stories.js";
+
+setProjectAnnotations(preview);
+
+const { Missing } = composeStories(stories);
+```
+
+It is called in the test files that compose stories, not in a setup file: a setup file would load the preview, and every module it imports, into every test file, ahead of that file's own mocks. A preview with loaders gives every story loaders, so such a test awaits `load()` before it mounts a story as a component.
 
 ## The gallery
 
