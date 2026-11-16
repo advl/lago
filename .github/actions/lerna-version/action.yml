@@ -40,6 +40,10 @@ runs:
       shell: bash
       run: bun run check:fix
 
+    - name: Hold the changelogs to the leakage gate
+      shell: bash
+      run: ${{ github.action_path }}/check-changelogs.sh
+
     - name: Setup Git CLI
       uses: ./.github/actions/setup-git
       with:
