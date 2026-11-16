@@ -105,7 +105,7 @@ const preview = {
 export default preview;
 ```
 
-The plugin's `preview` option names the module from the project's root, as in `testStories({ viewports, preview: "./src/lago.preview.tsx" })`, and every stories file is then set inside it. A preview holds `args`, `parameters`, `decorators`, `loaders` and `tags`, and each is set around what the file and the story say:
+`createConfig({ preview: "./src/lago.preview.tsx" })` names the module from the project's root, and every stories file is then set inside it; coverage leaves it out, as it leaves the stories. A project that writes its own configuration gives the same path to the plugin, as `testStories({ viewports, preview })`. A preview holds `args`, `parameters`, `decorators`, `loaders` and `tags`, and each is set around what the file and the story say:
 
 - its args and parameters come first, so a file's or a story's win;
 - its decorators wrap all the others, the file's included;

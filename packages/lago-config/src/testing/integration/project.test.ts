@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import runProject from "../../../testing/runProject.js";
+import runProject, { configure } from "../../../testing/runProject.js";
 
 const project = {
   "src/Label.tsx": `import { useEffect, useState } from "react";
@@ -115,5 +115,68 @@ describe("a project configured by createConfig alone", {
     expect(output).toContain(
       "Coverage is measured on the unit project alone, so that a line a story merely draws does not count as tested.",
     );
+  });
+
+  it("sets every story inside the preview it names, and a test composing them inside the same", async () => {
+    const { outcomes, output, read } = await runProject({
+      ...project,
+      "vitest.config.ts": configure(', preview: "./src/lago.preview.tsx"'),
+      "src/lago.preview.tsx": `import type { Preview } from "@aztlan/lago-react";
+
+const preview = {
+  decorators: [
+    (Story, { loaded }) => (
+      <box flexDirection="column">
+        <text>{String(loaded.mark)}</text>
+        <Story />
+      </box>
+    ),
+  ],
+  loaders: [() => ({ mark: "framed" })],
+} satisfies Preview;
+
+export default preview;
+`,
+      "src/Label.test.tsx": `import { composeStories, setProjectAnnotations } from "@aztlan/lago-react";
+import { expect, it } from "vitest";
+import preview from "./lago.preview.js";
+import * as stories from "./Label.stories.js";
+
+setProjectAnnotations(preview);
+
+it("draws a story as its stories file does", async () => {
+  const { Hello } = composeStories(stories);
+  expect((await Hello.run({ cols: 20, rows: 3 })).lines).toEqual(["framed", "hello", ""]);
+});
+`,
+    });
+    expect([...outcomes].sort(), output).toEqual([
+      ["draws a story as its stories file does", "passed"],
+      ["scratch/Label Hello at small", "passed"],
+      ["scratch/Label keeps no golden that no story owns", "passed"],
+    ]);
+    expect(read("src/__goldens__/Label.Hello.small.golden")).toMatch(
+      /^20x3\n\|framed\n\|hello\n/,
+    );
+  });
+
+  it("measures coverage without the preview, which only the stories draw", async () => {
+    const { outcomes, output } = await runProject(
+      {
+        ...project,
+        "vitest.config.ts": configure(', preview: "./src/lago.preview.tsx"'),
+        "src/lago.preview.tsx":
+          "export default {\n  decorators: [(Story) => <box>{Story()}</box>],\n};\n",
+      },
+      "--coverage",
+      "--project",
+      "unit",
+    );
+    expect(
+      outcomes.map(([, status]) => status),
+      output,
+    ).toEqual(["passed", "passed"]);
+    expect(output).not.toContain("lago.preview");
+    expect(output).not.toContain("does not meet global threshold");
   });
 });

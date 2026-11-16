@@ -23,12 +23,18 @@ export interface Run {
 
 const packageRoot = resolve(import.meta.dirname, "..");
 
-/** The configuration of a scratch project: one call of this package's function, from its source. */
-const config = `import { mergeConfig } from "vitest/config";
+/**
+ * The configuration of a scratch project: one call of this package's
+ * function, from its source, with whatever else `options` adds to its
+ * options, written as source.
+ */
+export const configure = (
+  options = "",
+) => `import { mergeConfig } from "vitest/config";
 import createConfig from ${JSON.stringify(join(packageRoot, "src/lib/createConfig.ts"))};
 
 export default mergeConfig(
-  createConfig({ viewports: { small: { cols: 20, rows: 3 } }, coverage: true }),
+  createConfig({ viewports: { small: { cols: 20, rows: 3 } }, coverage: true${options} }),
   // Kept in the project, which is removed with it.
   { test: { fsModuleCachePath: ".vitest-cache" } },
 );
@@ -68,7 +74,7 @@ export default async function runProject(
   symlinkSync(join(packageRoot, "node_modules"), join(root, "node_modules"));
   const scaffold = {
     "package.json": JSON.stringify({ type: "module" }),
-    "vitest.config.ts": config,
+    "vitest.config.ts": configure(),
   };
   for (const [file, text] of Object.entries({ ...scaffold, ...files })) {
     mkdirSync(dirname(join(root, file)), { recursive: true });
