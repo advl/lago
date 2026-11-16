@@ -1,5 +1,6 @@
 import { relative } from "node:path";
 import type { StoryRecord } from "../catalog/index.js";
+import { timedOut } from "./constants.js";
 import type { ReportedError, ReportedTest } from "./types.js";
 
 /**
@@ -17,9 +18,32 @@ function placeError(
 }
 
 /**
+ * Every error of a failed test, each with its place, a blank line between
+ * them. A timeout says only that the time ran out, so it comes after an
+ * error that says why, as the one a story's stalled loaders leave.
+ */
+function describeErrors(
+  errors: readonly ReportedError[],
+  file: string,
+  root: string,
+): string | undefined {
+  if (errors.length === 0) return undefined;
+  const ordered = [
+    ...errors.filter(({ message }) => !timedOut.test(message)),
+    ...errors.filter(({ message }) => timedOut.test(message)),
+  ];
+  return ordered
+    .map((error) => {
+      const place = placeError(error, file, root);
+      return place ? `${error.message}\n  at ${place}` : error.message;
+    })
+    .join("\n\n");
+}
+
+/**
  * One story test as the gallery shows it, or nothing for a test that is no
  * story's. A test that passed is `pass`. One that failed before its story
- * was drawn is `error`, with the first error's message and its place. One
+ * was drawn is `error`, with every error's message and its place. One
  * whose picture was drawn and failed is `new` when its golden does not
  * exist, as `exists` tells, and `changed` otherwise. A story's test in a
  * mode, named `<Story> at <viewport>@<mode>`, is not read: the gallery shows
@@ -47,13 +71,12 @@ export default function readRecord(
   };
   if (test.state === "passed") return { ...base, status: "pass" };
   if (story === undefined) {
-    const [first] = test.errors;
-    const place = first && placeError(first, test.file, root);
-    const message = first?.message ?? "The story did not finish.";
     return {
       ...base,
       status: "error",
-      error: place ? `${message}\n  at ${place}` : message,
+      error:
+        describeErrors(test.errors, test.file, root) ??
+        "The story did not finish.",
     };
   }
   return { ...base, status: exists(story.golden) ? "changed" : "new" };

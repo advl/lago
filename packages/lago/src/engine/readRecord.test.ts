@@ -95,6 +95,30 @@ describe("readRecord", () => {
     expect(readRecord(bare, "/project", exists)?.error).toBe("no");
   });
 
+  it("gives every error a story failed with, a timeout after the error that says why", () => {
+    const stalled: ReportedTest = {
+      ...test,
+      state: "failed",
+      story: undefined,
+      errors: [
+        {
+          message:
+            "Test timed out in 5000ms.\nIf this is a long-running test, pass a timeout value.",
+        },
+        {
+          message:
+            "The story was still running its loaders when its test ended.",
+          stacks: [
+            { file: "/project/src/Row.stories.tsx", line: 7, column: 3 },
+          ],
+        },
+      ],
+    };
+    expect(readRecord(stalled, "/project", exists)?.error).toBe(
+      "The story was still running its loaders when its test ended.\n  at src/Row.stories.tsx:7:3\n\nTest timed out in 5000ms.\nIf this is a long-running test, pass a timeout value.",
+    );
+  });
+
   it("says a story that failed with no error did not finish", () => {
     const silent: ReportedTest = { ...test, state: "failed", story: undefined };
     expect(readRecord(silent, "/project", exists)?.error).toBe(

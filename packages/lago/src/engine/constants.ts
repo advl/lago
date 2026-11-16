@@ -9,3 +9,6 @@ export const storiesProject = "stories";
  * under its `api`: `createConfig({ gallery })` adds it.
  */
 export const galleryPlugin = "lago:gallery";
+
+/** What vitest's own error says when a test or a hook runs out of time. */
+export const timedOut = /^(Test|Hook) timed out in /;

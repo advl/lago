@@ -112,6 +112,41 @@ describe("startEngine", { timeout: 60_000 }, () => {
     }
   });
 
+  it("says why a story whose loaders never finish failed, before the timeout", async () => {
+    const root = makeProject({
+      "src/Label.tsx": files["src/Label.tsx"],
+      "src/Label.stories.tsx":
+        'import Component from "./Label.js";\n\nexport default { title: "scratch/Label", component: Component };\n\nexport const Waiting = {\n  args: { text: "never" },\n  loaders: [() => new Promise((done) => setTimeout(done, 10))],\n};\n',
+      "vitest.config.ts": `import { createConfig } from "@aztlan/lago-config";
+import { mergeConfig } from "vitest/config";
+
+export default mergeConfig(
+  createConfig({ viewports: { small: { cols: 20, rows: 3 } } }),
+  { test: { fsModuleCachePath: ".vitest-cache", testTimeout: 300 } },
+);
+`,
+    });
+    const catalogs: Catalog[] = [];
+    const engine = await startEngine({
+      root,
+      onChrome: () => {},
+      onCatalog: (catalog) => catalogs.push(catalog),
+    });
+    try {
+      const error = (await nextCatalog(catalogs, 0)).groups
+        .at(0)
+        ?.components.at(0)
+        ?.stories.at(0)
+        ?.pictures.at(0)?.error;
+      expect(error).toMatch(
+        /^The story "scratch\/Label Waiting" was still running its loaders when its test ended\./,
+      );
+      expect(error).toContain("\n\nTest timed out in 300ms.");
+    } finally {
+      await engine.close();
+    }
+  });
+
   it("closes the vitest it started when the start fails, so nothing runs after", async () => {
     const root = makeProject(files);
     let calls = 0;

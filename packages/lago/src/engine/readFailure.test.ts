@@ -25,6 +25,16 @@ describe("readFailure", () => {
     });
   });
 
+  it("gives every error that kept a file from loading, in order", () => {
+    expect(
+      readFailure(
+        orphans.file,
+        [{ message: "cannot import" }, { message: "and cannot parse" }],
+        [orphans],
+      )?.message,
+    ).toBe("cannot import\n\nand cannot parse");
+  });
+
   it("gives a failed check that the file's goldens all have a story", () => {
     expect(readFailure(orphans.file, [], [orphans])).toEqual({
       file: orphans.file,

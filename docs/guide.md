@@ -242,7 +242,7 @@ It is called in the test files that compose stories, not in a setup file: a setu
 | `?` | every key |
 | `q` | quit |
 
-A story that throws shows its message and its place in the source; no other story is affected. A stories file that fails to load is named in the status line.
+A story that throws shows every error its test failed with, each with its place in the source, and a timeout after the error that says why, such as loaders that never finish on the stopped clock; no other story is affected. A stories file that fails to load is named in the status line.
 
 ### The gallery's chrome
 
