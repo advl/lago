@@ -64,7 +64,9 @@ const readPath = (id: string) => id.replace(/\?.*$/s, "");
  *
  * It appends lines to each stories file, which hand the file's own exports,
  * and the preview's, to the code that registers the tests. Which files are
- * run stays vitest's `include` to say.
+ * run stays vitest's `include` to say. Its `api` names the modes, in the
+ * order given, for whatever reads the resolved configuration, as the gallery
+ * does.
  */
 export default function testStories({
   viewports = { "80x24": defaultViewport },
@@ -92,6 +94,7 @@ export default function testStories({
   return {
     name: "lago:test-stories",
     enforce: "pre",
+    api: { modes: modes ?? {} },
     configResolved({ root }) {
       if (preview === undefined || existsSync(resolve(root, preview))) return;
       throw new Error(

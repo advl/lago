@@ -80,6 +80,18 @@ describe("testStories", () => {
     });
   });
 
+  it("names its modes, in the order given, under its api, and none without them", () => {
+    const modes = {
+      dark: { globals: { scheme: "dark" } },
+      ascii: { globals: { glyphs: "ascii" } },
+    };
+    expect(Object.keys(testStories({ viewports, modes }).api.modes)).toEqual([
+      "dark",
+      "ascii",
+    ]);
+    expect(testStories({ viewports }).api).toEqual({ modes: {} });
+  });
+
   it("refuses a mode whose name cannot be part of a file's name", () => {
     expect(() =>
       testStories({ modes: { "dark.mode": { globals: { scheme: "dark" } } } }),
