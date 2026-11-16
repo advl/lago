@@ -6,9 +6,11 @@ export type {
   ComposedStories,
   ComposedStory,
   Decorator,
+  Loader,
   Meta,
   Parameters,
   PlayContext,
+  Preview,
   PropsOf,
   Run,
   Screen,
@@ -19,4 +21,9 @@ export type {
   UserEvent,
   Viewport,
 } from "./lib/index.js";
-export { composeStories, render, waitFor } from "./lib/index.js";
+export {
+  composeStories,
+  render,
+  setProjectAnnotations,
+  waitFor,
+} from "./lib/index.js";

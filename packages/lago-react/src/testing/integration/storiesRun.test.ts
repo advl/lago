@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import runProject, { entry } from "../../../testing/runProject.js";
+import runProject, { configure, entry } from "../../../testing/runProject.js";
 
 const label = `export default function Label({ text }: { text: string }) {
   return <text>{text}</text>;
@@ -166,6 +166,24 @@ export const Default = { args: { text: "untitled" } };
     );
   });
 
+  it("fail a story whose loader waits on a timer, saying the clock is stopped", async () => {
+    const delayed = stories.replace(
+      'args: { text: "bye" },',
+      'args: { text: "bye" },\n  loaders: [() => new Promise((done) => setTimeout(done, 1))],',
+    );
+    const { outcomes } = await runProject(
+      { ...project, "Label.stories.tsx": delayed },
+      "--testTimeout=500",
+    );
+    const bye = outcomes.find(({ name }) =>
+      name.startsWith("scratch/Label Bye"),
+    );
+    expect(bye?.status).toBe("failed");
+    expect(bye?.failures.join("\n")).toContain(
+      'The story "scratch/Label Bye" was still running its loaders when its test ended. Loaders run on the stopped clock, where no timer fires',
+    );
+  });
+
   it("leave a story tagged !test out of the run, keeping its golden", async () => {
     const tagged = stories.replace(
       'args: { text: "bye" },',
@@ -178,5 +196,122 @@ export const Default = { args: { text: "untitled" } };
     ]);
     const updated = await first.again({}, "-u");
     expect(updated.read("__goldens__/Label.Bye.small.golden")).toBe(byeGolden);
+  });
+});
+
+const previewed = {
+  "vitest.config.ts": configure(', preview: "./lago.preview.tsx"'),
+  "lago.preview.tsx": `export default {
+  args: { text: "preset" },
+  decorators: [
+    (Story, { loaded }) => (
+      <box flexDirection="column">
+        <text>{\`[\${loaded.who}]\`}</text>
+        <Story />
+      </box>
+    ),
+  ],
+  loaders: [() => ({ who: "preview" })],
+};
+`,
+  "Label.tsx": label,
+  "Label.stories.tsx": `import Component from "./Label.js";
+
+export default {
+  title: "scratch/Label",
+  component: Component,
+  decorators: [
+    (Story) => (
+      <box flexDirection="column">
+        <text>file</text>
+        <Story />
+      </box>
+    ),
+  ],
+};
+
+/** Says hello. */
+export const Hello = { args: { text: "hello" } };
+
+/** Says what the preview gives, loaded by the story. */
+export const Preset = { loaders: [() => ({ who: "story" })] };
+`,
+};
+
+describe("a project's stories under the plugin with a preview", {
+  timeout: 60_000,
+}, () => {
+  it("are each set inside the preview: its args under the story's, its decorators around the file's, its loaders first", async () => {
+    const { outcomes, output, read } = await runProject(previewed);
+    expect(
+      outcomes.map(({ name, status }) => [name, status]),
+      output,
+    ).toEqual([
+      ["scratch/Label Hello at small", "passed"],
+      ["scratch/Label Preset at small", "passed"],
+      ["scratch/Label keeps no golden that no story owns", "passed"],
+    ]);
+    expect(
+      outcomes
+        .at(0)
+        ?.story?.actual.lines.map((runs) =>
+          runs.map(({ text }) => text).join(""),
+        ),
+    ).toEqual(["[preview]", "file", "hello"]);
+    expect(
+      outcomes
+        .at(1)
+        ?.story?.actual.lines.map((runs) =>
+          runs.map(({ text }) => text).join(""),
+        ),
+    ).toEqual(["[story]", "file", "preset"]);
+    expect(read("__goldens__/Label.Preset.small.golden")).toContain(
+      "|[story]\n|file\n|preset\n",
+    );
+  });
+
+  it("draw in a test what they draw in their own, once the test sets the same preview", async () => {
+    const { outcomes, output } = await runProject({
+      ...previewed,
+      "Label.test.tsx": `import { expect, it } from "vitest";
+import { composeStories, setProjectAnnotations } from ${entry};
+import preview from "./lago.preview.js";
+import * as stories from "./Label.stories.js";
+
+setProjectAnnotations(preview);
+
+it("draws a story inside the preview", async () => {
+  const { Preset } = composeStories(stories);
+  expect((await Preset.run({ cols: 20, rows: 3 })).lines).toEqual(["[story]", "file", "preset"]);
+});
+`,
+    });
+    expect(
+      outcomes.find(({ name }) => name === "draws a story inside the preview")
+        ?.status,
+      output,
+    ).toBe("passed");
+  });
+
+  it("fail the stories files when the preview has no default export, naming it", async () => {
+    const { outcomes, errors } = await runProject({
+      ...previewed,
+      "lago.preview.tsx": "export const decorators = [];\n",
+    });
+    expect(outcomes).toEqual([]);
+    expect(errors["Label.stories.tsx"]).toMatch(
+      /The preview \S+\/lago\.preview\.tsx has no default export\./,
+    );
+  });
+
+  it("refuse a preview that is not a file, naming where it was looked for", async () => {
+    const { outcomes, output } = await runProject({
+      ...previewed,
+      "vitest.config.ts": configure(', preview: "./missing.tsx"'),
+    });
+    expect(outcomes).toEqual([]);
+    expect(output).toMatch(
+      /The preview "\.\/missing\.tsx" given to testStories is not a file: \S+\/missing\.tsx does not exist\./,
+    );
   });
 });

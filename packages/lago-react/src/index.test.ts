@@ -5,6 +5,7 @@ describe("the package's entries", () => {
     expect(Object.keys(await import("./index.js")).sort()).toEqual([
       "composeStories",
       "render",
+      "setProjectAnnotations",
       "waitFor",
     ]);
   });

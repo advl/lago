@@ -37,6 +37,50 @@ describe("prepareStory", () => {
     });
   });
 
+  it("runs the file's loaders before the story's", () => {
+    const fromFile = () => ({ from: "file" });
+    const fromStory = () => ({ from: "story" });
+    const story = prepareStory({ ...meta, loaders: [fromFile] }, "Loaded", {
+      loaders: [fromStory],
+    });
+    expect(story.loaders).toEqual([fromFile, fromStory]);
+    expect(prepareStory(meta, "Bare", {}).loaders).toEqual([]);
+  });
+
+  it("sets a story inside the project's preview: its args, parameters, loaders and tags first, its decorators outermost", () => {
+    const outermost: Decorator = (Story) => <Story />;
+    const fromPreview = () => ({ from: "preview" });
+    const fromFile = () => ({ from: "file" });
+    const fromStory = () => ({ from: "story" });
+    const story = prepareStory(
+      { ...meta, loaders: [fromFile] },
+      "Previewed",
+      {
+        parameters: { docs: { note: "two" } },
+        decorators: [inner],
+        loaders: [fromStory],
+        tags: ["slow"],
+      },
+      {
+        args: { text: "from the preview", width: 20 },
+        parameters: { rows: 2, docs: { page: "zero", theme: "dark" } },
+        decorators: [outermost],
+        loaders: [fromPreview],
+        tags: ["!dev", "themed", "!slow"],
+      },
+    );
+    expect(story).toMatchObject({
+      args: { text: "from the file", loud: true, width: 20 },
+      parameters: {
+        rows: 4,
+        docs: { page: "one", theme: "dark", note: "two" },
+      },
+      decorators: [inner, outer, outermost],
+      loaders: [fromPreview, fromFile, fromStory],
+      tags: ["test", "themed", "slow"],
+    });
+  });
+
   it("draws the file's component with the args when nothing else is said", () => {
     const story = prepareStory(meta, "Default", {});
     expect(story.render({ text: "hi" }, {} as never)).toEqual(

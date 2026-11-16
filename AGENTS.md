@@ -70,6 +70,7 @@ The pipeline is `.github/workflows/ci.yml`. Its gate job installs with the lockf
 - The renderer's own declarations do not type-check, against themselves or against React's. `skipLibCheck` skips declaration files only.
 - The renderer's own `flush` waits on a timer, so it never returns while timers are faked. A screen settles by asking the scheduler's state and drawing on demand.
 - React's `act` waits on `setImmediate`. A test fakes the timers a component uses, the clock and the high-resolution clock among them, and leaves that one real, which `fakeTimers.toFake` in `vitest.config.ts` sets for every test.
+- A story's loaders run after its clock is stopped, so a loader that waits on a timer never finishes and its test only times out. `runStory` says why when a test ends with its loaders still running.
 - React warns about an update outside `act` whenever `IS_REACT_ACT_ENVIRONMENT` is set, as when a timer a test moved sets state, so it is set for the length of `act` alone.
 - Ctrl+C closes a renderer unless it is made with `exitOnCtrlC: false`.
 - In the renderer's default key mode a lone Escape waits on a timer and joins the next key, and most modifiers are lost. A renderer made with `kittyKeyboard: true` sends every key at once, with its modifiers.

@@ -10,6 +10,7 @@ export default mergeConfig(
       wide: { cols: 120, rows: 30 },
     },
     coverage: true,
+    preview: "./testing/preview.tsx",
   }),
   // The binary's entry only hands the process to runLago and a real
   // terminal to openGallery, which are tested; it is the one file left out.

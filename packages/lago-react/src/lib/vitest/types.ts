@@ -29,6 +29,11 @@ export interface Options {
    * a terminal's usual 80 columns and 24 lines, named `80x24`.
    */
   readonly viewports?: Readonly<Record<string, Viewport>>;
+  /**
+   * The project's preview: a module, named from the project's root, whose
+   * default export every story is set inside, as in `"./src/lago.preview.tsx"`.
+   */
+  readonly preview?: string;
 }
 
 /** What the plugin tells a stories file's tests, written into the file's last line. */
@@ -36,6 +41,8 @@ export interface Registration {
   readonly viewports: Readonly<Record<string, Viewport>>;
   /** The comment above each story's export, by the export's name, in the file's order. */
   readonly comments: Readonly<Record<string, string>>;
+  /** Where the project's preview is, when there is one. */
+  readonly preview?: string;
 }
 
 /** What a story's test leaves on its task for whatever reads the run, such as a reporter. */

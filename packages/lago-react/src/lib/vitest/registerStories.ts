@@ -5,6 +5,7 @@ import { listStories, type StoriesModule } from "../story/index.js";
 import checkOrphans from "./checkOrphans.js";
 import checkStory from "./checkStory.js";
 import { goldenFolder, storiesFile } from "./constants.js";
+import readPreview from "./readPreview.js";
 import resolveViewports from "./resolveViewports.js";
 import type { Registration } from "./types.js";
 
@@ -16,19 +17,25 @@ import type { Registration } from "./types.js";
  * A stories file that a test imports is that test's fixture, and adds no test
  * there: only the file vitest is running registers anything.
  *
+ * With the project's preview module, every story is set inside its default
+ * export.
+ *
  * @note Impure: registers tests on the running file.
  */
 export default function registerStories(
   module: StoriesModule,
   url: string,
-  { viewports, comments }: Registration,
+  { viewports, comments, preview: previewPath }: Registration,
+  preview?: { readonly default?: unknown },
 ): void {
   const file = fileURLToPath(url);
   if (expect.getState().testPath !== file) return;
   const order = Object.keys(comments);
-  const stories = listStories(module, file).sort(
-    (one, other) => order.indexOf(one.name) - order.indexOf(other.name),
-  );
+  const stories = listStories(
+    module,
+    file,
+    readPreview(preview, previewPath),
+  ).sort((one, other) => order.indexOf(one.name) - order.indexOf(other.name));
   const folder = join(dirname(file), goldenFolder);
   const base = basename(file).replace(storiesFile, "");
   const owned = new Set<string>();

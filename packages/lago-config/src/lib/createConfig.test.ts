@@ -34,6 +34,23 @@ describe("createConfig", () => {
     );
   });
 
+  it("hands the project's preview to the plugin, which imports it into each stories file", () => {
+    const [plugin] = createConfig({
+      viewports,
+      preview: "./src/lago.preview.tsx",
+    }).plugins as { transform: (...given: unknown[]) => unknown }[];
+    const result = plugin?.transform.call(
+      { environment: { config: { root: "/project" } } },
+      "export const Default = {};\n",
+      "/project/src/Row.stories.tsx",
+    );
+    expect(result).toMatchObject({
+      code: expect.stringContaining(
+        'import * as __lagoPreview from "/project/src/lago.preview.tsx";',
+      ),
+    });
+  });
+
   it("needs no options at all", () => {
     expect(createConfig().plugins).toMatchObject([
       { name: "lago:test-stories" },
@@ -63,6 +80,26 @@ describe("createConfig", () => {
       "Date",
       "performance",
     ]);
+  });
+
+  it("leaves the preview out of coverage, as it leaves the stories", () => {
+    expect(
+      createConfig({ preview: "./src/lago.preview.tsx", coverage: true }).test
+        ?.coverage,
+    ).toMatchObject({
+      exclude: expect.arrayContaining([
+        "**/*.stories.tsx",
+        "src/lago.preview.tsx",
+      ]),
+    });
+  });
+
+  it("refuses a preview named by an absolute path, which coverage could not leave out", () => {
+    expect(() =>
+      createConfig({ preview: "/project/src/lago.preview.tsx" }),
+    ).toThrow(
+      'The preview "/project/src/lago.preview.tsx" given to createConfig is an absolute path. Name it from the project\'s root, as in preview: "./src/lago.preview.tsx".',
+    );
   });
 
   it("sets up coverage only when asked: v8 over src, with a floor of 100%", () => {

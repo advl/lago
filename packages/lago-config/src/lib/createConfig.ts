@@ -1,3 +1,4 @@
+import { isAbsolute, posix } from "node:path";
 import { renderer, testStories } from "@aztlan/lago-react/vitest";
 import type { ViteUserConfig } from "vitest/config";
 import { fakedTimers } from "./constants.js";
@@ -14,16 +15,25 @@ import type { Options } from "./types.js";
  * one copy of React and of the renderer, the project's, even for a Lago
  * package linked from a checkout;
  * a `unit` project over the tests under `src/` and a `stories` project over
- * the stories files there; the plugin that makes each story a test; the
- * timers a test fakes; and, when asked, the coverage settings, which a run
- * applies to the unit project alone.
+ * the stories files there; the plugin that makes each story a test, inside
+ * the project's preview when one is named; the timers a test fakes; and,
+ * when asked, the coverage settings, which a run applies to the unit project
+ * alone.
  */
 export default function createConfig({
   viewports,
   coverage = false,
+  preview,
 }: Options = {}): ViteUserConfig {
+  // Coverage matches what it leaves out against paths from the project's
+  // root, so an absolute path would leave the preview measured.
+  if (preview !== undefined && isAbsolute(preview)) {
+    throw new Error(
+      `The preview ${JSON.stringify(preview)} given to createConfig is an absolute path. Name it from the project's root, as in preview: "./src/lago.preview.tsx".`,
+    );
+  }
   return {
-    plugins: [testStories({ viewports }), coverUnitsOnly],
+    plugins: [testStories({ viewports, preview }), coverUnitsOnly],
     // What names the renderer comes from the renderer's own package: where
     // JSX takes its runtime, the build vitest must load, and what is kept to
     // one copy.
@@ -61,6 +71,8 @@ export default function createConfig({
             "**/*.test.{ts,tsx}",
             "**/*.stories.tsx",
             "src/testing/**",
+            // The preview is drawn around the stories alone, as they are.
+            ...(preview === undefined ? [] : [posix.normalize(preview)]),
           ],
           thresholds: {
             statements: 100,
