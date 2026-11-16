@@ -67,6 +67,7 @@ The pipeline is `.github/workflows/ci.yml`. Its gate job installs with the lockf
 - Vitest's executable asks for Node. `bunx --bun` runs it on Bun, which is the runtime the packages are written for.
 - `webarchitect`'s `library` rules assume a `@canonical/` name and the LGPL-3.0 licence. Both are overridden by flag, not by a local copy of the rules.
 - Vitest must load the renderer's Bun build, which `ssr.resolve.conditions` in `vitest.config.ts` asks for. With two builds loaded, an object made by one is not recognised by the other.
+- Vite loads a project's configuration file with the renderer's Node build, while the gallery runs on its Bun build, so a colour made in the configuration is another class's instance. The gallery knows a colour by the four numbers an RGBA keeps, and makes it again with its own.
 - The renderer's own declarations do not type-check, against themselves or against React's. `skipLibCheck` skips declaration files only.
 - The renderer's own `flush` waits on a timer, so it never returns while timers are faked. A screen settles by asking the scheduler's state and drawing on demand.
 - React's `act` waits on `setImmediate`. A test fakes the timers a component uses, the clock and the high-resolution clock among them, and leaves that one real, which `fakeTimers.toFake` in `vitest.config.ts` sets for every test.

@@ -1,0 +1,91 @@
+80x24
+|component/Notice                                at terminal · as the room allows
+|component ───────────────── ┌─+ Missing────────────┐
+|± KeyBar                  2 │✗ git is not installed│
+|✗ Notice                  2 │Recovery: install git │
+|layout ──────────────────── └──────────────────────┘
+|✓ Pane                    1 ┌─▸ ✗ Thrown───────────────────────────────────┐
+|                            │TypeError: cannot read properties of undefined│
+|                            │at src/Notice.tsx:4:12                        │
+|                            └──────────────────────────────────────────────┘
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|✓ 4 pass · ± 2 changed · + 1 new · ✗ 1 error · ✗ 1 file failed to load
+|/project/src/Broken.stories.tsx: Cannot find module './Missing.js'
+|↑↓ move ⏎ open esc back / find p viewport v layout ? q quit
+
+1:1 "component/Notice                                at terminal · " fg=#e4e4e4 bg=#1b1b1b
+1:63 "as the room allows" fg=#a8a8a8 bg=#1b1b1b
+2:1 "component ───────────────── " fg=#e4e4e4 bg=#1b1b1b
+2:29 "┌─+ Missing────────────┐                            " fg=#7c7c7c bg=#1b1b1b
+3:1 "± " fg=#e0b040 bg=#1b1b1b
+3:3 "KeyBar                  " fg=#e4e4e4 bg=#1b1b1b
+3:27 "2 " fg=#a8a8a8 bg=#1b1b1b
+3:29 "│" fg=#7c7c7c bg=#1b1b1b
+3:30 "✗ git is not installed"
+3:52 "│                            " fg=#7c7c7c bg=#1b1b1b
+4:1 "✗ " fg=#ff8278 bg=#383838
+4:3 "Notice                  " fg=#e4e4e4 bg=#383838
+4:27 "2" fg=#a8a8a8 bg=#383838
+4:28 " │" fg=#7c7c7c bg=#1b1b1b
+4:30 "Recovery: install git"
+4:51 " │                            " fg=#7c7c7c bg=#1b1b1b
+5:1 "layout ──────────────────── " fg=#e4e4e4 bg=#1b1b1b
+5:29 "└──────────────────────┘                            " fg=#7c7c7c bg=#1b1b1b
+6:1 "✓ " fg=#72c476 bg=#1b1b1b
+6:3 "Pane                    " fg=#e4e4e4 bg=#1b1b1b
+6:27 "1 " fg=#a8a8a8 bg=#1b1b1b
+6:29 "┌─▸ ✗ Thrown───────────────────────────────────┐    " fg=#e4e4e4 bg=#1b1b1b
+7:1 "                            │" fg=#e4e4e4 bg=#1b1b1b
+7:30 "TypeError: cannot read properties of undefined" fg=#ff8278 bg=#1b1b1b
+7:76 "│    " fg=#e4e4e4 bg=#1b1b1b
+8:1 "                            │" fg=#e4e4e4 bg=#1b1b1b
+8:30 "at src/Notice.tsx:4:12                        " fg=#ff8278 bg=#1b1b1b
+8:76 "│    " fg=#e4e4e4 bg=#1b1b1b
+9:1 "                            └──────────────────────────────────────────────┘    " fg=#e4e4e4 bg=#1b1b1b
+10:1 "                                                                                " bg=#1b1b1b
+11:1 "                                                                                " bg=#1b1b1b
+12:1 "                                                                                " bg=#1b1b1b
+13:1 "                                                                                " bg=#1b1b1b
+14:1 "                                                                                " bg=#1b1b1b
+15:1 "                                                                                " bg=#1b1b1b
+16:1 "                                                                                " bg=#1b1b1b
+17:1 "                                                                                " bg=#1b1b1b
+18:1 "                                                                                " bg=#1b1b1b
+19:1 "                                                                                " bg=#1b1b1b
+20:1 "                                                                                " bg=#1b1b1b
+21:1 "                                                                                " bg=#1b1b1b
+22:1 "✓ 4 pass " fg=#e4e4e4 bg=#1b1b1b
+22:10 "· " fg=#a8a8a8 bg=#1b1b1b
+22:12 "± 2 changed " fg=#e0b040 bg=#1b1b1b
+22:24 "· " fg=#a8a8a8 bg=#1b1b1b
+22:26 "+ 1 new " fg=#e0b040 bg=#1b1b1b
+22:34 "· " fg=#a8a8a8 bg=#1b1b1b
+22:36 "✗ 1 error " fg=#ff8278 bg=#1b1b1b
+22:46 "· " fg=#a8a8a8 bg=#1b1b1b
+22:48 "✗ 1 file failed to load          " fg=#ff8278 bg=#1b1b1b
+23:1 "/project/src/Broken.stories.tsx: Cannot find module './Missing.js'              " fg=#ff8278 bg=#1b1b1b
+24:1 "↑↓ " fg=#e4e4e4 bg=#1b1b1b
+24:4 "move " fg=#a8a8a8 bg=#1b1b1b
+24:9 "⏎ " fg=#e4e4e4 bg=#1b1b1b
+24:11 "open " fg=#a8a8a8 bg=#1b1b1b
+24:16 "esc " fg=#e4e4e4 bg=#1b1b1b
+24:20 "back " fg=#a8a8a8 bg=#1b1b1b
+24:25 "/ " fg=#e4e4e4 bg=#1b1b1b
+24:27 "find " fg=#a8a8a8 bg=#1b1b1b
+24:32 "p " fg=#e4e4e4 bg=#1b1b1b
+24:34 "viewport " fg=#a8a8a8 bg=#1b1b1b
+24:43 "v " fg=#e4e4e4 bg=#1b1b1b
+24:45 "layout " fg=#a8a8a8 bg=#1b1b1b
+24:52 "? q " fg=#e4e4e4 bg=#1b1b1b
+24:56 "quit                     " fg=#a8a8a8 bg=#1b1b1b

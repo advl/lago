@@ -1,0 +1,84 @@
+120x30
+|component/Notice                                                                        at terminal · as the room allows
+|component ───────────────── ┌─+ Missing────────────┐  ┌─▸ ✗ Thrown───────────────────────────────────┐
+|± KeyBar                  2 │✗ git is not installed│  │TypeError: cannot read properties of undefined│
+|✗ Notice                  2 │Recovery: install git │  │at src/Notice.tsx:4:12                        │
+|layout ──────────────────── └──────────────────────┘  └──────────────────────────────────────────────┘
+|✓ Pane                    1
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|✓ 4 pass · ± 2 changed · + 1 new · ✗ 1 error · ✗ 1 file failed to load
+|/project/src/Broken.stories.tsx: Cannot find module './Missing.js'
+|↑↓ move ⏎ open esc back / find p viewport v layout ? q quit
+
+1:1 "component/Notice                                                                        at terminal ·"
+1:103 "as the room allows" fg=7
+2:1 "component ─────────────────"
+2:29 "┌─+ Missing────────────┐" fg=7
+2:55 "┌─▸ ✗ Thrown───────────────────────────────────┐"
+3:1 "±" fg=3
+3:3 "KeyBar"
+3:27 "2 │" fg=7
+3:30 "✗ git is not installed"
+3:52 "│" fg=7
+3:55 "│"
+3:56 "TypeError: cannot read properties of undefined" fg=1
+3:102 "│"
+4:1 "✗ " fg=1 bg=8
+4:3 "Notice                  " bg=8
+4:27 "2" fg=7 bg=8
+4:29 "│" fg=7
+4:30 "Recovery: install git"
+4:52 "│" fg=7
+4:55 "│"
+4:56 "at src/Notice.tsx:4:12" fg=1
+4:102 "│"
+5:1 "layout ────────────────────"
+5:29 "└──────────────────────┘" fg=7
+5:55 "└──────────────────────────────────────────────┘"
+6:1 "✓" fg=2
+6:3 "Pane"
+6:27 "1" fg=7
+28:1 "✓ 4 pass"
+28:10 "·" fg=7
+28:12 "± 2 changed" fg=3
+28:24 "·" fg=7
+28:26 "+ 1 new" fg=3
+28:34 "·" fg=7
+28:36 "✗ 1 error" fg=1
+28:46 "·" fg=7
+28:48 "✗ 1 file failed to load" fg=1
+29:1 "/project/src/Broken.stories.tsx: Cannot find module './Missing.js'" fg=1
+30:1 "↑↓"
+30:4 "move" fg=7
+30:9 "⏎"
+30:11 "open" fg=7
+30:16 "esc"
+30:20 "back" fg=7
+30:25 "/"
+30:27 "find" fg=7
+30:32 "p"
+30:34 "viewport" fg=7
+30:43 "v"
+30:45 "layout" fg=7
+30:52 "? q"
+30:56 "quit" fg=7

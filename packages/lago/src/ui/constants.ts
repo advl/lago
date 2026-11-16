@@ -25,4 +25,4 @@ export const minColumns = 80;
 export const minLines = 24;
 
 /** The pane's lines that are not the list region: the header, the counts, the status and the keys. */
-export const chromeLines = 4;
+export const barLines = 4;
