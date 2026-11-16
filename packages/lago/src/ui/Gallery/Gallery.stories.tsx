@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from "@aztlan/lago-react";
-import { Keys } from "@aztlan/tui";
 import { sampleCatalog } from "../../../testing/catalogs.js";
 import { buildCatalog } from "../../catalog/index.js";
 import Component from "./Gallery.js";
@@ -15,7 +14,6 @@ const meta = {
     width: 80,
     height: 24,
   },
-  decorators: [(Story) => <Keys>{Story()}</Keys>],
   render: (args, { viewport }) => (
     <Component {...args} width={viewport.cols} height={viewport.rows} />
   ),
