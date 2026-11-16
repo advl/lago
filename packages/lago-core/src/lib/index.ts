@@ -1,6 +1,17 @@
 export { screenshotFromBytes } from "./capture/index.js";
 export { formatGolden, parseGolden } from "./golden/index.js";
 export type {
+  Globals,
+  GlobalType,
+  GlobalTypes,
+  Mode,
+  ModuleLocation,
+  Plugin,
+  PluginDefinition,
+  PluginGallery,
+} from "./plugin/index.js";
+export { definePlugin } from "./plugin/index.js";
+export type {
   KeyName,
   Modifiers,
   Press,
