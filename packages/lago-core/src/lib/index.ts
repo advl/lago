@@ -1,3 +1,4 @@
+export { screenshotFromBytes } from "./capture/index.js";
 export { formatGolden, parseGolden } from "./golden/index.js";
 export type {
   KeyName,

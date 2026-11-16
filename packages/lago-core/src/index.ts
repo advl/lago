@@ -19,6 +19,7 @@ export {
   normalizeRuns,
   parseGolden,
   registerSerializer,
+  screenshotFromBytes,
   stoppedTimers,
   waitFor,
 } from "./lib/index.js";

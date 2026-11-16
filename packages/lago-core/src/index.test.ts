@@ -10,6 +10,7 @@ describe("the package's entry", () => {
       "normalizeRuns",
       "parseGolden",
       "registerSerializer",
+      "screenshotFromBytes",
       "stoppedTimers",
       "waitFor",
     ]);

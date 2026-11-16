@@ -75,6 +75,7 @@ The pipeline is `.github/workflows/ci.yml`. Its gate job installs with the lockf
 - In the renderer's default key mode a lone Escape waits on a timer and joins the next key, and most modifiers are lost. A renderer made with `kittyKeyboard: true` sends every key at once, with its modifiers.
 - The renderer wraps every tree in a boundary that draws a caught error's stack as text. `render` mounts the component inside a boundary of its own, so a test fails with the error instead of drawing it.
 - Text given no colour is drawn in fixed white, not in the terminal's own colour.
+- `@xterm/headless` reads what it is written on a timer, so `screenshotFromBytes` waits on real time and refuses to run while `setTimeout` is faked.
 - The renderer reports an inverted cell with its two colours already exchanged, and the attribute kept.
 - Vitest keeps transformed modules between runs, keyed by their source. A plugin whose output depends on its options adds them to the key with `defineCacheKeyGenerator`, or a changed option is never seen.
 - In watch mode, an update of every snapshot reaches the tests and not the plugins, so whether a run updates is read in the test, from `expect.getState().snapshotState`.
