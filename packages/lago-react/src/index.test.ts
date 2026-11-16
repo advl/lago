@@ -9,7 +9,10 @@ describe("the package's entries", () => {
     ]);
   });
 
-  it("export from ./vitest the plugin, and nothing else", async () => {
-    expect(Object.keys(await import("./vitest.js"))).toEqual(["testStories"]);
+  it("export from ./vitest the plugin and the renderer a configuration is set for, and nothing else", async () => {
+    expect(Object.keys(await import("./vitest.js")).sort()).toEqual([
+      "renderer",
+      "testStories",
+    ]);
   });
 });
