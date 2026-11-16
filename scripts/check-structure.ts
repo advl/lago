@@ -13,6 +13,8 @@
  *   a file beside them or of a child folder's `index.js`, and never `export *`;
  * - `types.ts` exports only types, and `constants.ts` only named values;
  * - no import uses a `#` alias;
+ * - `lago-core` imports no renderer, no React and no other Lago package, and
+ *   nothing `lago-react`'s `story/` ships imports the renderer;
  * - an import that leaves its domain enters the other one through its barrel;
  * - a file stays within 500 lines unless its first line says why not.
  */
@@ -40,6 +42,30 @@ const lengthExcuse = "// Longer than 500 lines because";
 const entryBarrels = new Set(["vitest.ts"]);
 /** Files that are run, not imported, and so export nothing. */
 const scripts = new Set(["bin.ts"]);
+
+/**
+ * Where a renderer may not be named, and why. The core is what every
+ * renderer's package builds on, so a renderer, React or another Lago package
+ * imported there would bind them all to it. A story is drawn through
+ * whatever mounts it, so the story layer asks the mount, not a renderer;
+ * its tests mount through this package's renderer, and may name it.
+ */
+const rendererFree: readonly {
+  readonly place: RegExp;
+  readonly refused: RegExp;
+  readonly reason: string;
+}[] = [
+  {
+    place: /^packages\/lago-core\/src\//,
+    refused: /^(react|react-reconciler|react-dom)(\/|$)|^@opentui\/|^@aztlan\//,
+    reason: "lago-core names no renderer and builds on no other Lago package",
+  },
+  {
+    place: /^packages\/lago-react\/src\/lib\/story\/(?!.*\.test\.tsx?$)/,
+    refused: /^@opentui\//,
+    reason: "a story takes what it needs of its screen from whatever mounts it",
+  },
+];
 
 /** `packages/<name>/src/<rest>` split into its package's source folder and the rest. */
 function splitPath(file: string): { source: string; rest: string } | undefined {
@@ -97,6 +123,20 @@ export function checkFile(file: string, text: string): Finding[] {
     return findings;
   }
   const domain = findDomain(place.rest);
+  const requests = [
+    ...module.staticImports.map(({ moduleRequest }) => moduleRequest.value),
+    ...module.staticExports.flatMap(({ entries }) =>
+      entries.flatMap(({ moduleRequest }) =>
+        moduleRequest ? [moduleRequest.value] : [],
+      ),
+    ),
+  ];
+  for (const { place: where, refused, reason } of rendererFree) {
+    if (!where.test(file)) continue;
+    for (const request of requests.filter((each) => refused.test(each))) {
+      report("renderer-free", `imports "${request}": ${reason}`);
+    }
+  }
   for (const { moduleRequest } of module.staticImports) {
     const request = moduleRequest.value;
     if (request.startsWith("#")) report("alias", `imports "${request}"`);
@@ -245,6 +285,18 @@ const breaks: Record<string, [string, string]> = {
     "barrel bypass",
     'import formatThing from "../golden/formatThing.js";\nexport default function reachIn() { return formatThing; }\n',
   ],
+  "packages/lago-core/src/lib/screen/drawScreen.ts": [
+    "renderer-free",
+    'import { createElement } from "react";\nexport default function drawScreen() { return createElement; }\n',
+  ],
+  "packages/lago-core/src/lib/screen/index.ts": [
+    "renderer-free",
+    'export { render } from "@aztlan/lago-react";\n',
+  ],
+  "packages/lago-react/src/lib/story/SizedFrame.tsx": [
+    "renderer-free",
+    'import { useTerminalDimensions } from "@opentui/react";\nexport default function SizedFrame() { return useTerminalDimensions(); }\n',
+  ],
   [`${lib}/render/growLong.ts`]: [
     "length",
     `export default function growLong() {}\n${"\n".repeat(lengthLimit)}`,
@@ -272,6 +324,12 @@ const allowed: Record<string, string> = {
     'import { start } from "./gallery/index.js";\nstart();\n',
   [`${lib}/render/explainLength.ts`]: `${lengthExcuse} it is a table.\nexport default function explainLength() {}\n${"\n".repeat(lengthLimit)}`,
   "packages/example/README.md": "export * from everything\n",
+  "packages/lago-core/src/lib/screen/waitLong.ts":
+    'import { onTestFinished } from "vitest";\nexport default function waitLong() { return onTestFinished; }\n',
+  "packages/lago-react/src/lib/story/SizedFrame.test.tsx":
+    'import { useKeyboard } from "@opentui/react";\nexport const fixture = useKeyboard;\n',
+  "packages/lago-react/src/lib/render/mountScreen.ts":
+    'import { createRoot } from "@opentui/react";\nexport default function mountScreen() { return createRoot; }\n',
 };
 
 function selfTest(): number {

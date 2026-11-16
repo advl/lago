@@ -57,7 +57,7 @@ The pipeline is `.github/workflows/ci.yml`. Its gate job installs with the lockf
 - `lerna.json` holds the one version every package shares.
 - The packages are published under `@aztlan`. A dependency between two of them points one way; never add one that closes a circle.
 - What a package publishes is its manifest's `exports` map and nothing beside it.
-- `@aztlan/lago-core` names no renderer: it imports neither React nor `@opentui/*`, and no other Lago package. `@aztlan/lago-react` depends on it, and `@aztlan/lago-config` on `@aztlan/lago-react`; each is built after what it depends on.
+- `@aztlan/lago-core` names no renderer: it imports neither React nor `@opentui/*`, and no other Lago package. Nothing `lago-react`'s `story/` ships imports the renderer either; a story learns its screen's size from what mounts it. `check:structure` refuses both. `@aztlan/lago-react` depends on it, and `@aztlan/lago-config` on `@aztlan/lago-react`; each is built after what it depends on.
 - `@aztlan/tui` takes the renderer, its keymap and React as peers: one copy of each must serve the application and the components, or a provider made by one is not seen by the other. It is tested by Lago, so `lago-react` and `lago-config` are among its development dependencies and never among its dependencies.
 
 ## Gotchas
