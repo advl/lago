@@ -50,12 +50,18 @@ interface Report {
 
 const source = resolve(import.meta.dirname, "../src");
 
-/** The configuration of a scratch project: this package's plugin, from its source, at one small size. */
-const config = `import { defineConfig } from "vitest/config";
+/**
+ * The configuration of a scratch project: this package's plugin, from its
+ * source, at one small size, with whatever else `options` adds to the
+ * plugin's options, written as source.
+ */
+export const configure = (
+  options = "",
+) => `import { defineConfig } from "vitest/config";
 import testStories from ${JSON.stringify(join(source, "lib/vitest/testStories.ts"))};
 
 export default defineConfig({
-  plugins: [testStories({ viewports: { small: { cols: 20, rows: 3 } } })],
+  plugins: [testStories({ viewports: { small: { cols: 20, rows: 3 } }${options} })],
   oxc: { jsx: { runtime: "automatic", importSource: "@opentui/react" } },
   ssr: { resolve: { conditions: ["bun"] } },
   test: {
@@ -162,7 +168,7 @@ export default function runProject(
   symlinkSync(resolve(source, "../node_modules"), join(root, "node_modules"));
   const scaffold = {
     "package.json": JSON.stringify({ type: "module" }),
-    "vitest.config.ts": config,
+    "vitest.config.ts": configure(),
   };
   return run(root, { ...scaffold, ...files }, flags);
 }

@@ -81,6 +81,20 @@ export interface Annotations<Args> {
   tags?: readonly string[];
 }
 
+/**
+ * A project's preview: what every story of the project shares, set around
+ * what its file and the story itself say. Its args and parameters come first,
+ * so a file's or a story's win; its decorators wrap all the others; its
+ * loaders run first; its tags come first.
+ */
+export interface Preview {
+  readonly args?: Readonly<Record<string, unknown>>;
+  readonly parameters?: Parameters;
+  readonly decorators?: readonly Decorator[];
+  readonly loaders?: readonly Loader[];
+  readonly tags?: readonly string[];
+}
+
 /** A stories file's default export: the component and what all its stories share. */
 export interface Meta<Component extends AnyComponent = AnyComponent>
   extends Annotations<PropsOf<Component>> {

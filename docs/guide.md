@@ -89,6 +89,28 @@ export const Long: Story = {
 - Data a story needs before it is drawn comes from a loader: `loaders: [async () => ({ user: await readUser() })]`. Loaders run one after another, the file's before the story's, each once the one before it has finished, on the stopped clock, where no timer fires: a loader awaits promises, never a delay, or its story's test ends still waiting for it and says so. What they give is merged into `loaded`, which `render`, the decorators and `play` read from their context, a later loader's value winning under the same name.
 - `tags: ["!test"]` leaves a story out of the test run, and keeps its goldens.
 
+## A project's preview
+
+What every story of a project shares is written once, in a preview module whose default export holds it:
+
+```tsx
+// src/lago.preview.tsx
+import type { Preview } from "@aztlan/lago-react";
+import { Keys } from "@aztlan/tui";
+
+const preview = {
+  decorators: [(Story) => <Keys>{Story()}</Keys>],
+} satisfies Preview;
+
+export default preview;
+```
+
+The plugin's `preview` option names the module from the project's root, as in `testStories({ viewports, preview: "./src/lago.preview.tsx" })`, and every stories file is then set inside it. A preview holds `args`, `parameters`, `decorators`, `loaders` and `tags`, and each is set around what the file and the story say:
+
+- its args and parameters come first, so a file's or a story's win;
+- its decorators wrap all the others, the file's included;
+- its loaders run before the file's, and its tags are read before the file's.
+
 ## Goldens
 
 The first run of a story on a person's machine writes its picture beside the stories file, as `__goldens__/<file>.<Story>.<viewport>.golden`: the screen's text, then each run's colours and attributes. Every later run compares the picture with it. In a pipeline, a missing golden fails the run, so a story without one never passes unseen.
@@ -144,7 +166,7 @@ A story that throws shows its message and its place in the source; no other stor
 3. Viewports are project data: the narrowest terminal the application supports, and one wider.
 4. Time, randomness and data come in as args. The clock stands at zero.
 5. Colours are palette entries or the terminal's defaults, through tokens. Text given no colour is drawn fixed white.
-6. Providers are decorators, kept in one module.
+6. Providers are decorators. Those every story needs are written once, in the project's preview.
 7. Keys go in `play`. A callback is asserted with `expect(args.onChoose)`.
 8. Stories run in their own vitest project, so that pictures are not counted as coverage. `createConfig` sets this up.
 9. A changed golden is read in the pull request's diff first and in the gallery second. Accepting is deliberate: `A` on one picture, or `vitest -u` on a named file.

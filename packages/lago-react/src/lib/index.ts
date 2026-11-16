@@ -11,6 +11,7 @@ export type {
   Meta,
   Parameters,
   PlayContext,
+  Preview,
   PropsOf,
   StoriesModule,
   StoryContext,

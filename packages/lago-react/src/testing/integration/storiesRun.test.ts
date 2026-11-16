@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import runProject, { entry } from "../../../testing/runProject.js";
+import runProject, { configure, entry } from "../../../testing/runProject.js";
 
 const label = `export default function Label({ text }: { text: string }) {
   return <text>{text}</text>;
@@ -196,5 +196,99 @@ export const Default = { args: { text: "untitled" } };
     ]);
     const updated = await first.again({}, "-u");
     expect(updated.read("__goldens__/Label.Bye.small.golden")).toBe(byeGolden);
+  });
+});
+
+const previewed = {
+  "vitest.config.ts": configure(', preview: "./lago.preview.tsx"'),
+  "lago.preview.tsx": `export default {
+  args: { text: "preset" },
+  decorators: [
+    (Story, { loaded }) => (
+      <box flexDirection="column">
+        <text>{\`[\${loaded.who}]\`}</text>
+        <Story />
+      </box>
+    ),
+  ],
+  loaders: [() => ({ who: "preview" })],
+};
+`,
+  "Label.tsx": label,
+  "Label.stories.tsx": `import Component from "./Label.js";
+
+export default {
+  title: "scratch/Label",
+  component: Component,
+  decorators: [
+    (Story) => (
+      <box flexDirection="column">
+        <text>file</text>
+        <Story />
+      </box>
+    ),
+  ],
+};
+
+/** Says hello. */
+export const Hello = { args: { text: "hello" } };
+
+/** Says what the preview gives, loaded by the story. */
+export const Preset = { loaders: [() => ({ who: "story" })] };
+`,
+};
+
+describe("a project's stories under the plugin with a preview", {
+  timeout: 60_000,
+}, () => {
+  it("are each set inside the preview: its args under the story's, its decorators around the file's, its loaders first", async () => {
+    const { outcomes, output, read } = await runProject(previewed);
+    expect(
+      outcomes.map(({ name, status }) => [name, status]),
+      output,
+    ).toEqual([
+      ["scratch/Label Hello at small", "passed"],
+      ["scratch/Label Preset at small", "passed"],
+      ["scratch/Label keeps no golden that no story owns", "passed"],
+    ]);
+    expect(
+      outcomes
+        .at(0)
+        ?.story?.actual.lines.map((runs) =>
+          runs.map(({ text }) => text).join(""),
+        ),
+    ).toEqual(["[preview]", "file", "hello"]);
+    expect(
+      outcomes
+        .at(1)
+        ?.story?.actual.lines.map((runs) =>
+          runs.map(({ text }) => text).join(""),
+        ),
+    ).toEqual(["[story]", "file", "preset"]);
+    expect(read("__goldens__/Label.Preset.small.golden")).toContain(
+      "|[story]\n|file\n|preset\n",
+    );
+  });
+
+  it("fail the stories files when the preview has no default export, naming it", async () => {
+    const { outcomes, errors } = await runProject({
+      ...previewed,
+      "lago.preview.tsx": "export const decorators = [];\n",
+    });
+    expect(outcomes).toEqual([]);
+    expect(errors["Label.stories.tsx"]).toMatch(
+      /The preview \S+\/lago\.preview\.tsx has no default export\./,
+    );
+  });
+
+  it("refuse a preview that is not a file, naming where it was looked for", async () => {
+    const { outcomes, output } = await runProject({
+      ...previewed,
+      "vitest.config.ts": configure(', preview: "./missing.tsx"'),
+    });
+    expect(outcomes).toEqual([]);
+    expect(output).toMatch(
+      /The preview "\.\/missing\.tsx" given to testStories is not a file: \S+\/missing\.tsx does not exist\./,
+    );
   });
 });

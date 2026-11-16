@@ -13,6 +13,7 @@ export type {
   Parameters,
   PlayContext,
   PreparedStory,
+  Preview,
   PropsOf,
   StoriesModule,
   StoryContext,

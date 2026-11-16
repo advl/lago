@@ -10,6 +10,7 @@ export type {
   Meta,
   Parameters,
   PlayContext,
+  Preview,
   PropsOf,
   Run,
   Screen,
