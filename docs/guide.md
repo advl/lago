@@ -285,6 +285,35 @@ createConfig({ viewports, gallery: { chrome: "terminal" } });
 
 The chrome colours the gallery around the pictures and never a picture itself: a story is drawn, and its golden kept, in the colours it asks for, whatever the chrome. The gallery refuses a chrome it cannot read when it opens, naming the configuration's file: a name it has no chrome for, or a set of tokens that lacks one.
 
+## Plugins
+
+A plugin is what a project adds to every story, and to the gallery, by naming one package: a theme switch, a baseline grid, request mocking. Its package is named `@aztlan/lago-plugin-<name>` and exports a function that takes the project's options and gives `definePlugin`'s result.
+
+### Writing a plugin
+
+```ts
+// src/index.ts of @aztlan/lago-plugin-schemes
+import { definePlugin } from "@aztlan/lago-core";
+
+export default function schemes({ include }: { include: readonly string[] }) {
+  return definePlugin({
+    name: "schemes",
+    preview: new URL("./preview.js", import.meta.url),
+    globalTypes: { scheme: { values: ["classic", ...include], default: "classic" } },
+    modes: Object.fromEntries(include.map((scheme) => [scheme, { globals: { scheme } }])),
+  });
+}
+```
+
+- `name` names the plugin wherever Lago names it, as in a refusal.
+- `preview` is a module whose default export is a `Preview`, as a project's is. The plugin's decorators, args, parameters, loaders and tags are set around every story, outside the file's and inside the project's preview: the project's args and parameters win over the plugin's, and the project's decorators wrap the plugin's.
+- `globalTypes` and `modes` join the project's. A global or a mode is declared once: one that two plugins declare, or a plugin and the project, is refused, naming both.
+- Each module is named by an absolute path or a `file:` URL, as `new URL("./preview.js", import.meta.url)` gives one, because the plugin is read from the project's configuration, where a relative path would mean nothing.
+
+A plugin names React, OpenTUI and vitest as peer dependencies, never as dependencies, so the project's one copy of each serves the plugin too.
+
+A project that writes its own configuration gives the plugins to the plugin, as `testStories({ viewports, preview, plugins })`. A test that composes stories gives `setProjectAnnotations` the plugins' previews before its own, as `setProjectAnnotations([schemesPreview, preview])`, so that the story is drawn as its file draws it.
+
 ## Practices
 
 1. One story per state worth pinning, named for the state, with one sentence above it that says what to look for.

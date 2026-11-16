@@ -7,6 +7,7 @@ import addMatrixReporter from "./addMatrixReporter.js";
 import checkMatrix from "./checkMatrix.js";
 import { modeName, storiesFile, viewportName } from "./constants.js";
 import readComments from "./readComments.js";
+import readPlugins from "./readPlugins.js";
 import type { Mode, Options, Registration } from "./types.js";
 
 /** The module the appended line calls, which stands beside this one. */
@@ -57,22 +58,24 @@ const readPath = (id: string) => id.replace(/\?.*$/s, "");
  * A vitest plugin that makes every stories file vitest runs a test file: each
  * story is drawn at each viewport, with time stopped, and compared with its
  * golden in `__goldens__` beside the file. With a preview, every story is set
- * inside the preview's default export. With modes, every story is drawn in
- * each too, and a mode's picture keeps a golden only where it differs from
+ * inside the preview's default export, and inside each plugin's preview
+ * before it. With modes, the project's and the plugins', every story is
+ * drawn in each too, and a mode's picture keeps a golden only where it differs from
  * the base picture at the same viewport, and the matrix totals are printed
  * after the run.
  *
  * It appends lines to each stories file, which hand the file's own exports,
  * and the preview's, to the code that registers the tests. Which files are
- * run stays vitest's `include` to say. Its `api` names the modes, in the
- * order given, for whatever reads the resolved configuration, as the gallery
- * does.
+ * run stays vitest's `include` to say. Its `api` names the modes, the
+ * plugins' first, in the order given, for whatever reads the resolved
+ * configuration, as the gallery does.
  */
 export default function testStories({
   viewports = { "80x24": defaultViewport },
   preview,
-  modes,
+  modes: projectModes,
   matrix,
+  plugins = [],
 }: Options = {}): Plugin {
   const names = Object.keys(viewports);
   const unusable = names.find((name) => !viewportName.test(name));
@@ -83,6 +86,7 @@ export default function testStories({
         : `The viewport name ${JSON.stringify(unusable)} cannot be part of a file's name. Use letters, digits, - and _.`,
     );
   }
+  const { modes, registrations } = readPlugins(plugins, projectModes);
   if (modes !== undefined) checkModes(modes);
   const modeCount = Object.keys(modes ?? {}).length;
   const max: unknown = matrix?.max;
@@ -96,6 +100,14 @@ export default function testStories({
     enforce: "pre",
     api: { modes: modes ?? {} },
     configResolved({ root }) {
+      const missing = registrations.find(
+        (plugin) => plugin.preview !== undefined && !existsSync(plugin.preview),
+      );
+      if (missing !== undefined) {
+        throw new Error(
+          `The plugin ${missing.name} names its preview ${missing.preview}, which does not exist. The plugin's package is built without it, or names it wrongly.`,
+        );
+      }
       if (preview === undefined || existsSync(resolve(root, preview))) return;
       throw new Error(
         `The preview ${JSON.stringify(preview)} given to testStories is not a file: ${resolve(root, preview)} does not exist. Name the module from the project's root, as in preview: "./src/lago.preview.tsx".`,
@@ -111,7 +123,12 @@ export default function testStories({
       // so they are made part of that file's key.
       defineCacheKeyGenerator(({ id }) =>
         storiesFile.test(readPath(id))
-          ? JSON.stringify({ viewports, preview, modes })
+          ? JSON.stringify({
+              viewports,
+              preview,
+              modes,
+              ...(registrations.length > 0 && { plugins: registrations }),
+            })
           : undefined,
       );
       if (matrix !== undefined) {
@@ -134,14 +151,44 @@ export default function testStories({
         comments: readComments(path, code),
         ...(previewPath !== undefined && { preview: previewPath }),
         ...(modes !== undefined && { modes }),
+        ...(registrations.length > 0 && { plugins: registrations }),
       };
+      // Each plugin's preview module is imported under a name of its own,
+      // and the registration is handed them in the plugins' order, nothing
+      // standing for a plugin with none.
+      const pluginPreviews = registrations.map(({ preview: module }, place) =>
+        module === undefined
+          ? { name: "undefined", line: [] }
+          : {
+              name: `__lagoPlugin${place}`,
+              line: [
+                `import * as __lagoPlugin${place} from ${JSON.stringify(module)};`,
+              ],
+            },
+      );
+      const previews =
+        registrations.length === 0
+          ? previewPath === undefined
+            ? []
+            : ["__lagoPreview"]
+          : [
+              previewPath === undefined ? "undefined" : "__lagoPreview",
+              `[${pluginPreviews.map(({ name }) => name).join(", ")}]`,
+            ];
+      const call = [
+        "__lagoStories",
+        "import.meta.url",
+        JSON.stringify(registration),
+        ...previews,
+      ];
       const appended = [
         `import * as __lagoStories from ${JSON.stringify(path)};`,
         `import __lagoRegisterStories from ${JSON.stringify(runtime)};`,
         ...(previewPath === undefined
           ? []
           : [`import * as __lagoPreview from ${JSON.stringify(previewPath)};`]),
-        `__lagoRegisterStories(__lagoStories, import.meta.url, ${JSON.stringify(registration)}${previewPath === undefined ? "" : ", __lagoPreview"});`,
+        ...pluginPreviews.flatMap(({ line }) => line),
+        `__lagoRegisterStories(${call.join(", ")});`,
       ];
       return { code: `${code}\n${appended.join("\n")}\n`, map: null };
     },

@@ -4,7 +4,9 @@ import { describe, expect, it } from "vitest";
 import {
   checkGlobals,
   listStories,
+  mergePreviews,
   type Parameters,
+  type PreviewLayer,
   type StoriesModule,
 } from "../story/index.js";
 import checkMode from "./checkMode.js";
@@ -32,7 +34,8 @@ const isLeftOut = (parameters: Parameters, mode: string) => {
  * there: only the file vitest is running registers anything.
  *
  * With the project's preview module, every story is set inside its default
- * export. A mode's test follows the base's at the same viewport, and
+ * export, and inside each plugin's preview and globals before it, in the
+ * plugins' order. A mode's test follows the base's at the same viewport, and
  * compares its picture with the one the base's test drew.
  *
  * @note Impure: registers tests on the running file.
@@ -40,13 +43,38 @@ const isLeftOut = (parameters: Parameters, mode: string) => {
 export default function registerStories(
   module: StoriesModule,
   url: string,
-  { viewports, comments, preview: previewPath, modes = {} }: Registration,
+  {
+    viewports,
+    comments,
+    preview: previewPath,
+    modes = {},
+    plugins = [],
+  }: Registration,
   preview?: { readonly default?: unknown },
+  pluginPreviews: readonly ({ readonly default?: unknown } | undefined)[] = [],
 ): void {
   const file = fileURLToPath(url);
   if (expect.getState().testPath !== file) return;
   const order = Object.keys(comments);
-  const annotations = readPreview(preview, previewPath);
+  const project = readPreview(preview, previewPath);
+  const layers: PreviewLayer[] = plugins.flatMap((plugin, place) => {
+    const own = readPreview(pluginPreviews.at(place), plugin.preview);
+    return [
+      {
+        where: `the plugin ${plugin.name}`,
+        preview: {
+          ...(plugin.globalTypes && { globalTypes: plugin.globalTypes }),
+        },
+      },
+      ...(own
+        ? [{ where: `the preview ${plugin.preview}`, preview: own }]
+        : []),
+    ];
+  });
+  if (project)
+    layers.push({ where: `the preview ${previewPath}`, preview: project });
+  // A project with no plugins is set inside its preview as it gives it.
+  const annotations = plugins.length === 0 ? project : mergePreviews(layers);
   for (const [name, mode] of Object.entries(modes)) {
     checkGlobals(
       annotations?.globalTypes ?? {},
