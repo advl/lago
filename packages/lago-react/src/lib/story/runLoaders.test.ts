@@ -8,6 +8,7 @@ const context = {
   args: { label: "apples" },
   parameters: { seed: 3 },
   viewport: { cols: 20, rows: 2 },
+  globals: { scheme: "dark" },
 };
 
 describe("runLoaders", () => {

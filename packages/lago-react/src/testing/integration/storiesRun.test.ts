@@ -51,6 +51,7 @@ describe("a project's stories under the plugin", { timeout: 60_000 }, () => {
       expected: { cols: 20, rows: 3 },
     });
     expect(outcomes.at(1)?.story?.description).toBe("Says goodbye.");
+    expect(output).not.toContain("Matrix");
   });
 
   it("fail the story whose picture changed, and no other", async () => {
@@ -301,6 +302,60 @@ it("draws a story inside the preview", async () => {
     expect(outcomes).toEqual([]);
     expect(errors["Label.stories.tsx"]).toMatch(
       /The preview \S+\/lago\.preview\.tsx has no default export\./,
+    );
+  });
+
+  it("draw each story with the preview's globals, a story's fixed value over the default", async () => {
+    const { outcomes, output } = await runProject({
+      ...previewed,
+      "lago.preview.tsx": `export default {
+  globalTypes: { scheme: { values: ["light", "dark"], default: "light" } },
+  decorators: [(Story, { globals }) => (
+    <box flexDirection="column">
+      <text>{globals.scheme}</text>
+      <Story />
+    </box>
+  )],
+};
+`,
+      "Label.stories.tsx": `import Component from "./Label.js";
+
+export default { title: "scratch/Label", component: Component, args: { text: "hi" } };
+
+/** In the default scheme. */
+export const Plain = {};
+
+/** In the dark scheme, whatever the mode. */
+export const Dark = { globals: { scheme: "dark" } };
+`,
+    });
+    expect(
+      outcomes.map(({ name, story }) => [
+        name,
+        story?.actual.lines.at(0)?.at(0)?.text,
+      ]),
+      output,
+    ).toEqual([
+      ["scratch/Label Plain at small", "light"],
+      ["scratch/Label Dark at small", "dark"],
+      ["scratch/Label keeps no golden that no story owns", undefined],
+    ]);
+  });
+
+  it("fail a stories file whose story fixes a global the preview does not declare, naming the file and the declared ones", async () => {
+    const { outcomes, errors } = await runProject({
+      ...previewed,
+      "Label.stories.tsx": `import Component from "./Label.js";
+
+export default { title: "scratch/Label", component: Component };
+
+/** In a scheme nobody declared. */
+export const Dark = { args: { text: "x" }, globals: { scheme: "dark" } };
+`,
+    });
+    expect(outcomes).toEqual([]);
+    expect(errors["Label.stories.tsx"]).toMatch(
+      /\S+\/Label\.stories\.tsx: the story "scratch\/Label Dark" sets the global "scheme", which the preview does not declare: it declares none/,
     );
   });
 

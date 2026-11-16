@@ -27,10 +27,10 @@ function readAnnotations(
 /**
  * A story with what its file's default export and the project's preview give
  * it, in three layers, the preview's first and the story's last: args merged
- * key by key, parameters object into object, tags in turn, and loaders in
- * that order; decorators the other way round, so the story's wrap the story
- * and the preview's wrap everything. The story's own `render` and `play` come
- * before the file's.
+ * key by key, parameters object into object, tags in turn, loaders in that
+ * order, and globals the story's over the file's; decorators the other way
+ * round, so the story's wrap the story and the preview's wrap everything. The
+ * story's own `render` and `play` come before the file's.
  */
 export default function prepareStory(
   meta: Meta,
@@ -68,6 +68,8 @@ export default function prepareStory(
       ...(meta.loaders ?? []),
       ...(story.loaders ?? []),
     ],
+    globalTypes: preview.globalTypes ?? {},
+    globals: { ...meta.globals, ...story.globals },
     render,
     play: story.play ?? meta.play,
     tags: resolveTags(preview.tags, meta.tags, story.tags),

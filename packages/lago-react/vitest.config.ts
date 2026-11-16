@@ -3,18 +3,6 @@ import { defineConfig } from "vitest/config";
 import testStories from "./src/lib/vitest/testStories.js";
 
 export default defineConfig({
-  // This package's own plugin, from its source, over its own fixtures: the
-  // stories under `testing/` are how the plugin is tested, so here, and only
-  // here, coverage counts the stories project too. What they cover is the
-  // code that registers and checks a story, not a component.
-  plugins: [
-    testStories({
-      viewports: {
-        narrow: { cols: 24, rows: 4 },
-        wide: { cols: 40, rows: 4 },
-      },
-    }),
-  ],
   // The components are drawn through the renderer's React reconciler, so JSX
   // takes its runtime from there.
   oxc: { jsx: { runtime: "automatic", importSource: "@opentui/react" } },
@@ -36,7 +24,38 @@ export default defineConfig({
       },
       {
         extends: true,
-        test: { name: "stories", include: ["testing/**/*.stories.tsx"] },
+        // This package's own plugin, from its source, over its own fixtures:
+        // the stories under `testing/` are how the plugin is tested, so here,
+        // and only here, coverage counts the stories projects too. What they
+        // cover is the code that registers and checks a story, not a
+        // component.
+        plugins: [
+          testStories({
+            viewports: {
+              narrow: { cols: 24, rows: 4 },
+              wide: { cols: 40, rows: 4 },
+            },
+          }),
+        ],
+        test: { name: "stories", include: ["testing/*.stories.tsx"] },
+      },
+      // The same plugin with modes, over fixtures of their own, so that the
+      // stories above keep the tests and goldens of a project with none.
+      {
+        extends: true,
+        plugins: [
+          testStories({
+            viewports: { narrow: { cols: 24, rows: 4 } },
+            preview: "./testing/modes/lago.preview.tsx",
+            modes: {
+              dark: {
+                globals: { scheme: "dark" },
+                expect: { tags: ["schemed"] },
+              },
+            },
+          }),
+        ],
+        test: { name: "modes", include: ["testing/modes/*.stories.tsx"] },
       },
     ],
     coverage: {

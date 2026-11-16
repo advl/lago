@@ -37,6 +37,40 @@ describe("setProjectAnnotations", () => {
     expect(Default.tags).toEqual(["dev", "test", "themed"]);
   });
 
+  it("gives a composed story each global's default, or the value the story fixes", async () => {
+    setProjectAnnotations({
+      globalTypes: { scheme: { values: ["light", "dark"], default: "dark" } },
+      decorators: [
+        (Story, { globals }) => (
+          <box flexDirection="column">
+            <text>{`scheme ${globals.scheme}`}</text>
+            <Story />
+          </box>
+        ),
+      ],
+    });
+    const { Default } = composeStories(stories);
+    expect((await Default.run({ cols: 20, rows: 2 })).lines).toEqual([
+      "scheme dark",
+      "apples 0",
+    ]);
+    await Default.load();
+    expect((await render(<Default />, { cols: 20, rows: 2 })).lines).toEqual([
+      "scheme dark",
+      "apples 0",
+    ]);
+  });
+
+  it("refuses a preview whose globalTypes cannot be drawn with", () => {
+    expect(() =>
+      setProjectAnnotations({
+        globalTypes: { scheme: { values: [], default: "dark" } },
+      }),
+    ).toThrow(
+      "The preview given to setProjectAnnotations declares the global scheme with no values to take.",
+    );
+  });
+
   it("leaves a story composed before it as it was composed", async () => {
     const { Default } = composeStories(stories);
     setProjectAnnotations({ decorators: [titled] });

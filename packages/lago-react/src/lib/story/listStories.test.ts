@@ -23,6 +23,20 @@ describe("listStories", () => {
     ]);
   });
 
+  it("refuses a story that fixes a global the preview does not declare, naming the file and the story", () => {
+    const module: StoriesModule = {
+      default: { title: "fixtures/Label", render, globals: { scheme: "dark" } },
+      Dark: {},
+    };
+    expect(() =>
+      listStories(module, "src/Label.stories.tsx", {
+        globalTypes: { density: { values: ["roomy"], default: "roomy" } },
+      }),
+    ).toThrow(
+      'src/Label.stories.tsx: the story "fixtures/Label Dark" sets the global "scheme", which the preview does not declare: it declares density.',
+    );
+  });
+
   it.each([
     ["no default export", {}],
     ["a default export without a title", { default: { render } }],

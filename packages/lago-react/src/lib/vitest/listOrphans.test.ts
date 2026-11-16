@@ -29,6 +29,21 @@ describe("listOrphans", () => {
     ]);
   });
 
+  it("gives a mode's golden that none of its stories owns", () => {
+    const folder = makeFolder(
+      "Row.Default.narrow.golden",
+      "Row.Default.narrow@dark.golden",
+      "Row.Default.narrow@dim.golden",
+    );
+    const owned = new Set([
+      join(folder, "Row.Default.narrow.golden"),
+      join(folder, "Row.Default.narrow@dark.golden"),
+    ]);
+    expect(listOrphans(folder, "Row", owned)).toEqual([
+      join(folder, "Row.Default.narrow@dim.golden"),
+    ]);
+  });
+
   it("leaves alone what belongs to another stories file, or is no golden", () => {
     const folder = makeFolder(
       "Row.Selected.Default.narrow.golden",
@@ -36,6 +51,10 @@ describe("listOrphans", () => {
       "Row.Default.narrow.txt",
       "Row.narrow.golden",
       "Row..narrow.golden",
+      "Row.golden",
+      "Row.Default.narrow@.golden",
+      "Row.Default.@dark.golden",
+      "Row.Default.narrow@dark@dim.golden",
       "notes.md",
     );
     expect(listOrphans(folder, "Row", new Set())).toEqual([]);

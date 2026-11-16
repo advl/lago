@@ -1,5 +1,7 @@
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import testStories from "./testStories.js";
+import type { Options } from "./types.js";
 
 const viewports = { narrow: { cols: 40, rows: 36 } };
 
@@ -59,6 +61,57 @@ describe("testStories", () => {
         ].join("\n"),
       ),
     });
+  });
+
+  it("makes a stories file hand the modes to its registration", () => {
+    const modes = {
+      dark: { globals: { scheme: "dark" }, expect: { tags: ["themed"] } },
+    };
+    const result = callHook(
+      testStories({ viewports, modes }),
+      "transform",
+      "export const Default = {};\n",
+      "/project/src/Row.stories.tsx",
+    );
+    expect(result).toMatchObject({
+      code: expect.stringContaining(
+        '{"viewports":{"narrow":{"cols":40,"rows":36}},"comments":{"Default":""},"modes":{"dark":{"globals":{"scheme":"dark"},"expect":{"tags":["themed"]}}}});',
+      ),
+    });
+  });
+
+  it("refuses a mode whose name cannot be part of a file's name", () => {
+    expect(() =>
+      testStories({ modes: { "dark.mode": { globals: { scheme: "dark" } } } }),
+    ).toThrow(
+      'The mode name "dark.mode" cannot be part of a file\'s name. Use letters, digits, - and _.',
+    );
+  });
+
+  it.each([
+    ["no globals", {}],
+    ["empty globals", { globals: {} }],
+    ["no object", null],
+  ])("refuses a mode with %s, which would draw as the base does", (_, mode) => {
+    expect(() => testStories({ modes: { dark: mode as never } })).toThrow(
+      'The mode dark sets no global, so it would draw every story as the base does. Give it the globals it sets, as in dark: { globals: { scheme: "dark" } }.',
+    );
+  });
+
+  it.each([
+    ["a text", { tags: "themed" }],
+    ["no tags", {}],
+    ["a tag that is no text", { tags: [1] }],
+  ])("refuses a mode that expects by %s", (_, expected) => {
+    expect(() =>
+      testStories({
+        modes: {
+          dark: { globals: { scheme: "dark" }, expect: expected as never },
+        },
+      }),
+    ).toThrow(
+      'The mode dark expects to change stories by tags that are not a list of text. Name the tags, as in dark: { globals: { scheme: "dark" }, expect: { tags: ["coloured"] } }.',
+    );
   });
 
   it("refuses a preview that is not a file, naming where it was looked for", () => {
@@ -134,6 +187,95 @@ describe("testStories", () => {
     };
     expect(readKeys("./one.tsx")).not.toBe(readKeys("./other.tsx"));
     expect(readKeys("./one.tsx")).not.toBe(readKeys());
+  });
+
+  it("has vitest transform a stories file again when its modes change", () => {
+    const readKeys = (scheme?: string) => {
+      let readKey = (_: { id: string }): unknown => "never defined";
+      const modes =
+        scheme === undefined ? undefined : { dark: { globals: { scheme } } };
+      callHook(testStories({ viewports, modes }), "configureVitest", {
+        vitest: { config: { reporters: [] }, logger: { log() {} } },
+        project: { name: "stories" },
+        defineCacheKeyGenerator: (generator: typeof readKey) => {
+          readKey = generator;
+        },
+      });
+      return readKey({ id: "/project/Row.stories.tsx" });
+    };
+    expect(readKeys("dark")).not.toBe(readKeys("dim"));
+    expect(readKeys("dark")).not.toBe(readKeys());
+  });
+
+  it("has vitest print the matrix totals for a project that draws modes, and for no other", () => {
+    const configure = (modes?: Options["modes"]) => {
+      const vitest = { config: { reporters: [] }, logger: { log() {} } };
+      callHook(testStories({ viewports, modes }), "configureVitest", {
+        vitest,
+        project: { name: "stories" },
+        defineCacheKeyGenerator() {},
+      });
+      return vitest.config.reporters;
+    };
+    expect(configure({ dark: { globals: { scheme: "dark" } } })).toHaveLength(
+      1,
+    );
+    expect(configure({})).toHaveLength(0);
+    expect(configure()).toHaveLength(0);
+  });
+
+  it("refuses a project whose matrix would pass matrix.max, with its count", async () => {
+    const counter = join(
+      import.meta.dirname,
+      "../../../testing/Counter.stories.tsx",
+    );
+    const configure = (max: number, modes?: Options["modes"]) =>
+      callHook(
+        testStories({ viewports, modes, matrix: { max } }),
+        "configureVitest",
+        {
+          vitest: { config: { reporters: [] }, logger: { log() {} } },
+          project: {
+            name: "stories",
+            globTestFiles: async () => ({
+              testFiles: [
+                counter,
+                join(import.meta.dirname, "testStories.test.ts"),
+              ],
+            }),
+          },
+          defineCacheKeyGenerator() {},
+        },
+      );
+    const dark = { dark: { globals: { scheme: "dark" } } };
+    await expect(configure(20, dark)).resolves.toBeUndefined();
+    await expect(configure(19, dark)).rejects.toThrow(
+      "The project stories has 20 cells in its matrix, 10 stories at 1 viewport in the base and 1 mode, past matrix.max, 19. Every story its stories files export is counted at every configured viewport, whatever it leaves out. Draw fewer modes or viewports, or raise matrix.max.",
+    );
+    await expect(
+      callHook(
+        testStories({
+          viewports: { ...viewports, wide: { cols: 80, rows: 4 } },
+          matrix: { max: 1 },
+        }),
+        "configureVitest",
+        {
+          project: {
+            name: "stories",
+            globTestFiles: async () => ({ testFiles: [counter] }),
+          },
+          defineCacheKeyGenerator() {},
+        },
+      ),
+    ).rejects.toThrow(
+      "20 cells in its matrix, 10 stories at 2 viewports in the base and 0 modes",
+    );
+  });
+
+  it.each([0, 1.5, "many", undefined])("refuses a matrix.max of %s", (max) => {
+    expect(() => testStories({ matrix: { max: max as number } })).toThrow(
+      `matrix.max must be a whole number above 0, the most cells the matrix may hold, as in matrix: { max: 400 }; it is ${JSON.stringify(max)}.`,
+    );
   });
 
   it("refuses an empty set of viewports", () => {

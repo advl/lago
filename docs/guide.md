@@ -105,17 +105,88 @@ const preview = {
 export default preview;
 ```
 
-`createConfig({ preview: "./src/lago.preview.tsx" })` names the module from the project's root, and every stories file is then set inside it; coverage leaves it out, as it leaves the stories. A project that writes its own configuration gives the same path to the plugin, as `testStories({ viewports, preview })`. A preview holds `args`, `parameters`, `decorators`, `loaders` and `tags`, and each is set around what the file and the story say:
+`createConfig({ preview: "./src/lago.preview.tsx" })` names the module from the project's root, and every stories file is then set inside it; coverage leaves it out, as it leaves the stories. A project that writes its own configuration gives the same path to the plugin, as `testStories({ viewports, preview })`. A preview holds `args`, `parameters`, `decorators`, `loaders`, `tags` and `globalTypes`, and each is set around what the file and the story say:
 
 - its args and parameters come first, so a file's or a story's win;
 - its decorators wrap all the others, the file's included;
 - its loaders run before the file's, and its tags are read before the file's.
 
+## Globals and modes
+
+A setting that is not an arg, such as a colour scheme, a density or a set of glyphs, is a global. The preview declares each one with the values it takes and its default:
+
+```tsx
+// src/lago.preview.tsx
+import type { Preview } from "@aztlan/lago-react";
+import { SeatProvider, SCHEMES } from "./seat.js";
+
+const preview = {
+  globalTypes: {
+    scheme: { values: ["classic", "tokyo-night", "dracula", "iceberg"], default: "classic" },
+    tint: { values: ["16", "truecolor"], default: "16" },
+  },
+  decorators: [
+    (Story, { globals }) => (
+      <SeatProvider palette={SCHEMES[globals.scheme]} tint={globals.tint}>
+        {Story()}
+      </SeatProvider>
+    ),
+  ],
+} satisfies Preview;
+
+export default preview;
+```
+
+- `globals` in a story's context holds the value of every declared global, for `render`, the decorators, the loaders and `play`.
+- A story, or its file's default export, fixes a global with `globals: { scheme: "dracula" }`; the story's win over the file's.
+- A global the preview does not declare, or a value it does not take, fails the stories file, naming the file, the story and the declared choices.
+
+A mode is a named set of globals every story is also drawn in. The configuration names the modes beside the viewports:
+
+```ts
+// vitest.config.ts
+import { createConfig } from "@aztlan/lago-config";
+
+export default createConfig({
+  viewports,
+  preview: "./src/lago.preview.tsx",
+  modes: {
+    dracula: { globals: { scheme: "dracula" }, expect: { tags: ["coloured"] } },
+    truecolor: { globals: { tint: "truecolor" } },
+  },
+  matrix: { max: 400 },
+});
+```
+
+A project that writes its own configuration gives the same to the plugin, as `testStories({ viewports, preview, modes, matrix })`.
+
+- A mode's name becomes part of a golden's file name, so it holds letters, digits, `-` and `_`. A mode sets at least one global, and only globals the preview declares, at their values.
+- Every story is drawn at every viewport in the base, which sets nothing, and then in each mode. A value resolves as the story's own, then the mode's, then the default.
+- A mode's test is named `<Story> at <viewport>@<mode>`, after the base's `<Story> at <viewport>`.
+- A mode's picture is compared with the base picture at the same viewport, drawn in the same run. Equal, it keeps no golden. Different, it is compared with its own golden, `<file>.<Story>.<viewport>@<mode>.golden`, written on a person's machine and missing in a pipeline like any other.
+- A mode names the stories it is meant to change with `expect.tags`, a list of tags. Such a story whose picture comes out equal to the base's fails, naming the mode: the mode's globals did not reach it, or the story fixes them itself.
+- A story leaves a mode out with `parameters.modes: { dracula: { disable: true } }`.
+
+After the stories run, the run prints the matrix totals, a line for the whole and one per mode:
+
+```
+Matrix: 450 pictures covered, 50 in the base and 400 in 8 modes: 14 distinct · 386 equal · 0 expected but equal · 0 excluded
+  dracula            2 distinct · 48 equal · 0 expected but equal · 0 excluded
+```
+
+- **covered**: every picture drawn, the base's and the modes';
+- **distinct**: a mode's pictures that differ from the base's, each kept as a golden;
+- **equal**: a mode's pictures equal to the base's, which keep none;
+- **expected but equal**: equal pictures of stories the mode expects to change, each a failed test;
+- **excluded**: cells a story leaves out with `parameters.modes`.
+
+A run with no modes prints nothing of the kind. What equality saves is files and review, not time: each mode draws every story once more. `matrix: { max: 400 }` bounds that cost. It counts the matrix's cells from the stories files as they are written: every story they export, at every configured viewport, in the base and in each mode, the stories and modes a story leaves out included and the viewports a story adds not. A project with more cells is refused before anything is drawn, with its count.
+
 ## Goldens
 
-The first run of a story on a person's machine writes its picture beside the stories file, as `__goldens__/<file>.<Story>.<viewport>.golden`: the screen's text, then each run's colours and attributes. Every later run compares the picture with it. In a pipeline, a missing golden fails the run, so a story without one never passes unseen.
+The first run of a story on a person's machine writes its picture beside the stories file, as `__goldens__/<file>.<Story>.<viewport>.golden`: the screen's text, then each run's colours and attributes. A mode's picture that differs from the base's is kept beside it as `<file>.<Story>.<viewport>@<mode>.golden`, so the two sort together. Every later run compares the picture with it. In a pipeline, a missing golden fails the run, so a story without one never passes unseen.
 
-A golden is text, and a changed one is read in the pull request's diff like code. Accepting a new picture is deliberate: `A` on that picture in the gallery, or `vitest run --project stories -u` on a named file. `-u` also removes the goldens no story owns.
+A golden is text, and a changed one is read in the pull request's diff like code. Accepting a new picture is deliberate: `A` on that picture in the gallery, or `vitest run --project stories -u` on a named file. `-u` also removes the goldens no story owns, a mode's whose picture has come to equal the base's among them.
 
 ## Testing a component
 
@@ -153,7 +224,7 @@ It is called in the test files that compose stories, not in a setup file: a setu
 
 ## The gallery
 
-`lago` in a project's folder, or `lago <folder>`, opens the gallery. It runs the project's own vitest on the stories project, never writing, and draws a stories file again when it is saved.
+`lago` in a project's folder, or `lago <folder>`, opens the gallery. It runs the project's own vitest on the stories project, never writing, and draws a stories file again when it is saved. It shows each story's base pictures; a mode's tests run with the others and are read in vitest's own report.
 
 | Key | What it does |
 |---|---|

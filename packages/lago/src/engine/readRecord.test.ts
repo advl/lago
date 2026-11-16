@@ -10,6 +10,7 @@ const story = {
   description: "A row.",
   tags: ["dev", "test"],
   viewportName: "narrow",
+  globals: {},
   golden: "/project/src/__goldens__/Row.Default.narrow.golden",
   actual: drawPicture(["row"]),
   text: '40x1\n|row\n\n1:1 "row"\n',
@@ -99,6 +100,22 @@ describe("readRecord", () => {
     expect(readRecord(silent, "/project", exists)?.error).toBe(
       "The story did not finish.",
     );
+  });
+
+  it("reads nothing from a story's test in a mode, drawn or not", () => {
+    const moded = {
+      ...test,
+      name: "Default at narrow@dark",
+      story: { ...story, mode: "dark" },
+    };
+    expect(readRecord(moded, "/project", exists)).toBeUndefined();
+    expect(
+      readRecord(
+        { ...moded, state: "failed", story: undefined },
+        "/project",
+        exists,
+      ),
+    ).toBeUndefined();
   });
 
   it("reads nothing from a test that is no story's", () => {

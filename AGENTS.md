@@ -46,7 +46,7 @@ The pipeline is `.github/workflows/ci.yml`. Its gate job installs with the lockf
 - Coverage is a floor, not a target. Behaviour lands with the tests that pin it, and the fill comes after.
 - A package with components extends `@canonical/typescript-config-react` and takes its JSX runtime from `@opentui/react`, in `tsconfig.json` and in `vitest.config.ts`.
 - A stories file follows Component Story Format 3: the component imported as `Component`, `const meta = { … } satisfies Meta<typeof Component>`, and one named export per state with a documentation comment above it.
-- A story's picture is kept beside its stories file as `__goldens__/<file>.<Story>.<viewport>.golden`. A run on a person's machine writes a golden that is missing, and a pipeline fails for it; `-u` rewrites every golden and removes those no story owns. A changed golden is reviewed in the diff like code.
+- A story's picture is kept beside its stories file as `__goldens__/<file>.<Story>.<viewport>.golden`, and a mode's, where it differs from that picture, as `<file>.<Story>.<viewport>@<mode>.golden`. A run on a person's machine writes a golden that is missing, and a pipeline fails for it; `-u` rewrites every golden and removes those no story owns. A changed golden is reviewed in the diff like code.
 - An implementation file exports one value, as its default, at its declaration, and is named after it. `types.ts` exports only types and `constants.ts` only named constants.
 - A folder's `index.ts` is a barrel of named re-exports reaching a file beside it or a child folder's `index.js`. No `export *`, and no `#` alias.
 - In a library, each domain is a folder under `src/lib/`. The gallery is an application, organised by what it does: each domain is a folder directly under `src/`. Code inside a domain imports its siblings by file; code in another domain imports through the barrel.
@@ -90,6 +90,8 @@ The pipeline is `.github/workflows/ci.yml`. Its gate job installs with the lockf
 - The gallery starts the project's own vitest from code, with `update: "none"`: a run never writes a golden, so a missing one is reported as new, and only accepting it in the gallery writes it.
 - Vitest's own `start` refuses a project with no test file, so the gallery asks `globTestSpecifications` first and opens an empty gallery on a project with no stories yet.
 - Vitest started from code prints to the terminal the gallery draws on unless it is given streams of its own, so the gallery gives it streams that keep nothing.
+- A project under `test.projects` is transformed by the root configuration's plugins as well as its own, so a plugin given to the root and to a project transforms that project's files twice. A package that runs the plugin with two sets of options gives each project its own and the root none.
+- Vitest builds its reporters from its resolved configuration only after every plugin's `configureVitest` has run, so a plugin adds a reporter by pushing it onto `vitest.config.reporters` there. A restart resolves a new configuration, and the plugin adds it again.
 - Vitest tells a reporter of a removed test file with `onTestRemoved` and runs nothing after, so the gallery's reporter drops that file's stories there.
 - A screenshot keeps no blank cell before a run's first drawn character, so a fixture's run starts where its text does.
 - A box's border shows its title only when the title fits between the corners, so a frame is made wide enough for its story's name.

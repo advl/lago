@@ -7,6 +7,9 @@ export type {
   ComposedStories,
   ComposedStory,
   Decorator,
+  Globals,
+  GlobalType,
+  GlobalTypes,
   Loader,
   Meta,
   Parameters,
@@ -18,5 +21,12 @@ export type {
   StoryObj,
 } from "./story/index.js";
 export { composeStories, setProjectAnnotations } from "./story/index.js";
-export type { Options, Renderer, StoryResult } from "./vitest/index.js";
+export type {
+  Cell,
+  Comparison,
+  Mode,
+  Options,
+  Renderer,
+  StoryResult,
+} from "./vitest/index.js";
 export { renderer, testStories } from "./vitest/index.js";

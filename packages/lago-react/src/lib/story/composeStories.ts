@@ -2,6 +2,7 @@ import { defaultViewport } from "@aztlan/lago-core";
 import { createElement } from "react";
 import listStories from "./listStories.js";
 import projectAnnotations from "./projectAnnotations.js";
+import resolveGlobals from "./resolveGlobals.js";
 import runLoaders from "./runLoaders.js";
 import runStory from "./runStory.js";
 import StoryFrame from "./StoryFrame.js";
@@ -17,6 +18,9 @@ const nothingLoaded: Readonly<Record<string, unknown>> = {};
 
 function composeStory(story: PreparedStory): ComposedStory {
   const { title, name, args, parameters, loaders } = story;
+  // A composed story is drawn in no mode: each global the story does not
+  // fix takes its default.
+  const globals = resolveGlobals(story);
   // What the loaders last gave. A component draws at once, and loaders are
   // awaited before the first draw, so a story with loaders has nothing to
   // draw with until `load` has run them.
@@ -31,6 +35,7 @@ function composeStory(story: PreparedStory): ComposedStory {
       story,
       args: { ...args, ...props },
       loaded,
+      globals,
     });
   };
   return Object.assign(Composed, {
@@ -45,6 +50,7 @@ function composeStory(story: PreparedStory): ComposedStory {
         args,
         parameters,
         viewport,
+        globals,
       });
     },
     run: (viewport = defaultViewport) => runStory(story, viewport),

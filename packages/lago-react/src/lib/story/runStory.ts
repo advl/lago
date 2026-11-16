@@ -2,13 +2,16 @@ import { type Screen, stoppedTimers, type Viewport } from "@aztlan/lago-core";
 import { createElement } from "react";
 import { onTestFinished, vi } from "vitest";
 import { render } from "../render/index.js";
+import resolveGlobals from "./resolveGlobals.js";
 import runLoaders from "./runLoaders.js";
 import StoryFrame from "./StoryFrame.js";
-import type { PreparedStory } from "./types.js";
+import type { Globals, PreparedStory } from "./types.js";
 
 /**
  * Mounts a story on a screen of the given size, with time stopped at zero,
- * runs its `play`, and gives the screen as the story leaves it. Its loaders
+ * runs its `play`, and gives the screen as the story leaves it. A mode's
+ * globals stand under those the story fixes, and over each global's default,
+ * in the context of everything that loads, draws or plays the story. Its loaders
  * run first, on the stopped clock, and what they give is in the context of
  * everything that draws or plays the story. A test that has already faked
  * the timers keeps its own clock. A test that ends while the loaders still
@@ -19,6 +22,7 @@ import type { PreparedStory } from "./types.js";
 export default async function runStory(
   story: PreparedStory,
   viewport: Viewport,
+  mode?: Globals,
 ): Promise<Screen> {
   if (!vi.isFakeTimers()) {
     vi.useFakeTimers({ now: 0, toFake: [...stoppedTimers] });
@@ -27,6 +31,7 @@ export default async function runStory(
     });
   }
   const { title, name, args, parameters } = story;
+  const globals = resolveGlobals(story, mode);
   // A loader that waits on a timer never finishes, since the clock stands
   // still, and the test would only say it timed out; this says why.
   let loading = true;
@@ -43,11 +48,12 @@ export default async function runStory(
     args,
     parameters,
     viewport,
+    globals,
   }).finally(() => {
     loading = false;
   });
   const screen = await render(
-    createElement(StoryFrame, { story, args, loaded }),
+    createElement(StoryFrame, { story, args, loaded, globals }),
     viewport,
   );
   if (story.play) {
@@ -57,6 +63,7 @@ export default async function runStory(
       args,
       parameters,
       viewport,
+      globals,
       loaded,
       canvas: screen,
       userEvent: screen.userEvent,
