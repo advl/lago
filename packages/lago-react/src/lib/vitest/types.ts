@@ -104,9 +104,40 @@ export interface StoryResult {
   readonly expected: Screenshot | undefined;
 }
 
+/** One story at one viewport in one mode: a cell of the matrix. */
+export interface Cell {
+  readonly title: string;
+  readonly name: string;
+  readonly viewportName: string;
+  readonly mode: string;
+}
+
+/** What one mode's cells came to in a run. */
+export interface ModeTotals {
+  /** Pictures equal to the base's, which keep no golden. */
+  readonly equal: number;
+  /** Pictures that differ from the base's, each kept as a golden. */
+  readonly distinct: number;
+  /** Pictures equal to the base's in stories the mode expects to change. */
+  readonly unreached: number;
+  /** Cells a story leaves out with `parameters.modes`. */
+  readonly excluded: number;
+}
+
+/** What a run drew of the matrix: the base pictures, then each mode's cells, by name. */
+export interface MatrixTotals {
+  readonly base: number;
+  readonly modes: Readonly<Record<string, ModeTotals>>;
+}
+
 declare module "vitest" {
   interface TaskMeta {
     /** Set by a story's test once the story has been drawn. */
     lago?: StoryResult;
+    /**
+     * Set by a stories file's check of its goldens: the cells its stories
+     * leave out, when there are any.
+     */
+    lagoExcluded?: readonly Cell[];
   }
 }

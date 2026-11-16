@@ -65,6 +65,9 @@ describe("a project's stories under the plugin with modes", {
     });
     expect(exists(equalGolden)).toBe(false);
     expect(read(darkGolden)).toContain("|dark\n");
+    expect(output).toContain(
+      "Matrix: 4 pictures covered, 2 in the base and 2 in 1 mode: 1 distinct · 1 equal · 0 expected but equal · 0 excluded",
+    );
     expect(read("__goldens__/Label.Schemed.small.golden")).toContain(
       "|light\n",
     );
@@ -117,7 +120,7 @@ describe("a project's stories under the plugin with modes", {
   });
 
   it("leave out a mode a story disables, its golden no longer owned", async () => {
-    const { outcomes } = await runProject({
+    const { outcomes, output } = await runProject({
       ...moded,
       [darkGolden]: "stale\n",
       "Label.stories.tsx": moded["Label.stories.tsx"].replace(
@@ -131,6 +134,9 @@ describe("a project's stories under the plugin with modes", {
       ["scratch/Label Schemed at small", "passed"],
       ["scratch/Label keeps no golden that no story owns", "failed"],
     ]);
+    expect(output).toContain(
+      "dark  0 distinct · 1 equal · 0 expected but equal · 1 excluded",
+    );
   });
 
   it("compare a mode's picture with the base when the run leaves the base's test out", async () => {

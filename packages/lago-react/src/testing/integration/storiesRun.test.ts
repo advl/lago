@@ -51,6 +51,7 @@ describe("a project's stories under the plugin", { timeout: 60_000 }, () => {
       expected: { cols: 20, rows: 3 },
     });
     expect(outcomes.at(1)?.story?.description).toBe("Says goodbye.");
+    expect(output).not.toContain("Matrix");
   });
 
   it("fail the story whose picture changed, and no other", async () => {

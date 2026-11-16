@@ -39,3 +39,9 @@ export const Undarkened: Story = {
 export const Untested: Story = {
   tags: ["!test"],
 };
+
+/** Left out of the test run, and of the dark mode, which counts it nowhere. */
+export const Shelved: Story = {
+  tags: ["!test"],
+  parameters: { modes: { dark: { disable: true } } },
+};

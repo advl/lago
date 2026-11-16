@@ -22,6 +22,7 @@ export type {
 } from "./story/index.js";
 export { composeStories, setProjectAnnotations } from "./story/index.js";
 export type {
+  Cell,
   Comparison,
   Mode,
   Options,

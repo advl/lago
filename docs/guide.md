@@ -161,7 +161,20 @@ testStories({
 - A mode names the stories it is meant to change with `expect.tags`, a list of tags. Such a story whose picture comes out equal to the base's fails, naming the mode: the mode's globals did not reach it, or the story fixes them itself.
 - A story leaves a mode out with `parameters.modes: { dracula: { disable: true } }`.
 
-What equality saves is files and review, not time: each mode draws every story once more.
+After the stories run, the run prints the matrix totals, a line for the whole and one per mode:
+
+```
+Matrix: 450 pictures covered, 50 in the base and 400 in 8 modes: 14 distinct · 386 equal · 0 expected but equal · 0 excluded
+  dracula            2 distinct · 48 equal · 0 expected but equal · 0 excluded
+```
+
+- **covered**: every picture drawn, the base's and the modes';
+- **distinct**: a mode's pictures that differ from the base's, each kept as a golden;
+- **equal**: a mode's pictures equal to the base's, which keep none;
+- **expected but equal**: equal pictures of stories the mode expects to change, each a failed test;
+- **excluded**: cells a story leaves out with `parameters.modes`.
+
+A run with no modes prints nothing of the kind. What equality saves is files and review, not time: each mode draws every story once more.
 
 ## Goldens
 

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import testStories from "./testStories.js";
+import type { Options } from "./types.js";
 
 const viewports = { narrow: { cols: 40, rows: 36 } };
 
@@ -193,6 +194,8 @@ describe("testStories", () => {
       const modes =
         scheme === undefined ? undefined : { dark: { globals: { scheme } } };
       callHook(testStories({ viewports, modes }), "configureVitest", {
+        vitest: { config: { reporters: [] }, logger: { log() {} } },
+        project: { name: "stories" },
         defineCacheKeyGenerator: (generator: typeof readKey) => {
           readKey = generator;
         },
@@ -201,6 +204,23 @@ describe("testStories", () => {
     };
     expect(readKeys("dark")).not.toBe(readKeys("dim"));
     expect(readKeys("dark")).not.toBe(readKeys());
+  });
+
+  it("has vitest print the matrix totals for a project that draws modes, and for no other", () => {
+    const configure = (modes?: Options["modes"]) => {
+      const vitest = { config: { reporters: [] }, logger: { log() {} } };
+      callHook(testStories({ viewports, modes }), "configureVitest", {
+        vitest,
+        project: { name: "stories" },
+        defineCacheKeyGenerator() {},
+      });
+      return vitest.config.reporters;
+    };
+    expect(configure({ dark: { globals: { scheme: "dark" } } })).toHaveLength(
+      1,
+    );
+    expect(configure({})).toHaveLength(0);
+    expect(configure()).toHaveLength(0);
   });
 
   it("refuses an empty set of viewports", () => {

@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { defaultViewport } from "@aztlan/lago-core";
 import type { Plugin } from "vitest/config";
+import addMatrixReporter from "./addMatrixReporter.js";
 import { modeName, storiesFile, viewportName } from "./constants.js";
 import readComments from "./readComments.js";
 import type { Mode, Options, Registration } from "./types.js";
@@ -57,7 +58,8 @@ const readPath = (id: string) => id.replace(/\?.*$/s, "");
  * golden in `__goldens__` beside the file. With a preview, every story is set
  * inside the preview's default export. With modes, every story is drawn in
  * each too, and a mode's picture keeps a golden only where it differs from
- * the base picture at the same viewport.
+ * the base picture at the same viewport, and the matrix totals are printed
+ * after the run.
  *
  * It appends lines to each stories file, which hand the file's own exports,
  * and the preview's, to the code that registers the tests. Which files are
@@ -87,7 +89,11 @@ export default function testStories({
         `The preview ${JSON.stringify(preview)} given to testStories is not a file: ${resolve(root, preview)} does not exist. Name the module from the project's root, as in preview: "./src/lago.preview.tsx".`,
       );
     },
-    configureVitest({ defineCacheKeyGenerator }) {
+    configureVitest({ vitest, project, defineCacheKeyGenerator }) {
+      // The totals are printed only for a project that draws modes.
+      if (Object.keys(modes ?? {}).length > 0) {
+        addMatrixReporter(vitest, project.name);
+      }
       // Vitest keeps transformed modules between runs, by their source. What
       // is appended to a stories file depends on this plugin's options too,
       // so they are made part of that file's key.

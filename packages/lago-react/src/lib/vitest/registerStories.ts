@@ -13,7 +13,7 @@ import checkStory from "./checkStory.js";
 import { goldenFolder, storiesFile } from "./constants.js";
 import readPreview from "./readPreview.js";
 import resolveViewports from "./resolveViewports.js";
-import type { Registration } from "./types.js";
+import type { Cell, Registration } from "./types.js";
 
 /** Whether a story's `parameters.modes` leaves the mode out. */
 const isLeftOut = (parameters: Parameters, mode: string) => {
@@ -63,6 +63,7 @@ export default function registerStories(
   // The base pictures drawn in this run, by story and viewport, for the
   // modes' tests that follow to compare with.
   const drawn = new Map<string, string>();
+  const excluded: Cell[] = [];
   describe(module.default.title, () => {
     for (const story of stories) {
       const sizes = resolveViewports(
@@ -95,7 +96,17 @@ export default function registerStories(
           );
         }
         for (const [modeName, mode] of Object.entries(modes)) {
-          if (isLeftOut(story.parameters, modeName)) continue;
+          if (isLeftOut(story.parameters, modeName)) {
+            if (story.tags.includes("test")) {
+              excluded.push({
+                title: story.title,
+                name: story.name,
+                viewportName,
+                mode: modeName,
+              });
+            }
+            continue;
+          }
           const modeGolden = join(
             folder,
             `${base}.${story.name}.${viewportName}@${modeName}.golden`,
@@ -118,7 +129,10 @@ export default function registerStories(
         }
       }
     }
-    it("keeps no golden that no story owns", () =>
-      checkOrphans({ file, folder, base, owned }));
+    it("keeps no golden that no story owns", ({ task }) => {
+      // The cells left out are counted in the matrix with those drawn.
+      if (excluded.length > 0) task.meta.lagoExcluded = excluded;
+      checkOrphans({ file, folder, base, owned });
+    });
   });
 }
