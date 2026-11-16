@@ -14,6 +14,7 @@ import { rendererKeys } from "./constants.js";
 import ErrorCatcher from "./ErrorCatcher.js";
 import flushReact from "./flushReact.js";
 import settleScreen from "./settleScreen.js";
+import ViewportContext from "./ViewportContext.js";
 
 /**
  * Mounts `node` on a screen of the given size, drawn by the renderer's own
@@ -68,9 +69,13 @@ export default async function render(
   await flushReact(() =>
     root.render(
       createElement(
-        ErrorCatcher,
-        { onError: (error) => errors.push(error) },
-        node,
+        ViewportContext.Provider,
+        { value: viewport },
+        createElement(
+          ErrorCatcher,
+          { onError: (error) => errors.push(error) },
+          node,
+        ),
       ),
     ),
   );
