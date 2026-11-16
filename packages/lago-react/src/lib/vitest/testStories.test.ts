@@ -1,3 +1,4 @@
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import testStories from "./testStories.js";
 import type { Options } from "./types.js";
@@ -221,6 +222,60 @@ describe("testStories", () => {
     );
     expect(configure({})).toHaveLength(0);
     expect(configure()).toHaveLength(0);
+  });
+
+  it("refuses a project whose matrix would pass matrix.max, with its count", async () => {
+    const counter = join(
+      import.meta.dirname,
+      "../../../testing/Counter.stories.tsx",
+    );
+    const configure = (max: number, modes?: Options["modes"]) =>
+      callHook(
+        testStories({ viewports, modes, matrix: { max } }),
+        "configureVitest",
+        {
+          vitest: { config: { reporters: [] }, logger: { log() {} } },
+          project: {
+            name: "stories",
+            globTestFiles: async () => ({
+              testFiles: [
+                counter,
+                join(import.meta.dirname, "testStories.test.ts"),
+              ],
+            }),
+          },
+          defineCacheKeyGenerator() {},
+        },
+      );
+    const dark = { dark: { globals: { scheme: "dark" } } };
+    await expect(configure(20, dark)).resolves.toBeUndefined();
+    await expect(configure(19, dark)).rejects.toThrow(
+      "The project stories has 20 cells in its matrix, 10 stories at 1 viewport in the base and 1 mode, past matrix.max, 19. Every story its stories files export is counted at every configured viewport, whatever it leaves out. Draw fewer modes or viewports, or raise matrix.max.",
+    );
+    await expect(
+      callHook(
+        testStories({
+          viewports: { ...viewports, wide: { cols: 80, rows: 4 } },
+          matrix: { max: 1 },
+        }),
+        "configureVitest",
+        {
+          project: {
+            name: "stories",
+            globTestFiles: async () => ({ testFiles: [counter] }),
+          },
+          defineCacheKeyGenerator() {},
+        },
+      ),
+    ).rejects.toThrow(
+      "20 cells in its matrix, 10 stories at 2 viewports in the base and 0 modes",
+    );
+  });
+
+  it.each([0, 1.5, "many", undefined])("refuses a matrix.max of %s", (max) => {
+    expect(() => testStories({ matrix: { max: max as number } })).toThrow(
+      `matrix.max must be a whole number above 0, the most cells the matrix may hold, as in matrix: { max: 400 }; it is ${JSON.stringify(max)}.`,
+    );
   });
 
   it("refuses an empty set of viewports", () => {

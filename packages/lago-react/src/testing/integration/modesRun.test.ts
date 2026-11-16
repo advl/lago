@@ -168,4 +168,17 @@ describe("a project's stories under the plugin with modes", {
       'The mode dim sets the global "light", which the preview does not declare: it declares scheme.',
     );
   });
+
+  it("refuse a run whose matrix would pass matrix.max before drawing anything, with its count", async () => {
+    const { outcomes, output } = await runProject({
+      ...moded,
+      "vitest.config.ts": configure(
+        ', preview: "./lago.preview.tsx", modes: { dark: { globals: { scheme: "dark" } } }, matrix: { max: 3 }',
+      ),
+    });
+    expect(outcomes).toEqual([]);
+    expect(output).toContain(
+      "has 4 cells in its matrix, 2 stories at 1 viewport in the base and 1 mode, past matrix.max, 3.",
+    );
+  });
 });

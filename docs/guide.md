@@ -174,7 +174,7 @@ Matrix: 450 pictures covered, 50 in the base and 400 in 8 modes: 14 distinct · 
 - **expected but equal**: equal pictures of stories the mode expects to change, each a failed test;
 - **excluded**: cells a story leaves out with `parameters.modes`.
 
-A run with no modes prints nothing of the kind. What equality saves is files and review, not time: each mode draws every story once more.
+A run with no modes prints nothing of the kind. What equality saves is files and review, not time: each mode draws every story once more. `matrix: { max: 400 }` beside the modes bounds that cost. It counts the matrix's cells from the stories files as they are written: every story they export, at every configured viewport, in the base and in each mode, the stories and modes a story leaves out included and the viewports a story adds not. A project with more cells is refused before anything is drawn, with its count.
 
 ## Goldens
 

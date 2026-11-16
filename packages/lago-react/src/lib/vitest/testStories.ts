@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { defaultViewport } from "@aztlan/lago-core";
 import type { Plugin } from "vitest/config";
 import addMatrixReporter from "./addMatrixReporter.js";
+import checkMatrix from "./checkMatrix.js";
 import { modeName, storiesFile, viewportName } from "./constants.js";
 import readComments from "./readComments.js";
 import type { Mode, Options, Registration } from "./types.js";
@@ -69,6 +70,7 @@ export default function testStories({
   viewports = { "80x24": defaultViewport },
   preview,
   modes,
+  matrix,
 }: Options = {}): Plugin {
   const names = Object.keys(viewports);
   const unusable = names.find((name) => !viewportName.test(name));
@@ -80,6 +82,13 @@ export default function testStories({
     );
   }
   if (modes !== undefined) checkModes(modes);
+  const modeCount = Object.keys(modes ?? {}).length;
+  const max: unknown = matrix?.max;
+  if (matrix !== undefined && !(Number.isInteger(max) && Number(max) > 0)) {
+    throw new Error(
+      `matrix.max must be a whole number above 0, the most cells the matrix may hold, as in matrix: { max: 400 }; it is ${JSON.stringify(max)}.`,
+    );
+  }
   return {
     name: "lago:test-stories",
     enforce: "pre",
@@ -89,9 +98,9 @@ export default function testStories({
         `The preview ${JSON.stringify(preview)} given to testStories is not a file: ${resolve(root, preview)} does not exist. Name the module from the project's root, as in preview: "./src/lago.preview.tsx".`,
       );
     },
-    configureVitest({ vitest, project, defineCacheKeyGenerator }) {
+    async configureVitest({ vitest, project, defineCacheKeyGenerator }) {
       // The totals are printed only for a project that draws modes.
-      if (Object.keys(modes ?? {}).length > 0) {
+      if (modeCount > 0) {
         addMatrixReporter(vitest, project.name);
       }
       // Vitest keeps transformed modules between runs, by their source. What
@@ -102,6 +111,13 @@ export default function testStories({
           ? JSON.stringify({ viewports, preview, modes })
           : undefined,
       );
+      if (matrix !== undefined) {
+        await checkMatrix(project, {
+          viewports: names.length,
+          modes: modeCount,
+          max: matrix.max,
+        });
+      }
     },
     transform(code, id) {
       const path = readPath(id);

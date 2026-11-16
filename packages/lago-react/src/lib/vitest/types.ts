@@ -56,6 +56,13 @@ export interface Options {
    * with `parameters.modes: { dracula: { disable: true } }`.
    */
   readonly modes?: Readonly<Record<string, Mode>>;
+  /**
+   * A bound on the matrix's cells: every story the stories files export, at
+   * every configured viewport, in the base and in each mode, whatever a story
+   * leaves out. A project past it is refused before anything is drawn, with
+   * its count.
+   */
+  readonly matrix?: { readonly max: number };
 }
 
 /** What the plugin tells a stories file's tests, written into the file's last line. */
