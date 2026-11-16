@@ -1,6 +1,7 @@
+import type { ChromeName } from "@aztlan/lago-config";
 import { tokens } from "@aztlan/tui";
 import type { RGBA } from "@opentui/core";
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 import { chromes } from "./constants.js";
 
 /** A colour's relative luminance, as the contrast ratio reads it. */
@@ -28,6 +29,11 @@ const texts = [
 ] as const;
 
 describe("chromes", () => {
+  it("has a chrome for each name createConfig takes, and no other", () => {
+    expectTypeOf<keyof typeof chromes>().toEqualTypeOf<ChromeName>();
+    expect(Object.keys(chromes)).toEqual(["terminal", "light", "dark"]);
+  });
+
   it("is the terminal's own tokens under terminal", () => {
     expect(chromes.terminal).toBe(tokens);
   });

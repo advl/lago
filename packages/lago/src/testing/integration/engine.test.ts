@@ -1,5 +1,7 @@
 import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { type Tokens, tokens } from "@aztlan/tui";
+import { RGBA } from "@opentui/core";
 import { describe, expect, it } from "vitest";
 import makeProject from "../../../testing/makeProject.js";
 import writeChromeConfig from "../../../testing/writeChromeConfig.js";
@@ -148,6 +150,26 @@ describe("startEngine", { timeout: 60_000 }, () => {
     } finally {
       await engine.close();
     }
+  });
+
+  it("takes a project's own set of tokens through its configuration whole", async () => {
+    const root = makeProject({
+      ...files,
+      "vitest.config.ts": writeChromeConfig(
+        '{ ...tokens, "color.text": RGBA.fromHex("#123456") }',
+      ),
+    });
+    const seen: Tokens[] = [];
+    const engine = await startEngine({
+      root,
+      onChrome: (chrome) => seen.push(chrome),
+      onCatalog: () => {},
+    });
+    await engine.close();
+    expect(seen.at(0)?.["color.text"].toString()).toBe(
+      RGBA.fromHex("#123456").toString(),
+    );
+    expect(seen.at(0)?.["glyph.rule"]).toBe(tokens["glyph.rule"]);
   });
 
   it("refuses to start on a chrome it cannot read, naming the configuration's file", async () => {

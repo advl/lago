@@ -1,2 +1,2 @@
 export { default as createConfig } from "./createConfig.js";
-export type { Options } from "./types.js";
+export type { ChromeName, GalleryOptions, Options } from "./types.js";

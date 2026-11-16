@@ -244,6 +244,24 @@ It is called in the test files that compose stories, not in a setup file: a setu
 
 A story that throws shows its message and its place in the source; no other story is affected. A stories file that fails to load is named in the status line.
 
+### The gallery's chrome
+
+The gallery's own look, its chrome, is set by the project, in its configuration, and by nothing else: there is no setting of a person's own.
+
+```ts
+createConfig({ viewports, gallery: { chrome: "terminal" } });
+```
+
+| Chrome | What it looks like |
+|---|---|
+| `terminal`, the default | the terminal's own text and background, transparency included, and its palette's red, green, yellow, white and bright black for the marks |
+| `light`, `dark` | every colour fixed, and the background painted across the whole gallery, so it looks the same in any terminal |
+| a set of tokens | `{ ...tokens, "color.text": RGBA.fromHex("#202020") }`: every token of `@aztlan/tui`'s `tokens`, in colours of the project's choosing |
+
+`terminal` is the chrome to choose. It already follows each reader's terminal, whatever its colours, so the gallery looks right to everyone without a setting of their own. Each colour is paired with a glyph or a word in every chrome, so a status reads the same in all of them.
+
+The chrome colours the gallery around the pictures and never a picture itself: a story is drawn, and its golden kept, in the colours it asks for, whatever the chrome. The gallery refuses a chrome it cannot read when it opens, naming the configuration's file: a name it has no chrome for, or a set of tokens that lacks one.
+
 ## Practices
 
 1. One story per state worth pinning, named for the state, with one sentence above it that says what to look for.
