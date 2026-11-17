@@ -1,0 +1,59 @@
+120x30
+|project                                                                                 at terminal · as the room allows
+|Move · 2 of 4 ──────────────────────────────────────────────────────────────────────────────────────────────────────────
+|  ← →  h l choose a story beside
+|  ⏎        open the component's stories
+|  esc      leave the help
+|
+|Find ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+|  /        filter the components
+|  n N      next or previous match
+|  ⏎        keep what is typed
+|  backspace erase the last character
+|
+|Picture ────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+|  p        show the next viewport
+|  m        show the next mode
+|           base: sets no global
+|           dark: sets scheme dark
+|           ascii: sets glyphs ascii
+|           globals drawn: scheme light, dark; glyphs unicode, ascii
+|  x        show every story in every size and mode
+|  v        set the stories as the room allows, in rows, or side by side
+|  d        show the golden over the picture
+|  c        read the cells under a cursor
+|  A        accept the picture as its golden
+|
+|App ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+|  ?        close the help
+|  q        quit
+|
+|  the pictures are drawn by the project's own vitest, which draws a stories file again when it is saved
+
+1:1 "project                                                                                 at terminal ·"
+1:103 "as the room allows" fg=7
+2:1 "Move · 2 of 4 ──────────────────────────────────────────────────────────────────────────────────────────────────────────"
+3:3 "← →  h l choose a story beside"
+4:3 "⏎        open the component's stories"
+5:3 "esc      leave the help"
+7:1 "Find ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────"
+8:3 "/        filter the components"
+9:3 "n N      next or previous match"
+10:3 "⏎        keep what is typed"
+11:3 "backspace erase the last character"
+13:1 "Picture ────────────────────────────────────────────────────────────────────────────────────────────────────────────────"
+14:3 "p        show the next viewport"
+15:3 "m        show the next mode"
+16:12 "base: sets no global"
+17:12 "dark: sets scheme dark"
+18:12 "ascii: sets glyphs ascii"
+19:12 "globals drawn: scheme light, dark; glyphs unicode, ascii"
+20:3 "x        show every story in every size and mode"
+21:3 "v        set the stories as the room allows, in rows, or side by side"
+22:3 "d        show the golden over the picture"
+23:3 "c        read the cells under a cursor"
+24:3 "A        accept the picture as its golden"
+26:1 "App ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────"
+27:3 "?        close the help"
+28:3 "q        quit"
+30:3 "the pictures are drawn by the project's own vitest, which draws a stories file again when it is saved"

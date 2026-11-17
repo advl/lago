@@ -9,6 +9,7 @@ const orphans: ReportedTest = {
   state: "failed",
   errors: [{ message: "__goldens__ holds goldens that no story owns" }],
   story: undefined,
+  excluded: [],
 };
 
 describe("readFailure", () => {
@@ -23,6 +24,16 @@ describe("readFailure", () => {
       file: "/project/src/Row.stories.tsx",
       message: "cannot import",
     });
+  });
+
+  it("gives every error that kept a file from loading, in order", () => {
+    expect(
+      readFailure(
+        orphans.file,
+        [{ message: "cannot import" }, { message: "and cannot parse" }],
+        [orphans],
+      )?.message,
+    ).toBe("cannot import\n\nand cannot parse");
   });
 
   it("gives a failed check that the file's goldens all have a story", () => {

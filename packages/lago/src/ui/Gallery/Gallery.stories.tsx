@@ -1,5 +1,9 @@
 import type { Meta, StoryObj } from "@aztlan/lago-react";
-import { sampleCatalog } from "../../../testing/catalogs.js";
+import {
+  crowdedCatalog,
+  modesCatalog,
+  sampleCatalog,
+} from "../../../testing/catalogs.js";
 import { buildCatalog } from "../../catalog/index.js";
 import Component from "./Gallery.js";
 
@@ -91,4 +95,52 @@ export const Empty: Story = { args: { catalog: buildCatalog([]) } };
 /** A terminal a column narrower than the gallery needs, and one a line shorter. */
 export const TooSmall: Story = {
   parameters: { viewports: { terminal: { cols: 79 }, wide: { rows: 23 } } },
+};
+
+/** A component's stories in a mode, which the status line names after the size: a picture of its own, a changed one, and one equal where a change was expected. */
+export const Modes: Story = {
+  args: { catalog: modesCatalog },
+  play: async ({ userEvent }) => {
+    await userEvent.keyboard("{Enter}m");
+  },
+};
+
+/** A mode's picture equal to the base's, inspected: the base picture, which keeps no golden of its own. */
+export const Equal: Story = {
+  args: { catalog: modesCatalog },
+  play: async ({ userEvent }) => {
+    await userEvent.keyboard("{Enter}mm{Enter}");
+  },
+};
+
+/** Every key of a project with modes: `m` with the modes and the globals drawn. */
+export const ModesHelp: Story = {
+  args: { catalog: modesCatalog },
+  play: async ({ userEvent }) => {
+    await userEvent.keyboard("?jjjjjjjjj");
+  },
+};
+
+/** The matrix: every story in every size and mode, with a cell in each state and the first selected. */
+export const Matrix: Story = {
+  args: { catalog: modesCatalog },
+  play: async ({ userEvent }) => {
+    await userEvent.keyboard("x");
+  },
+};
+
+/** A changed cell of the matrix opened on its difference, which Esc leaves for the matrix. */
+export const MatrixCell: Story = {
+  args: { catalog: modesCatalog },
+  play: async ({ userEvent }) => {
+    await userEvent.keyboard("xjl{Enter}");
+  },
+};
+
+/** A matrix larger than the terminal, scrolled to a cell far down and to the right, its long mode names cut. */
+export const MatrixCrowded: Story = {
+  args: { catalog: crowdedCatalog },
+  play: async ({ userEvent }) => {
+    await userEvent.keyboard(`x${"j".repeat(18)}${"l".repeat(8)}`);
+  },
 };

@@ -224,7 +224,7 @@ It is called in the test files that compose stories, not in a setup file: a setu
 
 ## The gallery
 
-`lago` in a project's folder, or `lago <folder>`, opens the gallery. It runs the project's own vitest on the stories project, never writing, and draws a stories file again when it is saved. It shows each story's base pictures; a mode's tests run with the others and are read in vitest's own report.
+`lago` in a project's folder, or `lago <folder>`, opens the gallery. It runs the project's own vitest on the stories project, never writing, and draws a stories file again when it is saved. It reads every story at each viewport in the base and in each mode the configuration names. It opens on the base pictures, and the counts take in every mode's pictures with them.
 
 | Key | What it does |
 |---|---|
@@ -235,6 +235,8 @@ It is called in the test files that compose stories, not in a setup file: a setu
 | `/` | filter the components, or search the stories' names, descriptions and drawn text |
 | `n` `N` | the next and the previous match |
 | `p` | the next viewport |
+| `m` | the next mode, the base first and then the configuration's in its order; only in a project with modes |
+| `x` | open or close the matrix; only in a project with modes |
 | `v` | set the stories as the room allows, in rows, or side by side |
 | `d` | show the golden over a changed picture, the difference in words |
 | `c` | read the cell under a cursor: its text, both colours as asked, its attributes |
@@ -242,7 +244,28 @@ It is called in the test files that compose stories, not in a setup file: a setu
 | `?` | every key |
 | `q` | quit |
 
-A story that throws shows its message and its place in the source; no other story is affected. A stories file that fails to load is named in the status line.
+In a project with modes, the status line names the size and the mode shown after what it says, as `narrow · dark`, and each frame and inspected picture is titled with its state in that mode:
+
+- a picture of its own, kept as `<file>.<Story>.<viewport>@<mode>.golden`, is passing, changed or new like any other, and `A` accepts it as that mode's golden;
+- `=` is a picture equal to the base picture at the same size, which keeps no golden: it shows the base picture and says so, and `A` says there is nothing to accept;
+- `!` is a picture equal to the base where the mode expects a change, a failure shown by its message, which says whether the mode's globals did not reach the story or the story fixes them itself;
+- a story that leaves the mode out with `parameters.modes` says so in its frame.
+
+The matrix, on `x`, has one row for each story and one column for each viewport in the base and then in each mode, the viewport's name over its columns and each mode's under it:
+
+```
+                terminal          wide
+story           base  dark  ascii base  dark  ascii
+▸ Badge Default [✓]    ✓     =     ✓     ✓     =
+  Badge Loud     ✓     ±     +     ✓     ±     +
+  Badge Quiet    ✓     !           ✓     !
+```
+
+A cell is ✓ passing, ± changed, + new, `=` equal to the base, `!` equal where the mode expected a change, ✗ an error, and blank where the story is not covered, as when its file leaves the mode out; a legend under the matrix says as much. The arrows choose a cell, which the status line names with its state. Enter opens it, on its difference when it changed, and Esc comes back to the matrix. A matrix larger than the terminal scrolls both ways to keep the chosen cell in view, its title says which stories and columns are shown, and a mode's name longer than its column is cut. A filter kept on the tree leaves the matrix only the stories of the components it matches, and the title names it; a search kept on the stories is set aside while the matrix is open, so the status line names the chosen cell.
+
+Help lists, under `m`, the base, each mode with the globals it sets, and each global with the values the stories were drawn at. A project with no modes has no `m` and no `x`, and its status line names no size or mode.
+
+A story that throws shows every error its test failed with, each with its place in the source, and a timeout after the error that says why, such as loaders that never finish on the stopped clock; no other story is affected. A stories file that fails to load is named in the status line.
 
 ### The gallery's chrome
 

@@ -24,6 +24,7 @@ const test: ReportedTest = {
   state: "passed",
   errors: [],
   story,
+  excluded: [],
 };
 
 const exists = (path: string) => path === story.golden;
@@ -36,6 +37,9 @@ describe("readRecord", () => {
       name: "Default",
       description: "A row.",
       viewportName: "narrow",
+      mode: undefined,
+      comparison: undefined,
+      globals: {},
       status: "pass",
       golden: story.golden,
       actual: story.actual,
@@ -95,6 +99,30 @@ describe("readRecord", () => {
     expect(readRecord(bare, "/project", exists)?.error).toBe("no");
   });
 
+  it("gives every error a story failed with, a timeout after the error that says why", () => {
+    const stalled: ReportedTest = {
+      ...test,
+      state: "failed",
+      story: undefined,
+      errors: [
+        {
+          message:
+            "Test timed out in 5000ms.\nIf this is a long-running test, pass a timeout value.",
+        },
+        {
+          message:
+            "The story was still running its loaders when its test ended.",
+          stacks: [
+            { file: "/project/src/Row.stories.tsx", line: 7, column: 3 },
+          ],
+        },
+      ],
+    };
+    expect(readRecord(stalled, "/project", exists)?.error).toBe(
+      "The story was still running its loaders when its test ended.\n  at src/Row.stories.tsx:7:3\n\nTest timed out in 5000ms.\nIf this is a long-running test, pass a timeout value.",
+    );
+  });
+
   it("says a story that failed with no error did not finish", () => {
     const silent: ReportedTest = { ...test, state: "failed", story: undefined };
     expect(readRecord(silent, "/project", exists)?.error).toBe(
@@ -102,20 +130,98 @@ describe("readRecord", () => {
     );
   });
 
-  it("reads nothing from a story's test in a mode, drawn or not", () => {
-    const moded = {
+  it("reads a mode's picture equal to the base's as a pass that is equal, with the globals it was drawn with", () => {
+    const equal: ReportedTest = {
       ...test,
       name: "Default at narrow@dark",
-      story: { ...story, mode: "dark" },
+      story: {
+        ...story,
+        mode: "dark",
+        globals: { scheme: "dark" },
+        comparison: { equal: true, expectedToDiffer: false },
+        golden: "/project/src/__goldens__/Row.Default.narrow@dark.golden",
+        expected: undefined,
+      },
     };
-    expect(readRecord(moded, "/project", exists)).toBeUndefined();
-    expect(
-      readRecord(
-        { ...moded, state: "failed", story: undefined },
-        "/project",
-        exists,
-      ),
-    ).toBeUndefined();
+    expect(readRecord(equal, "/project", exists)).toMatchObject({
+      viewportName: "narrow",
+      mode: "dark",
+      comparison: "equal",
+      globals: { scheme: "dark" },
+      status: "pass",
+      golden: "/project/src/__goldens__/Row.Default.narrow@dark.golden",
+    });
+  });
+
+  it("reads a mode's picture that differs from the base's by its own golden", () => {
+    const distinct: ReportedTest = {
+      ...test,
+      state: "failed",
+      name: "Default at narrow@dark",
+      story: {
+        ...story,
+        mode: "dark",
+        comparison: { equal: false, expectedToDiffer: false },
+      },
+    };
+    expect(readRecord(distinct, "/project", exists)).toMatchObject({
+      mode: "dark",
+      comparison: "distinct",
+      status: "changed",
+    });
+    expect(readRecord(distinct, "/project", () => false)?.status).toBe("new");
+  });
+
+  it("reads a mode's picture equal to the base's that the mode expected to change as an error, with why, no place inside Lago and no picture of its own", () => {
+    const unreached: ReportedTest = {
+      ...test,
+      state: "failed",
+      name: "Default at narrow@dark",
+      errors: [
+        {
+          message:
+            "The mode dark expects to change the stories tagged coloured",
+          stacks: [
+            {
+              file: "/project/node_modules/@aztlan/lago-react/dist/checkMode.js",
+              line: 116,
+              column: 5,
+            },
+          ],
+        },
+      ],
+      story: {
+        ...story,
+        mode: "dark",
+        comparison: { equal: true, expectedToDiffer: true },
+      },
+    };
+    expect(readRecord(unreached, "/project", exists)).toMatchObject({
+      mode: "dark",
+      comparison: "unreached",
+      status: "error",
+      error: "The mode dark expects to change the stories tagged coloured",
+      actual: undefined,
+      text: undefined,
+    });
+  });
+
+  it("reads a mode's test that failed before its story was drawn by its name", () => {
+    const thrown: ReportedTest = {
+      ...test,
+      state: "failed",
+      name: "Default at narrow@dark",
+      story: undefined,
+      errors: [{ message: "cannot draw this" }],
+    };
+    expect(readRecord(thrown, "/project", exists)).toMatchObject({
+      name: "Default",
+      viewportName: "narrow",
+      mode: "dark",
+      comparison: undefined,
+      status: "error",
+      error: "cannot draw this",
+    });
   });
 
   it("reads nothing from a test that is no story's", () => {

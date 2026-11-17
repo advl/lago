@@ -1,0 +1,90 @@
+120x30
+|component/Badge                                                                         at terminal · as the room allows
+|component ───────────────── ┌─▸ ✓ Default─┐  A badge in the project's colours.
+|✗ Badge                   4 │● dark badge │
+|layout ──────────────────── └─────────────┘
+|✓ Card                    1 ┌─± Loud───────┐
+|                            │▲ LOUD in dark│
+|                            └──────────────┘
+|                            ┌─! Quiet──────────────────────────────────────────────────────────────────────────────────┐
+|                            │The mode dark expects to change the stories tagged coloured, but component/Badge Quiet at │
+|                            │terminal draws the base picture: scheme dark did not reach the story.                     │
+|                            └──────────────────────────────────────────────────────────────────────────────────────────┘
+|                            ┌─✗ Thrown─────────────┐
+|                            │TypeError: no badge   │
+|                            │at src/Badge.tsx:3:9  │
+|                            └──────────────────────┘
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|✓ 16 pass · ± 2 changed · + 2 new · ✗ 8 error
+|watching the stories for changes                                                                         terminal · dark
+|↑↓ move ⏎ open esc back / find p viewport m mode x matrix v layout ? q quit
+
+1:1 "component/Badge                                                                         at terminal ·"
+1:103 "as the room allows" fg=7
+2:1 "component ───────────────── ┌─▸ ✓ Default─┐"
+2:46 "A badge in the project's colours." fg=7
+3:1 "✗ " fg=1 bg=8
+3:3 "Badge                   " bg=8
+3:27 "4" fg=7 bg=8
+3:29 "│● dark badge │"
+4:1 "layout ──────────────────── └─────────────┘"
+5:1 "✓" fg=2
+5:3 "Card"
+5:27 "1 ┌─± Loud───────┐" fg=7
+6:29 "│" fg=7
+6:30 "▲ LOUD in dark"
+6:44 "│" fg=7
+7:29 "└──────────────┘" fg=7
+8:29 "┌─! Quiet──────────────────────────────────────────────────────────────────────────────────┐" fg=7
+9:29 "│" fg=7
+9:30 "The mode dark expects to change the stories tagged coloured, but component/Badge Quiet at" fg=1
+9:120 "│" fg=7
+10:29 "│" fg=7
+10:30 "terminal draws the base picture: scheme dark did not reach the story." fg=1
+10:120 "│" fg=7
+11:29 "└──────────────────────────────────────────────────────────────────────────────────────────┘" fg=7
+12:29 "┌─✗ Thrown─────────────┐" fg=7
+13:29 "│" fg=7
+13:30 "TypeError: no badge" fg=1
+13:52 "│" fg=7
+14:29 "│" fg=7
+14:30 "at src/Badge.tsx:3:9" fg=1
+14:52 "│" fg=7
+15:29 "└──────────────────────┘" fg=7
+28:1 "✓ 16 pass"
+28:11 "·" fg=7
+28:13 "± 2 changed" fg=3
+28:25 "·" fg=7
+28:27 "+ 2 new" fg=3
+28:35 "·" fg=7
+28:37 "✗ 8 error" fg=1
+29:1 "watching the stories for changes                                                                         terminal · dark" fg=7
+30:1 "↑↓"
+30:4 "move" fg=7
+30:9 "⏎"
+30:11 "open" fg=7
+30:16 "esc"
+30:20 "back" fg=7
+30:25 "/"
+30:27 "find" fg=7
+30:32 "p"
+30:34 "viewport" fg=7
+30:43 "m"
+30:45 "mode" fg=7
+30:50 "x"
+30:52 "matrix" fg=7
+30:59 "v"
+30:61 "layout" fg=7
+30:68 "? q"
+30:72 "quit" fg=7

@@ -11,6 +11,7 @@ const frame = (overrides: Partial<StoryFrame>): StoryFrame => ({
   extent: { cols: 16, rows: 5 },
   selected: false,
   matched: false,
+  absent: "not drawn at this viewport",
   ...overrides,
 });
 

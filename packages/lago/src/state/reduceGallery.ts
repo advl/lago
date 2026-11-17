@@ -1,5 +1,7 @@
 import type { Catalog } from "../catalog/index.js";
 import { nextArrangement } from "./constants.js";
+import listColumns from "./listColumns.js";
+import listRows from "./listRows.js";
 import readSelection from "./readSelection.js";
 import type { GalleryAction, GalleryState } from "./types.js";
 
@@ -50,10 +52,50 @@ function goBack(state: GalleryState): GalleryState {
     return { ...state, searching: false, search: "", hit: 0 };
   }
   if (state.cell) return { ...state, cell: undefined };
+  // A cell opened from the matrix goes back to it in one step, whether it
+  // shows its picture or its difference.
+  if (state.matrix && state.inspecting) return leaveStory(state);
   if (state.difference) return { ...state, difference: false };
   if (state.inspecting) return leaveStory(state);
+  if (state.matrix) return { ...state, matrix: false };
   if (state.focus === "stories") return { ...state, focus: "tree" };
   return state;
+}
+
+/** Up or down the matrix's rows, from the selected story, stopping at either end. */
+function moveRow(state: GalleryState, catalog: Catalog, by: number) {
+  const selection = readSelection(state, catalog);
+  const rows = listRows(selection.components);
+  const at = rows.findIndex(
+    ({ component, place }) =>
+      component.title === selection.component?.title &&
+      place === selection.story,
+  );
+  const next = rows.at(clamp(at + by, 0, rows.length - 1));
+  return next === undefined || next === rows.at(at)
+    ? state
+    : leaveStory({ ...state, title: next.component.title, story: next.place });
+}
+
+/**
+ * Left or right along the matrix's columns, stopping at either end: the
+ * viewport and the mode shown. It moves from the column shown, which a run
+ * that drops a viewport may have moved back from the one the state names.
+ */
+function moveColumn(state: GalleryState, catalog: Catalog, by: number) {
+  const { viewportName, modeName } = readSelection(state, catalog);
+  const columns = listColumns(catalog);
+  const shown = columns.findIndex(
+    (column) =>
+      column.viewportName === viewportName && column.mode === modeName,
+  );
+  const span = catalog.modes.length + 1;
+  const at = clamp(shown + by, 0, columns.length - 1);
+  return {
+    ...state,
+    viewport: Math.floor(at / span),
+    mode: at % span,
+  };
 }
 
 /** Up or down, by what is focused. */
@@ -70,6 +112,7 @@ function move(
       cell: { ...state.cell, y: clamp(state.cell.y + by, 0, limit) },
     };
   }
+  if (state.matrix && !state.inspecting) return moveRow(state, catalog, by);
   if (state.inspecting) {
     // A scroll past the limit, left by a change of what is shown, starts
     // from the limit, so the first key back moves the picture.
@@ -136,12 +179,25 @@ export default function reduceGallery(
           },
         };
       }
+      if (state.matrix && !state.inspecting) {
+        return moveColumn(state, catalog, action.by);
+      }
       return state.focus === "stories" && !state.inspecting
         ? move(state, catalog, action.by, limitOf(action))
         : state;
     case "open": {
-      const { component } = readSelection(state, catalog);
+      const { component, record } = readSelection(state, catalog);
       if (!component) return state;
+      // A changed cell opens on its difference, which is what it asks to read.
+      if (state.matrix) {
+        return {
+          ...state,
+          focus: "stories",
+          title: component.title,
+          inspecting: true,
+          difference: record?.status === "changed",
+        };
+      }
       return state.focus === "tree"
         ? { ...state, focus: "stories", title: component.title }
         : { ...state, inspecting: true };
@@ -154,8 +210,22 @@ export default function reduceGallery(
         scroll: 0,
         hit: 0,
       };
+    case "nextMode":
+      return {
+        ...state,
+        mode: (state.mode + 1) % (catalog.modes.length + 1),
+        cell: undefined,
+        scroll: 0,
+        hit: 0,
+      };
     case "nextArrangement":
       return { ...state, arrangement: nextArrangement[state.arrangement] };
+    case "toggleMatrix":
+      return {
+        ...leaveStory(state),
+        matrix: !state.matrix,
+        title: readSelection(state, catalog).component?.title,
+      };
     case "startFilter":
       return leaveStory({ ...state, filtering: true, focus: "tree" });
     case "startSearch":
@@ -181,6 +251,7 @@ export default function reduceGallery(
               title: record.title,
               story: record.name,
               viewportName: record.viewportName,
+              mode: record.mode,
               text: record.text,
             },
           }

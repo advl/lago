@@ -1,0 +1,48 @@
+80x24
+|project                                         at terminal · as the room allows
+|Find · 3 of 4 ──────────────────────────────────────────────────────────────────
+|  ⏎        keep what is typed
+|  backspace erase the last character
+|
+|Picture ────────────────────────────────────────────────────────────────────────
+|  p        show the next viewport
+|  m        show the next mode
+|           base: sets no global
+|           dark: sets scheme dark
+|           ascii: sets glyphs ascii
+|           globals drawn: scheme light, dark; glyphs unicode, ascii
+|  x        show every story in every size and mode
+|  v        set the stories as the room allows, in rows, or side by side
+|  d        show the golden over the picture
+|  c        read the cells under a cursor
+|  A        accept the picture as its golden
+|
+|App ────────────────────────────────────────────────────────────────────────────
+|  ?        close the help
+|  q        quit
+|
+|  the pictures are drawn by the project's own vitest, which draws a stories file
+|  again when it is saved
+
+1:1 "project                                         at terminal ·"
+1:63 "as the room allows" fg=7
+2:1 "Find · 3 of 4 ──────────────────────────────────────────────────────────────────"
+3:3 "⏎        keep what is typed"
+4:3 "backspace erase the last character"
+6:1 "Picture ────────────────────────────────────────────────────────────────────────"
+7:3 "p        show the next viewport"
+8:3 "m        show the next mode"
+9:12 "base: sets no global"
+10:12 "dark: sets scheme dark"
+11:12 "ascii: sets glyphs ascii"
+12:12 "globals drawn: scheme light, dark; glyphs unicode, ascii"
+13:3 "x        show every story in every size and mode"
+14:3 "v        set the stories as the room allows, in rows, or side by side"
+15:3 "d        show the golden over the picture"
+16:3 "c        read the cells under a cursor"
+17:3 "A        accept the picture as its golden"
+19:1 "App ────────────────────────────────────────────────────────────────────────────"
+20:3 "?        close the help"
+21:3 "q        quit"
+23:3 "the pictures are drawn by the project's own vitest, which draws a stories file"
+24:3 "again when it is saved"

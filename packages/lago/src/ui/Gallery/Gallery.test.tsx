@@ -3,7 +3,12 @@ import { Keys } from "@aztlan/tui";
 import { useKeyboard } from "@opentui/react";
 import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
-import { passingCatalog, sampleCatalog } from "../../../testing/catalogs.js";
+import {
+  crowdedCatalog,
+  modesCatalog,
+  passingCatalog,
+  sampleCatalog,
+} from "../../../testing/catalogs.js";
 import { drawPicture } from "../../../testing/records.js";
 import type { Catalog, StoryRecord } from "../../catalog/index.js";
 import Gallery from "./Gallery.js";
@@ -343,5 +348,152 @@ describe("Gallery", () => {
   it("offers no move and no layout while there is nothing to move through", async () => {
     const { screen } = await open(undefined);
     expect(screen.lines.at(-1)).toBe("/ find ? q quit");
+  });
+
+  it("steps through the modes with m, the base first, naming the size and the mode after the status", async () => {
+    const { screen } = await open(modesCatalog);
+    await press(screen, "{Enter}");
+    expect(screen.lines.at(-2)).toMatch(
+      /^watching the stories for changes +terminal · base$/,
+    );
+    expect(screen.lines.at(-1)).toContain("m mode");
+    const dark = await press(screen, "m");
+    expect(dark.at(-2)).toMatch(/ terminal · dark$/);
+    expect(dark.at(2)).toContain("● dark badge");
+    expect(dark.join("\n")).toContain("! Quiet");
+    expect(dark.join("\n")).toContain("scheme dark did not reach");
+    const ascii = await press(screen, "m");
+    expect(ascii.at(-2)).toMatch(/ terminal · ascii$/);
+    expect(ascii.at(1)).toContain("= Default");
+    expect(ascii.join("\n")).toContain("left out of ascii");
+    expect((await press(screen, "m")).at(-2)).toMatch(/ terminal · base$/);
+  });
+
+  it("shows a mode's picture equal to the base as the base picture, and says why there is nothing to accept", async () => {
+    const { screen, onAccept } = await open(modesCatalog);
+    await press(screen, "{Enter}mm{Enter}");
+    expect(screen.lines.at(1)).toContain(
+      "= Default at terminal in ascii · equal to the base",
+    );
+    expect(screen.lines.at(2)).toContain("● badge");
+    expect(screen.lines.at(-2)).toMatch(
+      /^equal to the base picture, so it keeps no golden of its own +terminal · ascii$/,
+    );
+    await press(screen, "{Shift>}a{/Shift}");
+    expect(screen.lines.at(-2)).toMatch(
+      /^nothing to accept: the base picture's golden covers it +terminal/,
+    );
+    await press(screen, "{Escape}jjmm{Enter}");
+    expect(screen.lines.at(1)).toContain(
+      "! Quiet at terminal in dark · equal where a change was expected",
+    );
+    await press(screen, "{Shift>}a{/Shift}");
+    expect(screen.lines.at(-2)).toMatch(
+      /^nothing to accept: it draws the base picture, which dark should/,
+    );
+    expect(onAccept).not.toHaveBeenCalled();
+  });
+
+  it("accepts a mode's picture as that mode's golden, naming the mode", async () => {
+    const { screen, onAccept } = await open(modesCatalog);
+    await press(screen, "{Enter}jm{Enter}{Shift>}a{/Shift}");
+    expect(screen.lines.at(-2)).toMatch(
+      /^accept Loud at terminal in dark as its golden\? y accepts/,
+    );
+    await press(screen, "y");
+    expect(onAccept).toHaveBeenCalledWith(
+      expect.objectContaining({ name: "Loud", mode: "dark" }),
+    );
+    expect(
+      await screen.findByText("accepted Loud at terminal in dark"),
+    ).toBeDefined();
+  });
+
+  it("says a story leaves a mode out when it is inspected there", async () => {
+    const { screen } = await open(modesCatalog);
+    await press(screen, "{Enter}jjmm{Enter}");
+    expect(screen.lines.at(1)).toContain("Quiet at terminal in ascii");
+    expect(screen.lines.at(2)).toContain(
+      "This story's parameters.modes leaves ascii out.",
+    );
+  });
+
+  it("lists the modes and the globals drawn under m in the help", async () => {
+    const { screen } = await open(modesCatalog, { rows: 40 });
+    const help = (await press(screen, "?")).join("\n");
+    expect(help).toContain("m        show the next mode");
+    expect(help).toContain("base: sets no global");
+    expect(help).toContain("dark: sets scheme dark");
+    expect(help).toContain(
+      "globals drawn: scheme light, dark; glyphs unicode, ascii",
+    );
+  });
+
+  it("opens the matrix on x, a row for each story and a column for each size and mode, every cell in its state", async () => {
+    const { screen } = await open(modesCatalog);
+    const matrix = await press(screen, "x");
+    expect(matrix.at(1)).toMatch(/^┌─matrix · 5 stories in 6 columns─/);
+    expect(matrix.slice(2, 9)).toEqual([
+      "│                terminal          wide                                        │",
+      "│story           base  dark  ascii base  dark  ascii                           │",
+      "│▸ Badge Default [✓]    ✓     =     ✓     ✓     =                              │",
+      "│  Badge Loud     ✓     ±     +     ✓     ±     +                              │",
+      "│  Badge Quiet    ✓     !           ✓     !                                    │",
+      "│  Badge Thrown   ✗     ✗     ✗     ✗     ✗     ✗                              │",
+      "│  Card Default   ✓     =     ✓     ✓     =     ✓                              │",
+    ]);
+    expect(matrix.at(-2)).toMatch(
+      /^Badge Default at terminal: pass +terminal · base$/,
+    );
+    expect(matrix.at(-1)).toMatch(/^↑↓ move ←→ column ⏎ open esc back x /);
+    expect((await press(screen, "jjll")).at(-2)).toMatch(
+      /^Badge Quiet at terminal in ascii: left out +terminal · ascii$/,
+    );
+    expect((await press(screen, "x")).at(1)).toContain("= Default");
+  });
+
+  it("moves over the matrix's cells, opens one, and comes back to the matrix with Esc, then out of it", async () => {
+    const { screen } = await open(modesCatalog);
+    await press(screen, "xkhjl");
+    expect(screen.lines.at(-2)).toMatch(
+      /^Badge Loud at terminal in dark: changed/,
+    );
+    await press(screen, "jjjjjlllllll");
+    expect(screen.lines.at(-2)).toMatch(
+      /^Card Default at wide in ascii: pass +wide · ascii$/,
+    );
+    await press(screen, "kkkhhhh{Enter}");
+    expect(screen.lines.at(1)).toContain(
+      "± Loud at terminal in dark · changed",
+    );
+    expect(screen.lines.at(2)).toContain("1 line differs");
+    expect(screen.lines.at(-1)).toContain("esc back");
+    const back = await press(screen, "{Escape}");
+    expect(back.at(1)).toMatch(/^┌─matrix/);
+    expect(back.at(5)).toContain("[±]");
+    await press(screen, "j{Enter}");
+    expect(screen.lines.at(1)).toContain("! Quiet at terminal in dark");
+    expect(screen.lines.at(2)).toContain("The mode dark expects");
+    await press(screen, "{Escape}{Escape}");
+    expect(screen.lines.at(0)).toMatch(/^component\/Badge /);
+    expect(screen.lines.at(1)).not.toContain("matrix");
+  });
+
+  it("comes back from a cell to the matrix scrolled as it was", async () => {
+    const { screen } = await open(crowdedCatalog);
+    await press(screen, `x${"j".repeat(18)}${"k".repeat(10)}`);
+    const before = screen.lines.at(1);
+    expect(before).toMatch(/ · stories (?!1–)\d+–\d+/);
+    expect((await press(screen, "{Enter}{Escape}")).at(1)).toBe(before);
+  });
+
+  it("offers neither m nor x, in the key bar or the help, to a project with no modes", async () => {
+    const { screen } = await open(sampleCatalog, { rows: 40 });
+    expect(screen.lines.at(-1)).not.toMatch(/ [mx] /);
+    const help = await press(screen, "?");
+    expect(help.join("\n")).not.toContain("show the next mode");
+    expect(help.join("\n")).not.toContain("matrix");
+    await press(screen, "{Escape}xm");
+    expect(screen.lines.at(1)).toContain("▸ ✓ Default");
   });
 });

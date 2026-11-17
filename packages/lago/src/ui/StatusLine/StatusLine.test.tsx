@@ -1,6 +1,6 @@
 import { render } from "@aztlan/lago-react";
 import { describe, expect, it } from "vitest";
-import { sampleCatalog } from "../../../testing/catalogs.js";
+import { modesCatalog, sampleCatalog } from "../../../testing/catalogs.js";
 import {
   type GalleryState,
   openingState,
@@ -50,5 +50,55 @@ describe("StatusLine", () => {
     expect(
       await draw(openingState, undefined, { ...sampleCatalog, failures: [] }),
     ).toBe("watching the stories for changes");
+  });
+
+  it("names its items after what it says, apart by dots, taking up to half the line", async () => {
+    const drawWith = (items: readonly string[], cols = 80) =>
+      render(
+        <StatusLine
+          state={openingState}
+          selection={readSelection(openingState, sampleCatalog)}
+          catalog={{ ...sampleCatalog, failures: [] }}
+          message={undefined}
+          items={items}
+          width={cols}
+        />,
+        { cols, rows: 1 },
+      ).then((screen) => screen.lines.at(0));
+    expect(await drawWith(["narrow", "dark"])).toMatch(
+      /^watching the stories for changes +narrow · dark$/,
+    );
+    expect(await drawWith(["narrow", "a mode with a very long name"], 40)).toBe(
+      "watching the stori… narrow · a mode wit…",
+    );
+  });
+
+  it("says an inspected mode's picture equal to the base keeps no golden", async () => {
+    const state = {
+      ...openingState,
+      title: "component/Badge",
+      mode: 2,
+      inspecting: true,
+    };
+    const screen = await render(
+      <StatusLine
+        state={state}
+        selection={readSelection(state, modesCatalog)}
+        catalog={modesCatalog}
+        message={undefined}
+        width={80}
+      />,
+      { cols: 80, rows: 1 },
+    );
+    expect(screen.lines.at(0)).toBe(
+      "equal to the base picture, so it keeps no golden of its own",
+    );
+  });
+
+  it("names the matrix's chosen cell before a search kept from the stories", async () => {
+    const state = { ...openingState, matrix: true, search: "o" };
+    expect(await draw(state, undefined, modesCatalog)).toBe(
+      "Badge Default at terminal: pass",
+    );
   });
 });

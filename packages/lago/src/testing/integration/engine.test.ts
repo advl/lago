@@ -5,7 +5,7 @@ import { RGBA } from "@opentui/core";
 import { describe, expect, it } from "vitest";
 import makeProject from "../../../testing/makeProject.js";
 import writeChromeConfig from "../../../testing/writeChromeConfig.js";
-import type { Catalog } from "../../catalog/index.js";
+import type { Catalog, StoryRecord } from "../../catalog/index.js";
 import { chromes } from "../../chrome/index.js";
 import { startEngine } from "../../engine/index.js";
 
@@ -92,21 +92,175 @@ describe("startEngine", { timeout: 60_000 }, () => {
     });
     try {
       expect((await nextCatalog(catalogs, 0)).groups).toEqual([]);
-      await expect(
-        engine.accept({
-          file: join(root, "src/X.stories.tsx"),
-          title: "scratch/X",
-          name: "Default",
-          description: undefined,
-          viewportName: "small",
-          status: "error",
-          golden: undefined,
-          actual: undefined,
-          expected: undefined,
-          text: undefined,
-          error: "cannot draw this",
-        }),
-      ).rejects.toThrow("scratch/X Default at small has no picture to accept.");
+      const undrawn: StoryRecord = {
+        file: join(root, "src/X.stories.tsx"),
+        title: "scratch/X",
+        name: "Default",
+        description: undefined,
+        viewportName: "small",
+        mode: undefined,
+        comparison: undefined,
+        globals: undefined,
+        status: "error",
+        golden: undefined,
+        actual: undefined,
+        expected: undefined,
+        text: undefined,
+        error: "cannot draw this",
+      };
+      await expect(engine.accept(undrawn)).rejects.toThrow(
+        "scratch/X Default at small has no picture to accept.",
+      );
+      await expect(engine.accept({ ...undrawn, mode: "dark" })).rejects.toThrow(
+        "scratch/X Default at small in dark has no picture to accept.",
+      );
+    } finally {
+      await engine.close();
+    }
+  });
+
+  it("says why a story whose loaders never finish failed, before the timeout", async () => {
+    const root = makeProject({
+      "src/Label.tsx": files["src/Label.tsx"],
+      "src/Label.stories.tsx":
+        'import Component from "./Label.js";\n\nexport default { title: "scratch/Label", component: Component };\n\nexport const Waiting = {\n  args: { text: "never" },\n  loaders: [() => new Promise((done) => setTimeout(done, 10))],\n};\n',
+      "vitest.config.ts": `import { createConfig } from "@aztlan/lago-config";
+import { mergeConfig } from "vitest/config";
+
+export default mergeConfig(
+  createConfig({ viewports: { small: { cols: 20, rows: 3 } } }),
+  { test: { fsModuleCachePath: ".vitest-cache", testTimeout: 300 } },
+);
+`,
+    });
+    const catalogs: Catalog[] = [];
+    const engine = await startEngine({
+      root,
+      onChrome: () => {},
+      onCatalog: (catalog) => catalogs.push(catalog),
+    });
+    try {
+      const error = (await nextCatalog(catalogs, 0)).groups
+        .at(0)
+        ?.components.at(0)
+        ?.stories.at(0)
+        ?.pictures.at(0)?.error;
+      expect(error).toMatch(
+        /^The story "scratch\/Label Waiting" was still running its loaders when its test ended\./,
+      );
+      expect(error).toContain("\n\nTest timed out in 300ms.");
+    } finally {
+      await engine.close();
+    }
+  });
+
+  it("reads every story in each mode the configuration names, and accepts a mode's picture as its own golden", async () => {
+    const root = makeProject({
+      "src/lago.preview.tsx":
+        'export default { globalTypes: { scheme: { values: ["light", "dark"], default: "light" } } };\n',
+      "src/Label.tsx": files["src/Label.tsx"],
+      "src/Label.stories.tsx": [
+        'import Component from "./Label.js";',
+        "",
+        'export default { title: "scratch/Label", component: Component, args: { text: "same" } };',
+        "",
+        "export const Plain = {};",
+        "",
+        "export const Schemed = {",
+        "  render: (_args: unknown, { globals }: { globals: Record<string, string> }) => <Component text={globals.scheme} />,",
+        "};",
+        "",
+        'export const Missed = { tags: ["coloured"] };',
+        "",
+        "export const Aside = { parameters: { modes: { dark: { disable: true } } } };",
+        "",
+      ].join("\n"),
+      "vitest.config.ts": `import { createConfig } from "@aztlan/lago-config";
+import { mergeConfig } from "vitest/config";
+
+export default mergeConfig(
+  createConfig({
+    viewports: { small: { cols: 20, rows: 3 } },
+    preview: "./src/lago.preview.tsx",
+    modes: { dark: { globals: { scheme: "dark" }, expect: { tags: ["coloured"] } } },
+  }),
+  { test: { fsModuleCachePath: ".vitest-cache" } },
+);
+`,
+    });
+    const catalogs: Catalog[] = [];
+    const engine = await startEngine({
+      root,
+      onChrome: () => {},
+      onCatalog: (catalog) => catalogs.push(catalog),
+    });
+    try {
+      const first = await nextCatalog(catalogs, 0);
+      expect(first.modes).toEqual([
+        { name: "dark", globals: { scheme: "dark" } },
+      ]);
+      expect(first.globals).toEqual([
+        { name: "scheme", values: ["light", "dark"] },
+      ]);
+      const stories = first.groups.at(0)?.components.at(0)?.stories ?? [];
+      expect(
+        stories.map(({ name, pictures, excluded }) => [
+          name,
+          pictures.map(({ mode, comparison, status }) => [
+            mode,
+            comparison,
+            status,
+          ]),
+          excluded,
+        ]),
+      ).toEqual([
+        [
+          "Plain",
+          [
+            [undefined, undefined, "new"],
+            ["dark", "equal", "pass"],
+          ],
+          [],
+        ],
+        [
+          "Schemed",
+          [
+            [undefined, undefined, "new"],
+            ["dark", "distinct", "new"],
+          ],
+          [],
+        ],
+        [
+          "Missed",
+          [
+            [undefined, undefined, "new"],
+            ["dark", "unreached", "error"],
+          ],
+          [],
+        ],
+        [
+          "Aside",
+          [[undefined, undefined, "new"]],
+          [{ viewportName: "small", mode: "dark" }],
+        ],
+      ]);
+      expect(stories.at(2)?.pictures.at(1)?.error).toContain(
+        "The mode dark expects to change the stories tagged coloured",
+      );
+
+      const dark = stories.at(1)?.pictures.at(1);
+      if (!dark) throw new Error("the run gave no picture of Schemed in dark");
+      await engine.accept(dark);
+      const second = await nextCatalog(catalogs, 1);
+      const golden = join(
+        root,
+        "src/__goldens__/Label.Schemed.small@dark.golden",
+      );
+      expect(readFileSync(golden, "utf8")).toBe(dark.text);
+      expect(
+        second.groups.at(0)?.components.at(0)?.stories.at(1)?.pictures.at(1)
+          ?.status,
+      ).toBe("pass");
     } finally {
       await engine.close();
     }

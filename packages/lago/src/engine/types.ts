@@ -1,4 +1,4 @@
-import type { StoryResult } from "@aztlan/lago-react/vitest";
+import type { Cell, StoryResult } from "@aztlan/lago-react/vitest";
 import type { Tokens } from "@aztlan/tui";
 import type { Catalog, StoryRecord } from "../catalog/index.js";
 
@@ -28,13 +28,16 @@ export interface ReportedTest {
   readonly state: "passed" | "failed" | "skipped" | "pending";
   readonly errors: readonly ReportedError[];
   readonly story: StoryResult | undefined;
+  /** The cells the stories file leaves out, which its check of its goldens reports. */
+  readonly excluded: readonly Cell[];
 }
 
 /** The test run the gallery browses, kept running. */
 export interface Engine {
   /**
-   * Takes a story's current picture at one viewport as its golden, by
-   * writing the golden's file, and runs that stories file again.
+   * Takes a story's current picture at one viewport, in the base or in a
+   * mode, as its golden, by writing the golden's file, and runs that stories
+   * file again.
    */
   readonly accept: (record: StoryRecord) => Promise<void>;
   /** Stops the run. */

@@ -1,11 +1,12 @@
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 import { createVitest } from "vitest/node";
-import { buildCatalog } from "../catalog/index.js";
+import { buildCatalog, type CatalogMode } from "../catalog/index.js";
 import { readChrome } from "../chrome/index.js";
-import { galleryPlugin, storiesProject } from "./constants.js";
+import { galleryPlugin, storiesPlugin, storiesProject } from "./constants.js";
 import createReporter from "./createReporter.js";
 import createSink from "./createSink.js";
+import readModes from "./readModes.js";
 import type { Engine, EngineOptions } from "./types.js";
 
 /**
@@ -14,8 +15,9 @@ import type { Engine, EngineOptions } from "./types.js";
  * golden: a run that finds one missing or changed reports it, and only
  * `accept` writes one. The chrome the configuration names reaches
  * `onChrome` before anything runs, and a chrome it cannot read stops the
- * start. Every run's results reach `onCatalog`, and a project with no
- * stories gives one empty catalog.
+ * start. Every run's results reach `onCatalog`, with the modes the
+ * configuration names, and a project with no stories gives one empty
+ * catalog.
  *
  * @note Impure: starts vitest, which watches and reads the project, and writes a golden when one is accepted.
  */
@@ -24,6 +26,8 @@ export default async function startEngine({
   onChrome,
   onCatalog,
 }: EngineOptions): Promise<Engine> {
+  // Read from the configuration once vitest has resolved it, before any run.
+  let modes: readonly CatalogMode[] = [];
   const vitest = await createVitest(
     {
       root,
@@ -34,7 +38,7 @@ export default async function startEngine({
       // unrun, and the gallery would show them as failed.
       bail: 0,
       coverage: { enabled: false },
-      reporters: [createReporter(root, existsSync, onCatalog)],
+      reporters: [createReporter(root, existsSync, onCatalog, () => modes)],
     },
     {},
     { stdout: createSink(), stderr: createSink() },
@@ -44,6 +48,7 @@ export default async function startEngine({
   try {
     const { plugins, configFile } = vitest.vite.config;
     const gallery = plugins.find(({ name }) => name === galleryPlugin);
+    modes = readModes(plugins.find(({ name }) => name === storiesPlugin)?.api);
     // Only a configuration file adds the plugin, so a chrome refused always
     // has a file to name.
     onChrome(readChrome(gallery?.api.chrome, String(configFile)));
@@ -61,7 +66,7 @@ export default async function startEngine({
     accept: async (record) => {
       if (record.golden === undefined || record.text === undefined) {
         throw new Error(
-          `${record.title} ${record.name} at ${record.viewportName} has no picture to accept.`,
+          `${record.title} ${record.name} at ${record.viewportName}${record.mode === undefined ? "" : ` in ${record.mode}`} has no picture to accept.`,
         );
       }
       mkdirSync(dirname(record.golden), { recursive: true });

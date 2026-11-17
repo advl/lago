@@ -3,18 +3,19 @@ import type { ReactNode } from "react";
 import { gutter, pictureLines } from "../../layout/index.js";
 import { statusLooks } from "../constants.js";
 import Picture from "../Picture/Picture.js";
+import readLook from "../readLook.js";
 import wrapMessage from "../wrapMessage.js";
 import type { StoryBlockProps, StoryFrame } from "./types.js";
 
-/** What a frame shows inside: the picture, the error a story threw, or that it is not drawn at the viewport. */
-const drawInside = ({ record, extent }: StoryFrame, tokens: Tokens) => {
+/** What a frame shows inside: the picture, the error a story threw, or why it is not drawn there. */
+const drawInside = ({ record, extent, absent }: StoryFrame, tokens: Tokens) => {
   const lines = Math.min(extent.rows, pictureLines);
   if (record?.actual) {
     return <Picture picture={record.actual} lines={lines} cols={extent.cols} />;
   }
   const [message, fg] =
     record?.error === undefined
-      ? ["not drawn at this viewport", tokens["color.text.muted"]]
+      ? [absent, tokens["color.text.muted"]]
       : [record.error, tokens[statusLooks.error.color]];
   return (
     <box flexDirection="column">
@@ -34,7 +35,7 @@ const drawInside = ({ record, extent }: StoryFrame, tokens: Tokens) => {
 const Frame = ({ frame }: { readonly frame: StoryFrame }) => {
   const tokens = useTokens();
   const { name, record, extent, selected, matched } = frame;
-  const status = record ? `${statusLooks[record.status].glyph} ` : "";
+  const status = record ? `${readLook(record).glyph} ` : "";
   let border = tokens["color.border"];
   if (matched) border = tokens["color.text.warning"];
   if (selected) border = tokens["color.text"];

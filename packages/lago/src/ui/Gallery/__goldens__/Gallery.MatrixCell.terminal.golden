@@ -1,0 +1,79 @@
+80x24
+|component/Badge                                 at terminal · as the room allows
+|┌─± Loud at terminal in dark · changed─────────────────────────────────────────┐
+|│1 line differs: 1 in text.                                                    │
+|│                                                                              │
+|│  1 − ▲ LOUD, darker                                                          │
+|│    + ▲ LOUD in dark                                                          │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|└──────────────────────────────────────────────────────────────────────────────┘
+|✓ 16 pass · ± 2 changed · + 2 new · ✗ 8 error
+|watching the stories for changes                                 terminal · dark
+|↑↓ scroll esc back / find p viewport m mode d diff c cells A accept ? q quit
+
+1:1 "component/Badge                                 at terminal ·"
+1:63 "as the room allows" fg=7
+2:1 "┌─± Loud at terminal in dark · changed─────────────────────────────────────────┐"
+3:1 "│1 line differs: 1 in text.                                                    │"
+4:1 "│                                                                              │"
+5:1 "│"
+5:4 "1" fg=7
+5:6 "−" fg=1
+5:8 "▲ LOUD, darker                                                          │"
+6:1 "│"
+6:6 "+" fg=2
+6:8 "▲ LOUD in dark                                                          │"
+7:1 "│                                                                              │"
+8:1 "│                                                                              │"
+9:1 "│                                                                              │"
+10:1 "│                                                                              │"
+11:1 "│                                                                              │"
+12:1 "│                                                                              │"
+13:1 "│                                                                              │"
+14:1 "│                                                                              │"
+15:1 "│                                                                              │"
+16:1 "│                                                                              │"
+17:1 "│                                                                              │"
+18:1 "│                                                                              │"
+19:1 "│                                                                              │"
+20:1 "│                                                                              │"
+21:1 "└──────────────────────────────────────────────────────────────────────────────┘"
+22:1 "✓ 16 pass"
+22:11 "·" fg=7
+22:13 "± 2 changed" fg=3
+22:25 "·" fg=7
+22:27 "+ 2 new" fg=3
+22:35 "·" fg=7
+22:37 "✗ 8 error" fg=1
+23:1 "watching the stories for changes                                 terminal · dark" fg=7
+24:1 "↑↓"
+24:4 "scroll" fg=7
+24:11 "esc"
+24:15 "back" fg=7
+24:20 "/"
+24:22 "find" fg=7
+24:27 "p"
+24:29 "viewport" fg=7
+24:38 "m"
+24:40 "mode" fg=7
+24:45 "d"
+24:47 "diff" fg=7
+24:52 "c"
+24:54 "cells" fg=7
+24:60 "A"
+24:62 "accept" fg=7
+24:69 "? q"
+24:73 "quit" fg=7

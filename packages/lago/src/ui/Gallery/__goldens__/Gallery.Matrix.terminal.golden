@@ -1,0 +1,102 @@
+80x24
+|project                                         at terminal · as the room allows
+|┌─matrix · 5 stories in 6 columns──────────────────────────────────────────────┐
+|│                terminal          wide                                        │
+|│story           base  dark  ascii base  dark  ascii                           │
+|│▸ Badge Default [✓]    ✓     =     ✓     ✓     =                              │
+|│  Badge Loud     ✓     ±     +     ✓     ±     +                              │
+|│  Badge Quiet    ✓     !           ✓     !                                    │
+|│  Badge Thrown   ✗     ✗     ✗     ✗     ✗     ✗                              │
+|│  Card Default   ✓     =     ✓     ✓     =     ✓                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│                                                                              │
+|│✓ pass  ± changed  + new  = equal to the base  ! expected but equal  ✗ error  │
+|│blank not covered                                                             │
+|└──────────────────────────────────────────────────────────────────────────────┘
+|✓ 16 pass · ± 2 changed · + 2 new · ✗ 8 error
+|Badge Default at terminal: pass                                  terminal · base
+|↑↓ move ←→ column ⏎ open esc back x matrix ? q quit
+
+1:1 "project                                         at terminal ·"
+1:63 "as the room allows" fg=7
+2:1 "┌─matrix · 5 stories in 6 columns──────────────────────────────────────────────┐"
+3:1 "│                terminal          wide                                        │"
+4:1 "│"
+4:2 "story           base  dark  ascii base  dark  ascii" fg=7
+4:80 "│"
+5:1 "│▸ Badge Default"
+5:18 "[✓]   " fg=2 bg=8
+5:25 "✓" fg=2
+5:31 "=" fg=7
+5:37 "✓     ✓" fg=2
+5:49 "=" fg=7
+5:80 "│"
+6:1 "│  Badge Loud"
+6:19 "✓" fg=2
+6:25 "±     +" fg=3
+6:37 "✓" fg=2
+6:43 "±     +" fg=3
+6:80 "│"
+7:1 "│  Badge Quiet"
+7:19 "✓" fg=2
+7:25 "!" fg=1
+7:37 "✓" fg=2
+7:43 "!" fg=1
+7:80 "│"
+8:1 "│  Badge Thrown"
+8:19 "✗     ✗     ✗     ✗     ✗     ✗" fg=1
+8:80 "│"
+9:1 "│  Card Default"
+9:19 "✓" fg=2
+9:25 "=" fg=7
+9:31 "✓     ✓" fg=2
+9:43 "=" fg=7
+9:49 "✓" fg=2
+9:80 "│"
+10:1 "│                                                                              │"
+11:1 "│                                                                              │"
+12:1 "│                                                                              │"
+13:1 "│                                                                              │"
+14:1 "│                                                                              │"
+15:1 "│                                                                              │"
+16:1 "│                                                                              │"
+17:1 "│                                                                              │"
+18:1 "│                                                                              │"
+19:1 "│"
+19:2 "✓ pass" fg=2
+19:10 "± changed  + new" fg=3
+19:28 "= equal to the base" fg=7
+19:49 "! expected but equal  ✗ error" fg=1
+19:80 "│"
+20:1 "│"
+20:2 "blank not covered" fg=7
+20:80 "│"
+21:1 "└──────────────────────────────────────────────────────────────────────────────┘"
+22:1 "✓ 16 pass"
+22:11 "·" fg=7
+22:13 "± 2 changed" fg=3
+22:25 "·" fg=7
+22:27 "+ 2 new" fg=3
+22:35 "·" fg=7
+22:37 "✗ 8 error" fg=1
+23:1 "Badge Default at terminal: pass" fg=2
+23:66 "terminal · base" fg=7
+24:1 "↑↓"
+24:4 "move" fg=7
+24:9 "←→"
+24:12 "column" fg=7
+24:19 "⏎"
+24:21 "open" fg=7
+24:26 "esc"
+24:30 "back" fg=7
+24:35 "x"
+24:37 "matrix" fg=7
+24:44 "? q"
+24:48 "quit" fg=7

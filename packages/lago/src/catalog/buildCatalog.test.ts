@@ -71,7 +71,68 @@ describe("buildCatalog", () => {
       failures: [],
       tallies: { pass: 0, changed: 0, new: 0, error: 0 },
       viewports: [],
+      modes: [],
+      globals: [],
     });
+  });
+
+  it("keeps a story's pictures by viewport and mode, with the cells its file leaves out", () => {
+    const catalog = buildCatalog(
+      [
+        makeRecord("component/Row", "Default", {
+          globals: { scheme: "light" },
+        }),
+        makeRecord("component/Row", "Default", {
+          mode: "dark",
+          comparison: "equal",
+          globals: { scheme: "dark" },
+        }),
+        makeRecord("component/Row", "Default", {
+          mode: "loud",
+          comparison: "distinct",
+          status: "changed",
+        }),
+        makeRecord("component/Row", "Other", { globals: { scheme: "light" } }),
+      ],
+      [],
+      {
+        modes: [{ name: "dark", globals: { scheme: "dark" } }],
+        excluded: [
+          {
+            title: "component/Row",
+            name: "Other",
+            viewportName: "narrow",
+            mode: "dark",
+          },
+          {
+            title: "component/Gone",
+            name: "Other",
+            viewportName: "narrow",
+            mode: "dark",
+          },
+        ],
+      },
+    );
+    const [first, second] =
+      catalog.groups.at(0)?.components.at(0)?.stories ?? [];
+    expect(first?.pictures.map(({ mode }) => mode)).toEqual([
+      undefined,
+      "dark",
+      "loud",
+    ]);
+    expect(first?.status).toBe("changed");
+    expect(first?.excluded).toEqual([]);
+    expect(second?.excluded).toEqual([
+      { viewportName: "narrow", mode: "dark" },
+    ]);
+    expect(catalog.viewports).toEqual(["narrow"]);
+    expect(catalog.modes).toEqual([
+      { name: "dark", globals: { scheme: "dark" } },
+      { name: "loud", globals: {} },
+    ]);
+    expect(catalog.globals).toEqual([
+      { name: "scheme", values: ["light", "dark"] },
+    ]);
   });
   it("orders groups by their own names, whatever follows them in a title", () => {
     const catalog = buildCatalog([

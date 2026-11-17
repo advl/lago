@@ -1,5 +1,6 @@
 import { frameCells } from "../../layout/index.js";
 import compareScreens from "../Difference/compareScreens.js";
+import describePlace from "../describePlace.js";
 import wrapMessage from "../wrapMessage.js";
 import type { InspectedView, InspectProps } from "./types.js";
 
@@ -14,12 +15,20 @@ import type { InspectedView, InspectProps } from "./types.js";
 export default function measureInspected({
   record,
   viewportName,
+  mode,
+  leftOut,
   difference,
   width,
   height,
 }: Pick<
   InspectProps,
-  "record" | "viewportName" | "difference" | "width" | "height"
+  | "record"
+  | "viewportName"
+  | "mode"
+  | "leftOut"
+  | "difference"
+  | "width"
+  | "height"
 >): InspectedView {
   const room = {
     cols: width - frameCells.cols,
@@ -52,12 +61,9 @@ export default function measureInspected({
       cell: { x: cols - 1, y: actual.rows - 1 },
     };
   }
-  const message = wrapMessage(
-    record?.error === undefined
-      ? `This story is not drawn at ${viewportName}.`
-      : record.error,
-    room.cols,
-  );
+  let text = `This story is not drawn at ${describePlace(viewportName, mode)}.`;
+  if (leftOut) text = `This story's parameters.modes leaves ${mode} out.`;
+  const message = wrapMessage(record?.error ?? text, room.cols);
   return {
     shown: "message",
     room,
