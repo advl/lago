@@ -280,6 +280,7 @@ createConfig({ viewports, gallery: { chrome: "terminal" } });
 | `terminal`, the default | the terminal's own text and background, transparency included, and its palette's red, green, yellow, white and bright black for the marks |
 | `light`, `dark` | every colour fixed, and the background painted across the whole gallery, so it looks the same in any terminal |
 | a set of tokens | `{ ...tokens, "color.text": RGBA.fromHex("#202020") }`: every token of `@aztlan/tui`'s `tokens`, in colours of the project's choosing |
+| a plugin's chrome | its name, among those a plugin's gallery part gives |
 
 `terminal` is the chrome to choose. It already follows each reader's terminal, whatever its colours, so the gallery looks right to everyone without a setting of their own. Each colour is paired with a glyph or a word in every chrome, so a status reads the same in all of them.
 
@@ -331,6 +332,32 @@ export default function schemes({ include }: { include: readonly string[] }) {
 A plugin names React, OpenTUI and vitest as peer dependencies, never as dependencies, so the project's one copy of each serves the plugin too.
 
 A project that writes its own configuration gives the plugins to the plugin, as `testStories({ viewports, preview, plugins })`. A test that composes stories gives `setProjectAnnotations` the plugins' previews before its own, as `setProjectAnnotations([schemesPreview, preview])`, so that the story is drawn as its file draws it.
+
+### A plugin's gallery part
+
+A plugin adds to the gallery with a module of its own, named by `gallery.module`, beside the options the project gave it:
+
+```ts
+// in the plugin's definePlugin
+gallery: { module: new URL("./gallery.js", import.meta.url), options: { include } },
+```
+
+```ts
+// src/gallery.ts of the plugin
+import type { GalleryPart } from "@aztlan/lago";
+import { tokens } from "@aztlan/tui";
+import { RGBA } from "@opentui/core";
+
+const gallery: GalleryPart<{ include: readonly string[] }> = ({ include }) => ({
+  chromes: { sepia: { ...tokens, "color.text": RGBA.fromHex("#704214") } },
+});
+
+export default gallery;
+```
+
+`lago` finds the plugins in the project's resolved vitest configuration when it opens, imports each gallery part by its path, and calls its default export once with the plugin's options, which arrive as the configuration made them, functions and data included. What it gives is checked, and the gallery refuses, naming the plugin, anything it cannot use, and anything two plugins give, or a plugin and the gallery. `chromes` are chromes the project's `gallery.chrome` may then name, each a full set of `@aztlan/tui`'s tokens.
+
+The gallery and every gallery part share one copy of React, OpenTUI and vitest. Before it imports a part, the gallery resolves each of them from the part's folder and compares it with its own, and refuses a part that would load a second copy, naming the plugin, the package and both files. The fix is the peer dependency above, and installing the project again.
 
 ## Practices
 

@@ -78,7 +78,7 @@ export default async function openGallery(
     root,
     // Drawn only once the chrome is known, so a chrome that paints the
     // background never follows a first frame in the terminal's own.
-    onChrome: (chrome) =>
+    onSettings: ({ chrome }) =>
       tree.render(
         <TokensProvider tokens={chrome}>
           <Keys>

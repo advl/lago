@@ -58,6 +58,7 @@ The pipeline is `.github/workflows/ci.yml`. Its gate job installs with the lockf
 - The packages are published under `@aztlan`. A dependency between two of them points one way; never add one that closes a circle.
 - What a package publishes is its manifest's `exports` map and nothing beside it.
 - `@aztlan/lago-core` names no renderer: it imports neither React nor `@opentui/*`, and no other Lago package. Nothing `lago-react`'s `story/` ships imports the renderer either; a story learns its screen's size from what mounts it. `check:structure` refuses both. `@aztlan/lago-react` depends on it, and `@aztlan/lago-config` on `@aztlan/lago-react`; each is built after what it depends on.
+- A plugin is defined by `definePlugin` in `@aztlan/lago-core`. Its package, `@aztlan/lago-plugin-<name>`, takes React, OpenTUI and vitest as peers, as Lago's packages do, and the gallery refuses a gallery part that resolves a second copy of any of them, by name.
 - `@aztlan/tui` takes the renderer, its keymap and React as peers: one copy of each must serve the application and the components, or a provider made by one is not seen by the other. It is tested by Lago, so `lago-react` and `lago-config` are among its development dependencies and never among its dependencies.
 
 ## Gotchas
@@ -103,4 +104,5 @@ The pipeline is `.github/workflows/ci.yml`. Its gate job installs with the lockf
 - The key bar names each hint by its words, so no two commands enabled at once share a description: Esc says "put the cursor away" where `c` says "stop reading cells".
 - Text typed into the filter or the search comes through `useKeyboard`, while every binding but Enter, Esc and Backspace is off. The reducer ignores typing when nothing is being typed, so the handler sends every printable key.
 - A package linked from a checkout imports the checkout's own React and renderer, and a second React has no component to call hooks from. `createConfig` has vitest read the `@aztlan` packages and resolve React and the renderer to the project's one copy.
+- Bun installs what a module imports when no folder above it has a `node_modules`, so a package resolved from a scratch folder in the system's temporary folder is found in Bun's own cache. A test's scratch plugin has a `node_modules` of its own, empty when it needs nothing.
 - `scripts/check-packages.ts` lists every name each entry exports. A change to what a package publishes changes that list in the same commit.

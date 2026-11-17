@@ -1,6 +1,7 @@
 import type { Cell, StoryResult } from "@aztlan/lago-react/vitest";
 import type { Tokens } from "@aztlan/tui";
 import type { Catalog, StoryRecord } from "../catalog/index.js";
+import type { Contributions } from "../plugins/index.js";
 
 /** A frame of a stack, as vitest parses one. */
 export interface StackFrame {
@@ -48,11 +49,16 @@ export interface Engine {
 export interface EngineOptions {
   /** The project's root, where its vitest configuration is found. */
   readonly root: string;
-  /**
-   * Called once with the chrome the project's configuration names, the
-   * terminal's own when it names none, before the first run.
-   */
-  readonly onChrome: (chrome: Tokens) => void;
+  /** Called once, before the first run, with what the gallery is drawn with. */
+  readonly onSettings: (settings: Settings) => void;
   /** Called with the whole catalog after every run, the first included. */
   readonly onCatalog: (catalog: Catalog) => void;
+}
+
+/** What the project's configuration sets of the gallery. */
+export interface Settings {
+  /** The chrome the configuration names, the terminal's own when it names none. */
+  readonly chrome: Tokens;
+  /** What the project's plugins add to the gallery. */
+  readonly plugins: Contributions;
 }
