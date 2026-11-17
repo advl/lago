@@ -5,6 +5,7 @@ import { createRoot, useTerminalDimensions } from "@opentui/react";
 import { useSyncExternalStore } from "react";
 import type { Catalog, StoryRecord } from "../catalog/index.js";
 import { type Engine, startEngine } from "../engine/index.js";
+import type { Contributions } from "../plugins/index.js";
 import { Gallery } from "../ui/index.js";
 import createCatalogStore from "./createCatalogStore.js";
 
@@ -16,10 +17,11 @@ interface LiveProps {
   readonly read: () => Catalog | undefined;
   readonly accept: (record: StoryRecord) => Promise<void>;
   readonly quit: () => void;
+  readonly plugins: Contributions;
 }
 
 /** The gallery on the engine's latest catalog, at the terminal's size. */
-function Live({ name, subscribe, read, accept, quit }: LiveProps) {
+function Live({ name, subscribe, read, accept, quit, plugins }: LiveProps) {
   const catalog = useSyncExternalStore(subscribe, read);
   const { width, height } = useTerminalDimensions();
   return (
@@ -30,14 +32,15 @@ function Live({ name, subscribe, read, accept, quit }: LiveProps) {
       onQuit={quit}
       width={width}
       height={height}
+      plugins={plugins}
     />
   );
 }
 
 /**
  * Opens the gallery on the project at `root`: starts the project's own
- * vitest, draws the gallery in the chrome its configuration names as soon as
- * that is read, before any story runs, and shows each run's catalog as it
+ * vitest, draws the gallery in the chrome its configuration names, with
+ * what its plugins add, as soon as those are read, before any story runs, and shows each run's catalog as it
  * comes. `q`, or ctrl+c, closes the renderer, which stops vitest. When
  * vitest cannot start, or the chrome cannot be read, the renderer is closed
  * and the error given.
@@ -78,7 +81,7 @@ export default async function openGallery(
     root,
     // Drawn only once the chrome is known, so a chrome that paints the
     // background never follows a first frame in the terminal's own.
-    onSettings: ({ chrome }) =>
+    onSettings: ({ chrome, plugins }) =>
       tree.render(
         <TokensProvider tokens={chrome}>
           <Keys>
@@ -91,6 +94,7 @@ export default async function openGallery(
                 tree.unmount();
                 renderer.destroy();
               }}
+              plugins={plugins}
             />
           </Keys>
         </TokensProvider>,

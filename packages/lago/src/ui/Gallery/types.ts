@@ -4,6 +4,7 @@ import type {
   CatalogMode,
   StoryRecord,
 } from "../../catalog/index.js";
+import type { Contributions, GalleryControl } from "../../plugins/index.js";
 import type { GalleryAction, GalleryState } from "../../state/index.js";
 
 /** Props for the Gallery component. */
@@ -20,6 +21,8 @@ export interface GalleryProps {
   width: number;
   /** The height of the terminal, in lines. */
   height: number;
+  /** What the project's plugins add: palettes, keys and status items. Without it, nothing. */
+  plugins?: Contributions;
 }
 
 /** Props for the useGalleryKeys hook. */
@@ -53,4 +56,15 @@ export interface UseGalleryKeysProps {
   /** Says something in the status line, until the next key. */
   readonly say: (message: string) => void;
   readonly quit: () => void;
+}
+
+/** Props for the usePluginKeys hook. */
+export interface UsePluginKeysProps {
+  readonly plugins: Contributions;
+  /** Whether nothing is typed or asked, the help is closed and the gallery is drawn: when a key acts. */
+  readonly free: boolean;
+  /** What a key may read of the gallery and do to it. */
+  readonly control: GalleryControl;
+  /** Called before any of the keys acts. */
+  readonly onKey: () => void;
 }

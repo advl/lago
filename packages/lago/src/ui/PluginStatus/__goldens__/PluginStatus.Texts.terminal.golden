@@ -1,0 +1,7 @@
+80x24
+| · palette dracula · grid at wide
+
+1:2 "·" fg=7
+1:4 "palette dracula"
+1:20 "·" fg=7
+1:22 "grid at wide"

@@ -1,0 +1,7 @@
+80x24
+| · palette terminal · at wide
+
+1:2 "·" fg=7
+1:4 "palette terminal"
+1:21 "·" fg=7
+1:23 "at wide" fg=#ffffff

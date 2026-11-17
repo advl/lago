@@ -237,6 +237,7 @@ It is called in the test files that compose stories, not in a setup file: a setu
 | `p` | the next viewport |
 | `m` | the next mode, the base first and then the configuration's in its order; only in a project with modes |
 | `x` | open or close the matrix; only in a project with modes |
+| `t` | the next palette, when a plugin gives palettes |
 | `v` | set the stories as the room allows, in rows, or side by side |
 | `d` | show the golden over a changed picture, the difference in words |
 | `c` | read the cell under a cursor: its text, both colours as asked, its attributes |
@@ -355,7 +356,19 @@ const gallery: GalleryPart<{ include: readonly string[] }> = ({ include }) => ({
 export default gallery;
 ```
 
-`lago` finds the plugins in the project's resolved vitest configuration when it opens, imports each gallery part by its path, and calls its default export once with the plugin's options, which arrive as the configuration made them, functions and data included. What it gives is checked, and the gallery refuses, naming the plugin, anything it cannot use, and anything two plugins give, or a plugin and the gallery. `chromes` are chromes the project's `gallery.chrome` may then name, each a full set of `@aztlan/tui`'s tokens.
+`lago` finds the plugins in the project's resolved vitest configuration when it opens, imports each gallery part by its path, and calls its default export once with the plugin's options, which arrive as the configuration made them, functions and data included. What it gives is checked, and the gallery refuses, naming the plugin, anything it cannot use, and anything two plugins give, or a plugin and the gallery.
+
+What a gallery part gives, each part optional:
+
+| Part | What it is | What the gallery does with it |
+|---|---|---|
+| `palettes` | names, each with a table of 16 or 256 colours written `#rrggbb` | offers each after `terminal`, the terminal's own, which is always first; `t` steps to the next, round, for the session alone, and the status line names the one chosen |
+| `palette` | one of the plugin's palettes, or `terminal` | opens on it; one plugin alone may say |
+| `chromes` | names, each with a full set of `@aztlan/tui`'s tokens | lets the project's `gallery.chrome` name it |
+| `keys` | `{ key, description, run }`, the key as the keymap writes it, as `g` or `ctrl+g` | binds it while nothing is typed or asked, lists it in the help under the plugin's name, and runs `run` with the gallery's control |
+| `status` | `{ text: (selection) => string }`, or `{ columns, component }` | shows each at the end of the status line, after the palette, within half of the line; a component is drawn in the columns it asks for, given `{ selection }` |
+
+The selection a key and a status item are given holds the selected component's title, the selected story's name once the stories are open, the viewport shown, the mode shown, none for the base, and the palette. A key's control is that selection, every palette's name, `setPalette(name)`, which chooses one of them for the session, and `say(message)`, which shows a message in the status line until the next key. Nothing a plugin does in the gallery is kept: the next launch opens as the configuration says.
 
 The gallery and every gallery part share one copy of React, OpenTUI and vitest. Before it imports a part, the gallery resolves each of them from the part's folder and compares it with its own, and refuses a part that would load a second copy, naming the plugin, the package and both files. The fix is the peer dependency above, and installing the project again.
 
