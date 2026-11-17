@@ -3,6 +3,7 @@ import { dirname } from "node:path";
 import { createVitest } from "vitest/node";
 import { buildCatalog, type CatalogMode } from "../catalog/index.js";
 import { readChrome } from "../chrome/index.js";
+import { loadPlugins } from "../plugins/index.js";
 import { galleryPlugin, storiesPlugin, storiesProject } from "./constants.js";
 import createReporter from "./createReporter.js";
 import createSink from "./createSink.js";
@@ -13,17 +14,18 @@ import type { Engine, EngineOptions } from "./types.js";
  * Starts the project's own vitest from code, on its own configuration,
  * running the stories project alone, in watch mode, and never writing a
  * golden: a run that finds one missing or changed reports it, and only
- * `accept` writes one. The chrome the configuration names reaches
- * `onChrome` before anything runs, and a chrome it cannot read stops the
- * start. Every run's results reach `onCatalog`, with the modes the
- * configuration names, and a project with no stories gives one empty
- * catalog.
+ * `accept` writes one. Before anything runs, each plugin's gallery part is
+ * imported, and what the plugins add reaches `onSettings` with the chrome
+ * the configuration names, which may be a plugin's; a part that cannot be
+ * loaded, or a chrome that cannot be read, stops the start. Every run's
+ * results reach `onCatalog`, with the modes the configuration names, and a
+ * project with no stories gives one empty catalog.
  *
  * @note Impure: starts vitest, which watches and reads the project, and writes a golden when one is accepted.
  */
 export default async function startEngine({
   root,
-  onChrome,
+  onSettings,
   onCatalog,
 }: EngineOptions): Promise<Engine> {
   // Read from the configuration once vitest has resolved it, before any run.
@@ -51,7 +53,12 @@ export default async function startEngine({
     modes = readModes(plugins.find(({ name }) => name === storiesPlugin)?.api);
     // Only a configuration file adds the plugin, so a chrome refused always
     // has a file to name.
-    onChrome(readChrome(gallery?.api.chrome, String(configFile)));
+    const file = String(configFile);
+    const contributions = await loadPlugins(gallery?.api.plugins, file);
+    onSettings({
+      chrome: readChrome(gallery?.api.chrome, file, contributions.chromes),
+      plugins: contributions,
+    });
     if ((await vitest.globTestSpecifications()).length === 0) {
       await vitest.standalone();
       onCatalog(buildCatalog([]));

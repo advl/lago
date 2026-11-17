@@ -1,8 +1,10 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
+import { RGBA } from "@opentui/core";
 import { createTestRenderer } from "@opentui/core/testing";
 import { describe, expect, it } from "vitest";
 import makeProject from "../../../testing/makeProject.js";
+import pluginFiles from "../../../testing/pluginFiles.js";
 import writeChromeConfig from "../../../testing/writeChromeConfig.js";
 import { openGallery } from "../../app/index.js";
 import { chromes } from "../../chrome/index.js";
@@ -114,6 +116,33 @@ describe("openGallery", { timeout: 60_000 }, () => {
     expect(new Set([...shades, shade.toString()])).toEqual(
       new Set([paint.toString(), shade.toString()]),
     );
+    setup.mockInput.pressKey("q");
+    expect(await closed).toBe(0);
+  });
+
+  it("shows what a plugin's gallery part adds: its chrome, its palette and its component, which keeps its state", async () => {
+    const root = makeProject({ ...stories, ...pluginFiles });
+    let setup: Setup | undefined;
+    const closed = openGallery(root, async (config) => {
+      setup = await createTestRenderer({
+        ...config,
+        width: 80,
+        height: 24,
+        kittyKeyboard: true,
+      });
+      return setup.renderer;
+    });
+    while (!setup) await new Promise((resolve) => setTimeout(resolve, 10));
+    await waitForFrame(setup, "Label");
+    expect(
+      await waitForFrame(setup, " · palette dracula · palette dracula"),
+    ).toContain("hello");
+    const colours = setup
+      .captureSpans()
+      .lines.flatMap(({ spans }) => spans.map(({ fg }) => fg.toString()));
+    expect(colours).toContain(RGBA.fromHex("#704214").toString());
+    const frame = await press(setup, () => setup?.mockInput.pressKey("t"));
+    expect(frame).toContain(" · palette terminal · palette dracula");
     setup.mockInput.pressKey("q");
     expect(await closed).toBe(0);
   });

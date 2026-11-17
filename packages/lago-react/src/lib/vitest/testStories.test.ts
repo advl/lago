@@ -126,6 +126,109 @@ describe("testStories", () => {
     );
   });
 
+  it("makes a stories file hand each plugin's preview and globals to its registration, in the plugins' order", () => {
+    const plugin = testStories({
+      viewports,
+      plugins: [
+        { name: "grid", preview: "/plugins/grid/preview.js" },
+        {
+          name: "schemes",
+          globalTypes: { scheme: { values: ["light"], default: "light" } },
+        },
+      ],
+    });
+    const result = callHook(
+      plugin,
+      "transform",
+      "export const Default = {};\n",
+      "/project/src/Row.stories.tsx",
+    );
+    expect(result).toMatchObject({
+      code: expect.stringContaining(
+        [
+          'import * as __lagoPlugin0 from "/plugins/grid/preview.js";',
+          '__lagoRegisterStories(__lagoStories, import.meta.url, {"viewports":{"narrow":{"cols":40,"rows":36}},"comments":{"Default":""},"plugins":[{"name":"grid","preview":"/plugins/grid/preview.js"},{"name":"schemes","globalTypes":{"scheme":{"values":["light"],"default":"light"}}}]}, undefined, [__lagoPlugin0, undefined]);',
+        ].join("\n"),
+      ),
+    });
+    const withPreview = callHook(
+      testStories({
+        viewports,
+        preview: "./src/lago.preview.tsx",
+        plugins: [{ name: "grid" }],
+      }),
+      "transform",
+      "export const Default = {};\n",
+      "/project/src/Row.stories.tsx",
+    );
+    expect(withPreview).toMatchObject({
+      code: expect.stringContaining(", __lagoPreview, [undefined]);"),
+    });
+  });
+
+  it("draws the plugins' modes with the project's, names them first under its api, and refuses one that names an unusable file", () => {
+    const plugin = testStories({
+      viewports,
+      plugins: [
+        { name: "schemes", modes: { dark: { globals: { scheme: "dark" } } } },
+      ],
+    });
+    expect(
+      callHook(plugin, "transform", "", "/project/src/Row.stories.tsx"),
+    ).toMatchObject({
+      code: expect.stringContaining(
+        '"modes":{"dark":{"globals":{"scheme":"dark"}}}',
+      ),
+    });
+    expect(
+      Object.keys(
+        testStories({
+          viewports,
+          modes: { wide: { globals: { density: "wide" } } },
+          plugins: [
+            {
+              name: "schemes",
+              modes: { dark: { globals: { scheme: "dark" } } },
+            },
+          ],
+        }).api.modes,
+      ),
+    ).toEqual(["dark", "wide"]);
+    expect(() =>
+      testStories({
+        plugins: [
+          { name: "schemes", modes: { "dark mode": { globals: { a: "b" } } } },
+        ],
+      }),
+    ).toThrow('The mode name "dark mode" cannot be part of a file\'s name.');
+  });
+
+  it("refuses a plugin whose preview is not a file, naming the plugin", () => {
+    const plugin = testStories({
+      plugins: [{ name: "grid", preview: "/plugins/grid/missing.js" }],
+    });
+    expect(() =>
+      callHook(plugin, "configResolved", { root: "/project" }),
+    ).toThrow(
+      "The plugin grid names its preview /plugins/grid/missing.js, which does not exist. The plugin's package is built without it, or names it wrongly.",
+    );
+    expect(() =>
+      callHook(
+        testStories({
+          plugins: [
+            {
+              name: "grid",
+              preview: join(import.meta.dirname, "testStories.ts"),
+            },
+            { name: "none" },
+          ],
+        }),
+        "configResolved",
+        { root: "/project" },
+      ),
+    ).not.toThrow();
+  });
+
   it("refuses a preview that is not a file, naming where it was looked for", () => {
     const plugin = testStories({ preview: "./src/missing.tsx" });
     expect(() =>
@@ -199,6 +302,23 @@ describe("testStories", () => {
     };
     expect(readKeys("./one.tsx")).not.toBe(readKeys("./other.tsx"));
     expect(readKeys("./one.tsx")).not.toBe(readKeys());
+  });
+
+  it("has vitest transform a stories file again when its plugins change", () => {
+    const readKeys = (plugins?: Options["plugins"]) => {
+      let readKey = (_: { id: string }): unknown => "never defined";
+      callHook(testStories({ viewports, plugins }), "configureVitest", {
+        defineCacheKeyGenerator: (generator: typeof readKey) => {
+          readKey = generator;
+        },
+      });
+      return readKey({ id: "/project/Row.stories.tsx" });
+    };
+    expect(readKeys([{ name: "grid" }])).not.toBe(
+      readKeys([{ name: "other" }]),
+    );
+    expect(readKeys([{ name: "grid" }])).not.toBe(readKeys());
+    expect(readKeys([])).toBe(readKeys());
   });
 
   it("has vitest transform a stories file again when its modes change", () => {

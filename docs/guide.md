@@ -6,7 +6,7 @@ Lago makes a terminal interface drawn by OpenTUI reviewable the way a web interf
 
 | Package | What it gives | What it stands for in Storybook |
 |---|---|---|
-| `@aztlan/lago-core` | the screen, the screenshot and the golden, which name no renderer; installed with `@aztlan/lago-react`, which re-exports the types a test names | none |
+| `@aztlan/lago-core` | the screen, the screenshot and the golden, which name no renderer, and `definePlugin`; installed with `@aztlan/lago-react`, which re-exports the types a test names | none |
 | `@aztlan/lago-react` | the story types (`Meta`, `StoryObj`, `Preview`), `render`, `composeStories`, `setProjectAnnotations` and `waitFor` for tests; the vitest plugin `testStories` from `@aztlan/lago-react/vitest` | `@storybook/react` and its vitest add-on |
 | `@aztlan/lago-config` | `createConfig`, the vitest configuration a project needs | the project's own Storybook and vitest configuration |
 | `@aztlan/tui` | the components both an application and the gallery draw: the pane, its header, the scrolled list, the key bar and the help, notices, loading lines and empty states; the keymap and the text-fitting functions; the tokens they draw with, and `TokensProvider` to draw them in other colours | none |
@@ -237,6 +237,7 @@ It is called in the test files that compose stories, not in a setup file: a setu
 | `p` | the next viewport |
 | `m` | the next mode, the base first and then the configuration's in its order; only in a project with modes |
 | `x` | open or close the matrix; only in a project with modes |
+| `t` | the next palette, when a plugin gives palettes |
 | `v` | set the stories as the room allows, in rows, or side by side |
 | `d` | show the golden over a changed picture, the difference in words |
 | `c` | read the cell under a cursor: its text, both colours as asked, its attributes |
@@ -280,10 +281,96 @@ createConfig({ viewports, gallery: { chrome: "terminal" } });
 | `terminal`, the default | the terminal's own text and background, transparency included, and its palette's red, green, yellow, white and bright black for the marks |
 | `light`, `dark` | every colour fixed, and the background painted across the whole gallery, so it looks the same in any terminal |
 | a set of tokens | `{ ...tokens, "color.text": RGBA.fromHex("#202020") }`: every token of `@aztlan/tui`'s `tokens`, in colours of the project's choosing |
+| a plugin's chrome | its name, among those a plugin's gallery part gives |
 
 `terminal` is the chrome to choose. It already follows each reader's terminal, whatever its colours, so the gallery looks right to everyone without a setting of their own. Each colour is paired with a glyph or a word in every chrome, so a status reads the same in all of them.
 
 The chrome colours the gallery around the pictures and never a picture itself: a story is drawn, and its golden kept, in the colours it asks for, whatever the chrome. The gallery refuses a chrome it cannot read when it opens, naming the configuration's file: a name it has no chrome for, or a set of tokens that lacks one.
+
+## Plugins
+
+A plugin is what a project adds to every story, and to the gallery, by naming one package: a theme switch, a baseline grid, request mocking. Its package is named `@aztlan/lago-plugin-<name>` and exports a function that takes the project's options and gives `definePlugin`'s result.
+
+### Adding a plugin
+
+A project installs the plugin's package and gives it to `createConfig`, once, with its options:
+
+```ts
+// vitest.config.ts
+import { createConfig } from "@aztlan/lago-config";
+import schemes from "@aztlan/lago-plugin-schemes";
+
+export default createConfig({
+  viewports,
+  preview: "./src/lago.preview.tsx",
+  plugins: [schemes({ include: ["dracula", "iceberg"] })],
+});
+```
+
+That one entry configures both of the plugin's sides: the stories are set inside its preview and drawn in its modes, and the gallery takes what it adds there. Its globals are read as the project's own, with `context.globals`, `globals` on a story and `parameters.modes`, and its modes' goldens are named as the project's are.
+
+### Writing a plugin
+
+```ts
+// src/index.ts of @aztlan/lago-plugin-schemes
+import { definePlugin } from "@aztlan/lago-core";
+
+export default function schemes({ include }: { include: readonly string[] }) {
+  return definePlugin({
+    name: "schemes",
+    preview: new URL("./preview.js", import.meta.url),
+    globalTypes: { scheme: { values: ["classic", ...include], default: "classic" } },
+    modes: Object.fromEntries(include.map((scheme) => [scheme, { globals: { scheme } }])),
+  });
+}
+```
+
+- `name` names the plugin wherever Lago names it, as in a refusal.
+- `preview` is a module whose default export is a `Preview`, as a project's is. The plugin's decorators, args, parameters, loaders and tags are set around every story, outside the file's and inside the project's preview: the project's args and parameters win over the plugin's, and the project's decorators wrap the plugin's.
+- `globalTypes` and `modes` join the project's. A global or a mode is declared once: one that two plugins declare, or a plugin and the project, is refused, naming both.
+- Each module is named by an absolute path or a `file:` URL, as `new URL("./preview.js", import.meta.url)` gives one, because the plugin is read from the project's configuration, where a relative path would mean nothing.
+
+A plugin names React, OpenTUI and vitest as peer dependencies, never as dependencies, so the project's one copy of each serves the plugin too.
+
+A project that writes its own configuration gives the plugins to the plugin, as `testStories({ viewports, preview, plugins })`. A test that composes stories gives `setProjectAnnotations` the plugins' previews before its own, as `setProjectAnnotations([schemesPreview, preview])`, so that the story is drawn as its file draws it.
+
+### A plugin's gallery part
+
+A plugin adds to the gallery with a module of its own, named by `gallery.module`, beside the options the project gave it:
+
+```ts
+// in the plugin's definePlugin
+gallery: { module: new URL("./gallery.js", import.meta.url), options: { include } },
+```
+
+```ts
+// src/gallery.ts of the plugin
+import type { GalleryPart } from "@aztlan/lago";
+import { tokens } from "@aztlan/tui";
+import { RGBA } from "@opentui/core";
+
+const gallery: GalleryPart<{ include: readonly string[] }> = ({ include }) => ({
+  chromes: { sepia: { ...tokens, "color.text": RGBA.fromHex("#704214") } },
+});
+
+export default gallery;
+```
+
+`lago` finds the plugins in the project's resolved vitest configuration when it opens, imports each gallery part by its path, and calls its default export once with the plugin's options, which arrive as the configuration made them, functions and data included. What it gives is checked, and the gallery refuses, naming the plugin, anything it cannot use, and anything two plugins give, or a plugin and the gallery.
+
+What a gallery part gives, each part optional:
+
+| Part | What it is | What the gallery does with it |
+|---|---|---|
+| `palettes` | names, each with a table of 16 or 256 colours written `#rrggbb` | offers each after `terminal`, the terminal's own, which is always first; `t` steps to the next, round, for the session alone, and the status line names the one chosen |
+| `palette` | one of the plugin's palettes, or `terminal` | opens on it; one plugin alone may say |
+| `chromes` | names, each with a full set of `@aztlan/tui`'s tokens | lets the project's `gallery.chrome` name it |
+| `keys` | `{ key, description, run }`, the key as the keymap writes it, as `g` or `ctrl+g` | binds it while nothing is typed or asked, lists it in the help under the plugin's name, and runs `run` with the gallery's control |
+| `status` | `{ text: (selection) => string }`, or `{ columns, component }` | shows each at the end of the status line, after the palette, within half of the line; a component is drawn in the columns it asks for, given `{ selection }` |
+
+The selection a key and a status item are given holds the selected component's title, the selected story's name once the stories are open, the viewport shown, the mode shown, none for the base, and the palette. A key's control is that selection, every palette's name, `setPalette(name)`, which chooses one of them for the session, and `say(message)`, which shows a message in the status line until the next key. Nothing a plugin does in the gallery is kept: the next launch opens as the configuration says.
+
+The gallery and every gallery part share one copy of React, OpenTUI and vitest. Before it imports a part, the gallery resolves each of them from the part's folder and compares it with its own, and refuses a part that would load a second copy, naming the plugin, the package and both files. The fix is the peer dependency above, and installing the project again.
 
 ## Practices
 

@@ -19,7 +19,9 @@ import type { Options } from "./types.js";
  * that makes each story a test, inside the project's preview when one is
  * named and in each of its modes; the timers a test fakes; when asked, the
  * coverage settings, which a run applies to the unit project alone; and,
- * when given, the gallery's settings, which only `lago` reads.
+ * when given, the gallery's settings and the plugins' gallery parts, which
+ * only `lago` reads. Each plugin is set around every story before the
+ * project's preview, and its modes are drawn with the project's.
  */
 export default function createConfig({
   viewports,
@@ -28,6 +30,7 @@ export default function createConfig({
   modes,
   matrix,
   gallery,
+  plugins = [],
 }: Options = {}): ViteUserConfig {
   // Coverage matches what it leaves out against paths from the project's
   // root, so an absolute path would leave the preview measured.
@@ -38,9 +41,11 @@ export default function createConfig({
   }
   return {
     plugins: [
-      testStories({ viewports, preview, modes, matrix }),
+      testStories({ viewports, preview, modes, matrix, plugins }),
       coverUnitsOnly,
-      ...(gallery ? [createGalleryPlugin(gallery)] : []),
+      ...(gallery || plugins.some((plugin) => plugin.gallery)
+        ? [createGalleryPlugin(gallery ?? {}, plugins)]
+        : []),
     ],
     // What names the renderer comes from the renderer's own package: where
     // JSX takes its runtime, the build vitest must load, and what is kept to

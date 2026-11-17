@@ -1,5 +1,7 @@
-import type { Screenshot, Viewport } from "@aztlan/lago-core";
-import type { Globals } from "../story/index.js";
+import type { Mode, Plugin, Screenshot, Viewport } from "@aztlan/lago-core";
+import type { Globals, GlobalTypes } from "../story/index.js";
+
+export type { Mode } from "@aztlan/lago-core";
 
 /**
  * What a vitest configuration needs to know of the renderer a project's
@@ -19,20 +21,6 @@ export interface Renderer {
    * runtime load the same build of the renderer.
    */
   readonly conditions: readonly string[];
-}
-
-/**
- * A named set of globals every story is drawn in, beside its picture in no
- * mode, the base.
- */
-export interface Mode {
-  /** Values of globals the preview declares; a story's own fixed ones win. */
-  readonly globals: Globals;
-  /**
-   * The stories the mode is meant to change, by tag. One of them whose
-   * picture comes out equal to the base fails: the mode did not reach it.
-   */
-  readonly expect?: { readonly tags: readonly string[] };
 }
 
 /** What the plugin is given. */
@@ -63,6 +51,21 @@ export interface Options {
    * its count.
    */
   readonly matrix?: { readonly max: number };
+  /**
+   * Lago plugins, each made by `definePlugin`: their previews are set around
+   * every story before the project's own, in their order, and their globals
+   * and modes join the project's. A global or a mode two of them declare, or
+   * one of them and the project, is refused, naming both.
+   */
+  readonly plugins?: readonly Plugin[];
+}
+
+/** What a stories file is told of a plugin: what names it, its preview and its globals. */
+export interface PluginRegistration {
+  readonly name: string;
+  /** The absolute path of the plugin's preview module, when it has one. */
+  readonly preview?: string;
+  readonly globalTypes?: GlobalTypes;
 }
 
 /** What the plugin tells a stories file's tests, written into the file's last line. */
@@ -72,8 +75,10 @@ export interface Registration {
   readonly comments: Readonly<Record<string, string>>;
   /** Where the project's preview is, when there is one. */
   readonly preview?: string;
-  /** The modes, when there are any. */
+  /** The modes, the plugins' among them, when there are any. */
   readonly modes?: Readonly<Record<string, Mode>>;
+  /** The plugins, in their order, when there are any. */
+  readonly plugins?: readonly PluginRegistration[];
 }
 
 /** How a mode's picture compares with the base picture at the same viewport. */

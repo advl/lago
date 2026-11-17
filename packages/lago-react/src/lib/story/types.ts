@@ -1,5 +1,8 @@
+import type { Globals, GlobalTypes } from "@aztlan/lago-core";
 import type { ReactNode } from "react";
 import type { Screen, UserEvent, Viewport } from "../render/index.js";
+
+export type { Globals, GlobalType, GlobalTypes } from "@aztlan/lago-core";
 
 /** A function component, whatever props it takes. */
 // biome-ignore lint/suspicious/noExplicitAny: a component's props are checked where the component is used, and here any will do.
@@ -17,25 +20,6 @@ export type PropsOf<Component> = Component extends (
  * plain data, merged from the file's to the story's, object into object.
  */
 export type Parameters = Readonly<Record<string, unknown>>;
-
-/**
- * One setting of a project's that is not an arg, such as a colour scheme: the
- * values it takes, and the one a story is drawn with unless something fixes
- * another.
- */
-export interface GlobalType {
-  readonly values: readonly string[];
-  /** One of `values`. */
-  readonly default: string;
-  /** What the setting changes, for whoever reads the project. */
-  readonly description?: string;
-}
-
-/** The globals a project declares, by name. */
-export type GlobalTypes = Readonly<Record<string, GlobalType>>;
-
-/** Values of globals, by the global's name. */
-export type Globals = Readonly<Record<string, string>>;
 
 /** What a story's `render` and its decorators are given. */
 export interface StoryContext<Args = Record<string, unknown>> {
@@ -224,3 +208,10 @@ export type ComposedStories<Module extends StoriesModule> = {
       : Record<string, unknown>
   >;
 };
+
+/** One layer of what every story is set inside, and what to name it by in a refusal. */
+export interface PreviewLayer {
+  /** Who gives the layer, as in `the plugin palettes` or `the preview /project/src/lago.preview.tsx`. */
+  readonly where: string;
+  readonly preview: Preview;
+}

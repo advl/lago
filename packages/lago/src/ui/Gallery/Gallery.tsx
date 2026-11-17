@@ -13,6 +13,7 @@ import {
   type ReactNode,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -22,6 +23,12 @@ import {
   type StoryRecord,
 } from "../../catalog/index.js";
 import { chooseArrangement } from "../../layout/index.js";
+import {
+  type GalleryControl,
+  noContributions,
+  type Palette,
+  type PluginSelection,
+} from "../../plugins/index.js";
 import {
   type GalleryAction,
   listColumns,
@@ -35,6 +42,8 @@ import Inspect from "../Inspect/Inspect.js";
 import measureInspected from "../Inspect/measureInspected.js";
 import Matrix from "../Matrix/Matrix.js";
 import type { MatrixWindow } from "../Matrix/types.js";
+import { PaletteContext } from "../Palette/index.js";
+import { PluginStatus, placeStatusItems } from "../PluginStatus/index.js";
 import StatusLine from "../StatusLine/StatusLine.js";
 import Tallies from "../Tallies/Tallies.js";
 import buildStoryBlocks from "./buildStoryBlocks.js";
@@ -43,6 +52,7 @@ import { arrangementWords, helpNote } from "./constants.js";
 import frameStories from "./frameStories.js";
 import type { GalleryProps } from "./types.js";
 import useGalleryKeys from "./useGalleryKeys.js";
+import usePluginKeys from "./usePluginKeys.js";
 
 const emptyCatalog = buildCatalog([]);
 
@@ -65,9 +75,12 @@ const isTyped = ({
 /**
  * The gallery: the tree of components beside the selected component's
  * stories, each a frame around its picture, or one story inspected over the
- * whole region; the counts of every picture's status; a status line; and
- * the keys that work now. Every catalog a run gives is shown as it comes,
- * the reader kept on the component they had selected.
+ * whole region; the counts of every picture's status; a status line,
+ * ending with the palette and the plugins' items; and the keys that work
+ * now, the plugins' among them. Every catalog a run gives is shown as it
+ * comes, the reader kept on the component they had selected. The palette
+ * is the one the plugins open on until `t` changes it, for the session
+ * alone, and is given to everything drawn inside.
  */
 const Gallery = ({
   catalog,
@@ -76,9 +89,11 @@ const Gallery = ({
   onQuit,
   width,
   height,
+  plugins = noContributions,
 }: GalleryProps): ReactNode => {
   const known = catalog ?? emptyCatalog;
   const [state, setState] = useState(openingState);
+  const [palette, setPalette] = useState(plugins.palette);
   const [message, setMessage] = useState<string>();
   const [helpFirst, setHelpFirst] = useState(0);
   const treeFirst = useRef(0);
@@ -152,6 +167,48 @@ const Gallery = ({
     accept,
     say: setMessage,
     quit: onQuit,
+  });
+  const pluginSelection: PluginSelection = useMemo(
+    () => ({
+      title: component?.title,
+      story: state.focus === "stories" ? story?.name : undefined,
+      viewportName,
+      mode: modeName,
+      palette,
+    }),
+    [
+      component?.title,
+      state.focus,
+      story?.name,
+      viewportName,
+      modeName,
+      palette,
+    ],
+  );
+  const control: GalleryControl = useMemo(() => {
+    const palettes = plugins.palettes.map(({ name }) => name);
+    return {
+      selection: pluginSelection,
+      palettes,
+      setPalette: (name) =>
+        palettes.includes(name)
+          ? setPalette(name)
+          : setMessage(`there is no palette ${name}`),
+      say: setMessage,
+    };
+  }, [plugins.palettes, pluginSelection]);
+  const clearMessage = useCallback(() => setMessage(undefined), []);
+  usePluginKeys({
+    plugins,
+    free:
+      !state.filtering &&
+      !state.searching &&
+      !state.confirming &&
+      !state.help &&
+      width >= minColumns &&
+      height >= minLines,
+    control,
+    onKey: clearMessage,
   });
   useKeyboard((key) => {
     if (isTyped(key)) act({ type: "type", text: key.sequence });
@@ -280,6 +337,24 @@ const Gallery = ({
     );
   }
 
+  // The size and the mode name where the pictures are drawn, once there is
+  // a mode to tell the base from.
+  const statusItems =
+    known.modes.length > 0 && viewportName !== undefined
+      ? [viewportName, modeName ?? "base"]
+      : [];
+  // The palette is named at the end of the status line once there is one
+  // to change to, before the plugins' own items.
+  const placed = placeStatusItems(
+    [
+      ...(plugins.palettes.length > 1
+        ? [{ text: ({ palette: name }: PluginSelection) => `palette ${name}` }]
+        : []),
+      ...plugins.status,
+    ],
+    pluginSelection,
+    width,
+  );
   const where =
     state.focus === "tree" || !component
       ? { text: name, kind: "identifier" }
@@ -296,7 +371,10 @@ const Gallery = ({
           title={where}
           {...(viewportName !== undefined && {
             address: { text: `at ${viewportName}`, kind: "words" },
-            sort: { text: arrangementWords[state.arrangement], kind: "words" },
+            sort: {
+              text: arrangementWords[state.arrangement],
+              kind: "words",
+            },
           })}
           width={width}
         />
@@ -313,20 +391,30 @@ const Gallery = ({
         )
       }
       status={
-        <StatusLine
-          state={state}
-          selection={selection}
-          catalog={catalog}
-          message={message}
-          // The size and the mode name where the pictures are drawn, once
-          // there is a mode to tell the base from.
-          items={
-            known.modes.length > 0 && viewportName !== undefined
-              ? [viewportName, modeName ?? "base"]
-              : []
-          }
-          width={width}
-        />
+        placed.items.length === 0 ? (
+          <StatusLine
+            state={state}
+            selection={selection}
+            catalog={catalog}
+            message={message}
+            items={statusItems}
+            width={width}
+          />
+        ) : (
+          <box flexDirection="row" width={width} height={1}>
+            <box width={width - placed.columns} height={1}>
+              <StatusLine
+                state={state}
+                selection={selection}
+                catalog={catalog}
+                message={message}
+                items={statusItems}
+                width={width - placed.columns}
+              />
+            </box>
+            <PluginStatus placed={placed} selection={pluginSelection} />
+          </box>
+        )
       }
       keys={<KeyBar commands={active} width={width} />}
       {...(state.help && {
@@ -342,7 +430,13 @@ const Gallery = ({
         ),
       })}
     >
-      {region}
+      {/* The palette shown is always one of them: the one the plugins open
+       * on, or one a key chose among them. */}
+      <PaletteContext.Provider
+        value={plugins.palettes.find(({ name }) => name === palette) as Palette}
+      >
+        {region}
+      </PaletteContext.Provider>
     </Pane>
   );
 };

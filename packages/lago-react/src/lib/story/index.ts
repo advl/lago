@@ -2,6 +2,7 @@ export { default as checkGlobals } from "./checkGlobals.js";
 export { default as checkGlobalTypes } from "./checkGlobalTypes.js";
 export { default as composeStories } from "./composeStories.js";
 export { default as listStories } from "./listStories.js";
+export { default as mergePreviews } from "./mergePreviews.js";
 export { default as readDescription } from "./readDescription.js";
 export { default as resolveGlobals } from "./resolveGlobals.js";
 export { default as runStory } from "./runStory.js";
@@ -21,6 +22,7 @@ export type {
   PlayContext,
   PreparedStory,
   Preview,
+  PreviewLayer,
   PropsOf,
   StoriesModule,
   StoryContext,

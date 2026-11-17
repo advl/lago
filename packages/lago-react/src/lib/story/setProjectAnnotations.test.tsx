@@ -71,6 +71,49 @@ describe("setProjectAnnotations", () => {
     );
   });
 
+  it("sets a story inside a list of previews, a plugin's before the project's, as its stories file is", async () => {
+    setProjectAnnotations([
+      { decorators: [titled], args: { start: 1 } },
+      {
+        args: { start: 2 },
+        decorators: [
+          (Story) => (
+            <box flexDirection="column">
+              <text>project</text>
+              <Story />
+            </box>
+          ),
+        ],
+      },
+    ]);
+    const { Default } = composeStories(stories);
+    expect((await Default.run({ cols: 20, rows: 3 })).lines).toEqual([
+      "project",
+      "fixtures/Counter",
+      "apples 2",
+    ]);
+  });
+
+  it("refuses a list of previews in which two declare one global, naming both", () => {
+    const scheme = { values: ["light", "dark"], default: "dark" };
+    expect(() =>
+      setProjectAnnotations([
+        { globalTypes: { scheme } },
+        { globalTypes: { scheme } },
+      ]),
+    ).toThrow(
+      "The global scheme is declared by both the preview 1 of the 2 given to setProjectAnnotations and the preview 2 of the 2 given to setProjectAnnotations.",
+    );
+    expect(() =>
+      setProjectAnnotations([
+        {},
+        { globalTypes: { scheme: { values: [], default: "x" } } },
+      ]),
+    ).toThrow(
+      "The preview 2 of the 2 given to setProjectAnnotations declares the global scheme with no values to take.",
+    );
+  });
+
   it("leaves a story composed before it as it was composed", async () => {
     const { Default } = composeStories(stories);
     setProjectAnnotations({ decorators: [titled] });

@@ -1,13 +1,15 @@
 import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { render } from "@aztlan/lago-react";
 import { type Tokens, tokens } from "@aztlan/tui";
 import { RGBA } from "@opentui/core";
 import { describe, expect, it } from "vitest";
 import makeProject from "../../../testing/makeProject.js";
+import pluginFiles from "../../../testing/pluginFiles.js";
 import writeChromeConfig from "../../../testing/writeChromeConfig.js";
 import type { Catalog, StoryRecord } from "../../catalog/index.js";
 import { chromes } from "../../chrome/index.js";
-import { startEngine } from "../../engine/index.js";
+import { type Settings, startEngine } from "../../engine/index.js";
 
 const files = {
   "src/Label.tsx":
@@ -40,7 +42,7 @@ describe("startEngine", { timeout: 60_000 }, () => {
     const catalogs: Catalog[] = [];
     const engine = await startEngine({
       root,
-      onChrome: () => {},
+      onSettings: () => {},
       onCatalog: (catalog) => catalogs.push(catalog),
     });
     try {
@@ -87,7 +89,7 @@ describe("startEngine", { timeout: 60_000 }, () => {
     const catalogs: Catalog[] = [];
     const engine = await startEngine({
       root,
-      onChrome: () => {},
+      onSettings: () => {},
       onCatalog: (catalog) => catalogs.push(catalog),
     });
     try {
@@ -136,7 +138,7 @@ export default mergeConfig(
     const catalogs: Catalog[] = [];
     const engine = await startEngine({
       root,
-      onChrome: () => {},
+      onSettings: () => {},
       onCatalog: (catalog) => catalogs.push(catalog),
     });
     try {
@@ -191,7 +193,7 @@ export default mergeConfig(
     const catalogs: Catalog[] = [];
     const engine = await startEngine({
       root,
-      onChrome: () => {},
+      onSettings: () => {},
       onCatalog: (catalog) => catalogs.push(catalog),
     });
     try {
@@ -272,7 +274,7 @@ export default mergeConfig(
     await expect(
       startEngine({
         root,
-        onChrome: () => {},
+        onSettings: () => {},
         onCatalog: () => {
           calls += 1;
           throw new Error("the gallery could not take the catalog");
@@ -295,7 +297,7 @@ export default mergeConfig(
     const seen: unknown[] = [];
     const engine = await startEngine({
       root,
-      onChrome: (chrome) => seen.push(chrome),
+      onSettings: ({ chrome }) => seen.push(chrome),
       onCatalog: (catalog) => seen.push(catalog),
     });
     try {
@@ -316,7 +318,7 @@ export default mergeConfig(
     const seen: Tokens[] = [];
     const engine = await startEngine({
       root,
-      onChrome: (chrome) => seen.push(chrome),
+      onSettings: ({ chrome }) => seen.push(chrome),
       onCatalog: () => {},
     });
     await engine.close();
@@ -332,9 +334,66 @@ export default mergeConfig(
       "vitest.config.ts": writeChromeConfig('"sepia"'),
     });
     await expect(
-      startEngine({ root, onChrome: () => {}, onCatalog: () => {} }),
+      startEngine({ root, onSettings: () => {}, onCatalog: () => {} }),
     ).rejects.toThrow(
       `${join(root, "vitest.config.ts")} sets gallery.chrome to "sepia", which is no chrome`,
+    );
+  });
+
+  it("imports each plugin's gallery part with the project's options, its data and its components whole, under the gallery's React", async () => {
+    const root = makeProject({ ...files, ...pluginFiles });
+    const seen: Settings[] = [];
+    const engine = await startEngine({
+      root,
+      onSettings: (settings) => seen.push(settings),
+      onCatalog: () => {},
+    });
+    await engine.close();
+    const [settings] = seen;
+    expect(settings?.chrome["color.text"].toString()).toBe(
+      RGBA.fromHex("#704214").toString(),
+    );
+    expect(settings?.plugins.palette).toBe("dracula");
+    expect(settings?.plugins.palettes.map(({ name }) => name)).toEqual([
+      "terminal",
+      "dracula",
+    ]);
+    expect(settings?.plugins.palettes.at(1)?.colours?.at(1)).toBe("#ff5555");
+    const item = settings?.plugins.status.at(0);
+    if (!item || !("component" in item)) {
+      throw new Error("the plugin's component did not reach the gallery");
+    }
+    const Item = item.component;
+    // A component that holds state draws only under the gallery's own React.
+    const screen = await render(
+      <Item
+        selection={{
+          title: undefined,
+          story: undefined,
+          viewportName: undefined,
+          mode: undefined,
+          palette: "dracula",
+        }}
+      />,
+      { cols: 20, rows: 1 },
+    );
+    expect(screen.lines).toEqual(["palette dracula"]);
+  });
+
+  it("refuses a plugin's gallery part that loads a second React, naming the plugin and how to make it one", async () => {
+    const root = makeProject({
+      ...files,
+      ...pluginFiles,
+      "plugin/node_modules/react/package.json": JSON.stringify({
+        name: "react",
+        main: "index.js",
+      }),
+      "plugin/node_modules/react/index.js": "export default {};\n",
+    });
+    await expect(
+      startEngine({ root, onSettings: () => {}, onCatalog: () => {} }),
+    ).rejects.toThrow(
+      `The gallery part of the plugin demo, ${join(root, "plugin/gallery.js")}, loads a second copy of react`,
     );
   });
 });

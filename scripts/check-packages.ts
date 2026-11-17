@@ -34,6 +34,7 @@ const surface: Readonly<
       "attributeNames",
       "createScreen",
       "defaultViewport",
+      "definePlugin",
       "formatGolden",
       "normalizeRuns",
       "parseGolden",

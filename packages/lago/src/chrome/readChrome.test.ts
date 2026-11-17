@@ -56,4 +56,26 @@ describe("readChrome", () => {
       "/project/vitest.config.ts sets gallery.chrome to a set of tokens in which these are missing or of another kind than in @aztlan/tui's tokens: color.text, color.text.muted, color.border, glyph.rule. Give every token, each of its kind, or name one of terminal, light, dark.",
     );
   });
+
+  it("gives a chrome a plugin offers, by its name, and refuses one that lacks a token, naming the plugin", () => {
+    const contributed = {
+      sepia: {
+        plugin: "sepia",
+        tokens: { ...tokens, "color.text": RGBA.fromHex("#704214") },
+      },
+      broken: {
+        plugin: "sepia",
+        tokens: { "color.text": RGBA.fromHex("#704214") },
+      },
+    };
+    expect(
+      readChrome("sepia", file, contributed)["color.text"].toString(),
+    ).toBe(RGBA.fromHex("#704214").toString());
+    expect(() => readChrome("broken", file, contributed)).toThrow(
+      "The plugin sepia gives the chrome broken as a set of tokens in which these are missing or of another kind than in @aztlan/tui's tokens: color.text.muted",
+    );
+    expect(() => readChrome("mauve", file, contributed)).toThrow(
+      "name one of terminal, light, dark, sepia, broken, or give a set of tokens.",
+    );
+  });
 });
