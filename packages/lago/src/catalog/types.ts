@@ -7,7 +7,15 @@ import type { Screenshot } from "@aztlan/lago-react";
  */
 export type Status = "pass" | "changed" | "new" | "error";
 
-/** One story drawn at one viewport, as the test run left it. */
+/**
+ * How a mode's picture stands against the base picture at the same
+ * viewport: the same, so it keeps no golden of its own (`equal`); different,
+ * so it is compared with its own golden (`distinct`); or the same where the
+ * mode expected a change, which fails (`unreached`).
+ */
+export type Comparison = "equal" | "distinct" | "unreached";
+
+/** One story drawn at one viewport, in the base or in a mode, as the test run left it. */
 export interface StoryRecord {
   /** The stories file. */
   readonly file: string;
@@ -16,8 +24,17 @@ export interface StoryRecord {
   readonly name: string;
   readonly description: string | undefined;
   readonly viewportName: string;
+  /** The mode the story was drawn in; none for the base. */
+  readonly mode: string | undefined;
+  /** In a mode, how the picture compares with the base's, once it is drawn. */
+  readonly comparison: Comparison | undefined;
+  /** The value of every global the story was drawn with, once it is drawn. */
+  readonly globals: Readonly<Record<string, string>> | undefined;
   readonly status: Status;
-  /** Where the golden is kept, when the story was drawn. */
+  /**
+   * Where the golden is kept, when the story was drawn: in a mode, the
+   * mode's own, which exists only while its picture differs from the base's.
+   */
   readonly golden: string | undefined;
   /** What the screen showed, when the story was drawn. */
   readonly actual: Screenshot | undefined;
@@ -35,12 +52,20 @@ export interface FileFailure {
   readonly message: string;
 }
 
-/** One story of a component, with a picture for each viewport. */
+/** A story's place in the matrix that its stories file leaves out, by its viewport and mode. */
+export interface LeftOut {
+  readonly viewportName: string;
+  readonly mode: string;
+}
+
+/** One story of a component, with a picture for each viewport and mode. */
 export interface CatalogStory {
   readonly name: string;
   readonly description: string | undefined;
-  /** By viewport, in the order they were drawn. */
+  /** By viewport and mode, in the order they were drawn. */
   readonly pictures: readonly StoryRecord[];
+  /** The places its `parameters.modes` leaves out. */
+  readonly excluded: readonly LeftOut[];
   /** The worst of its pictures. */
   readonly status: Status;
 }
@@ -62,6 +87,32 @@ export interface CatalogGroup {
   readonly components: readonly CatalogComponent[];
 }
 
+/** A mode the project draws every story in, with the globals it sets. */
+export interface CatalogMode {
+  readonly name: string;
+  readonly globals: Readonly<Record<string, string>>;
+}
+
+/** A global the stories were drawn with, and every value they were drawn at, in the order first seen. */
+export interface CatalogGlobal {
+  readonly name: string;
+  readonly values: readonly string[];
+}
+
+/** A cell the stories leave out, as a stories file's check of its goldens reports it. */
+export interface ExcludedCell extends LeftOut {
+  readonly title: string;
+  readonly name: string;
+}
+
+/** What the catalog is built from beside the records and the failed files. */
+export interface CatalogExtras {
+  /** The project's modes, in its configuration's order. */
+  readonly modes?: readonly CatalogMode[];
+  /** The cells the stories leave out. */
+  readonly excluded?: readonly ExcludedCell[];
+}
+
 /** Everything the run showed, as the gallery browses it. */
 export interface Catalog {
   readonly groups: readonly CatalogGroup[];
@@ -70,4 +121,11 @@ export interface Catalog {
   readonly tallies: Readonly<Record<Status, number>>;
   /** The viewports any story was drawn at, in the order first seen. */
   readonly viewports: readonly string[];
+  /**
+   * The modes, in the configuration's order, then any other a story was
+   * drawn in; none for a project without modes.
+   */
+  readonly modes: readonly CatalogMode[];
+  /** The globals the stories were drawn with, in the order first seen. */
+  readonly globals: readonly CatalogGlobal[];
 }

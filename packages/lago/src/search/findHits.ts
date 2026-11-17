@@ -1,25 +1,25 @@
-import type { CatalogComponent } from "../catalog/index.js";
+import { type CatalogComponent, findPicture } from "../catalog/index.js";
 import readLines from "./readLines.js";
 import type { Hit } from "./types.js";
 
 /**
  * Every place `query` appears, ignoring case, in a component's stories at
- * one viewport: in a story's name, its description, and each line of the
- * text its picture draws, in the stories' order. Nothing for an empty query.
+ * one viewport in one mode, the base when it is none: in a story's name, its
+ * description, and each line of the text its picture draws, in the stories'
+ * order. Nothing for an empty query.
  */
 export default function findHits(
   component: CatalogComponent,
   viewportName: string,
   query: string,
+  mode?: string,
 ): Hit[] {
   if (query === "") return [];
   const asked = query.toLowerCase();
   const holds = (text: string | undefined) =>
     text?.toLowerCase().includes(asked) ?? false;
   return component.stories.flatMap((story, place): Hit[] => {
-    const picture = story.pictures.find(
-      (each) => each.viewportName === viewportName,
-    )?.actual;
+    const picture = findPicture(story, viewportName, mode)?.actual;
     const lines = picture ? readLines(picture) : [];
     return [
       ...(holds(story.name) ? [{ story: place, field: "name" as const }] : []),

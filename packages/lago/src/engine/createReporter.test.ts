@@ -1,3 +1,4 @@
+import type { Cell } from "@aztlan/lago-react/vitest";
 import { describe, expect, it } from "vitest";
 import type { TestModule } from "vitest/node";
 import { drawPicture } from "../../testing/records.js";
@@ -7,7 +8,12 @@ import createReporter from "./createReporter.js";
 /** A stand-in for vitest's test module of one stories file. */
 function makeModule(
   file: string,
-  tests: { name: string; state: "passed" | "failed"; story?: boolean }[],
+  tests: {
+    name: string;
+    state: "passed" | "failed";
+    story?: boolean;
+    excluded?: Cell[];
+  }[],
   errors: { message: string }[] = [],
 ): TestModule {
   const title = "component/Row";
@@ -16,7 +22,7 @@ function makeModule(
     errors: () => errors,
     children: {
       *allTests() {
-        for (const { name, state, story } of tests) {
+        for (const { name, state, story, excluded } of tests) {
           const [storyName = "", viewportName = ""] = name.split(" at ");
           yield {
             name,
@@ -37,6 +43,7 @@ function makeModule(
                     expected: undefined,
                   }
                 : undefined,
+              lagoExcluded: excluded,
             }),
           };
         }
@@ -124,5 +131,40 @@ describe("createReporter", () => {
     reporter.onTestRemoved?.("/project/a.stories.tsx");
     expect(catalogs).toHaveLength(2);
     expect(catalogs.at(1)?.groups).toEqual([]);
+  });
+
+  it("gives the modes it is told of, and the cells each file's check reports left out", () => {
+    const catalogs: Catalog[] = [];
+    const reporter = createReporter(
+      "/project",
+      () => true,
+      (catalog) => catalogs.push(catalog),
+      () => [{ name: "dark", globals: { scheme: "dark" } }],
+    );
+    const left = {
+      title: "component/Row",
+      name: "One",
+      viewportName: "narrow",
+      mode: "dark",
+    };
+    reporter.onTestRunEnd?.(
+      [
+        makeModule("/project/a.stories.tsx", [
+          { name: "One at narrow", state: "passed", story: true },
+          {
+            name: "keeps no golden that no story owns",
+            state: "passed",
+            excluded: [left],
+          },
+        ]),
+      ],
+      [],
+      "passed",
+    );
+    const catalog = catalogs.at(0);
+    expect(catalog?.modes.map(({ name }) => name)).toEqual(["dark"]);
+    expect(
+      catalog?.groups.at(0)?.components.at(0)?.stories.at(0)?.excluded,
+    ).toEqual([{ viewportName: "narrow", mode: "dark" }]);
   });
 });

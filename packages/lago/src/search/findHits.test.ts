@@ -16,6 +16,10 @@ const catalog = buildCatalog([
     lines: ["PARSER at wide"],
   }),
   makeRecord("component/Row", "Thrown", { status: "error", actual: undefined }),
+  makeRecord("component/Row", "Plain", {
+    mode: "dark",
+    lines: ["a dark row"],
+  }),
 ]);
 const row = catalog.groups.at(0)?.components.at(0);
 
@@ -34,6 +38,14 @@ describe("findHits", () => {
     expect(findHits(row, "wide", "at wide")).toEqual([
       { story: 1, field: "picture", line: 0 },
     ]);
+  });
+
+  it("reads the pictures of the mode asked for, and the base's by default", () => {
+    if (!row) throw new Error("no component");
+    expect(findHits(row, "narrow", "dark row", "dark")).toEqual([
+      { story: 1, field: "picture", line: 0 },
+    ]);
+    expect(findHits(row, "narrow", "dark row")).toEqual([]);
   });
 
   it("finds nothing for an empty query", () => {

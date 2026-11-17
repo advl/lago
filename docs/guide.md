@@ -224,7 +224,7 @@ It is called in the test files that compose stories, not in a setup file: a setu
 
 ## The gallery
 
-`lago` in a project's folder, or `lago <folder>`, opens the gallery. It runs the project's own vitest on the stories project, never writing, and draws a stories file again when it is saved. It shows each story's base pictures; a mode's tests run with the others and are read in vitest's own report.
+`lago` in a project's folder, or `lago <folder>`, opens the gallery. It runs the project's own vitest on the stories project, never writing, and draws a stories file again when it is saved. It reads every story at each viewport in the base and in each mode the configuration names, and shows the base pictures; the counts take in a mode's pictures with them.
 
 | Key | What it does |
 |---|---|

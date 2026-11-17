@@ -9,6 +9,7 @@ const orphans: ReportedTest = {
   state: "failed",
   errors: [{ message: "__goldens__ holds goldens that no story owns" }],
   story: undefined,
+  excluded: [],
 };
 
 describe("readFailure", () => {

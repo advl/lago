@@ -1,5 +1,5 @@
 import { measureText as measureCells } from "@aztlan/tui";
-import type { CatalogComponent } from "../../catalog/index.js";
+import { type CatalogComponent, findPicture } from "../../catalog/index.js";
 import {
   frameCells,
   measurePicture,
@@ -36,8 +36,9 @@ export default function frameStories(
 ): StoryFrame[] {
   const widest = room - frameCells.cols;
   const matched = new Set(hits.map(({ story }) => story));
-  return component.stories.map(({ name, description, pictures }, place) => {
-    const record = pictures.find((each) => each.viewportName === viewportName);
+  return component.stories.map((story, place) => {
+    const { name, description } = story;
+    const record = findPicture(story, viewportName, undefined);
     const extent = record?.actual
       ? measurePicture(record.actual)
       : measureMessage(record?.error, widest);

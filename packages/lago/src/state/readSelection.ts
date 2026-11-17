@@ -1,4 +1,4 @@
-import type { Catalog } from "../catalog/index.js";
+import { type Catalog, findPicture } from "../catalog/index.js";
 import { filterComponents, findHits } from "../search/index.js";
 import type { GalleryState, Selection } from "./types.js";
 
@@ -21,9 +21,11 @@ export default function readSelection(
     Math.min(state.viewport, catalog.viewports.length - 1),
   );
   const story = Math.min(state.story, last);
-  const record = component?.stories
-    .at(story)
-    ?.pictures.find((picture) => picture.viewportName === viewportName);
+  const record = findPicture(
+    component?.stories.at(story),
+    viewportName,
+    undefined,
+  );
   const hits =
     component && viewportName
       ? findHits(component, viewportName, state.search)

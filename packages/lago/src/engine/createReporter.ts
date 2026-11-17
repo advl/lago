@@ -2,6 +2,8 @@ import type { Reporter, TestModule } from "vitest/node";
 import {
   buildCatalog,
   type Catalog,
+  type CatalogMode,
+  type ExcludedCell,
   type FileFailure,
   type StoryRecord,
 } from "../catalog/index.js";
@@ -13,6 +15,7 @@ import type { ReportedTest } from "./types.js";
 interface FileRun {
   readonly records: readonly StoryRecord[];
   readonly failure: FileFailure | undefined;
+  readonly excluded: readonly ExcludedCell[];
 }
 
 /** A test module's tests as the engine reads them. */
@@ -24,6 +27,7 @@ function readTests(module: TestModule): ReportedTest[] {
     state: test.result().state,
     errors: test.result().errors ?? [],
     story: test.meta().lago,
+    excluded: test.meta().lagoExcluded ?? [],
   }));
 }
 
@@ -31,7 +35,9 @@ function readTests(module: TestModule): ReportedTest[] {
  * A vitest reporter that keeps the latest run of every stories file and,
  * after each run, gives the whole catalog. A run in watch mode covers only
  * the files it ran, so the others keep what their last run showed. A file
- * removed leaves the catalog at once.
+ * removed leaves the catalog at once. The catalog holds the modes
+ * `readModes` gives, asked after every run, since the configuration that
+ * names them is read once the reporter exists.
  *
  * @note Impure: keeps the files' runs between calls, and asks the file system whether each golden exists.
  */
@@ -39,6 +45,7 @@ export default function createReporter(
   root: string,
   exists: (path: string) => boolean,
   onCatalog: (catalog: Catalog) => void,
+  readModes: () => readonly CatalogMode[] = () => [],
 ): Reporter {
   const files = new Map<string, FileRun>();
   const give = () => {
@@ -47,6 +54,10 @@ export default function createReporter(
       buildCatalog(
         runs.flatMap(({ records }) => records),
         runs.flatMap(({ failure }) => (failure ? [failure] : [])),
+        {
+          modes: readModes(),
+          excluded: runs.flatMap(({ excluded }) => excluded),
+        },
       ),
     );
   };
@@ -59,6 +70,7 @@ export default function createReporter(
             (test) => readRecord(test, root, exists) ?? [],
           ),
           failure: readFailure(module.moduleId, module.errors(), tests),
+          excluded: tests.flatMap(({ excluded }) => excluded),
         });
       }
       give();
