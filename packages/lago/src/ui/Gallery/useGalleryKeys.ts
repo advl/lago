@@ -29,7 +29,9 @@ export default function useGalleryKeys({
   const free = !typing && !state.confirming && !state.help && !tooSmall;
   const back = describeBack(state);
   const onTree = state.focus === "tree";
-  let moveLabel = onTree ? "choose a component" : "choose a story";
+  // The matrix covers the tree and the stories until a cell is opened.
+  const inMatrix = state.matrix && !state.inspecting;
+  let moveLabel = onTree && !inMatrix ? "choose a component" : "choose a story";
   if (state.inspecting) moveLabel = "scroll the picture";
   if (state.cell) moveLabel = "move the cursor";
   if (state.help) moveLabel = "scroll the help";
@@ -38,7 +40,9 @@ export default function useGalleryKeys({
     state.help
       ? scrollHelp(by)
       : act({ type: "move", by, limit: state.cell ? limits.y : limits.scroll });
-  const across = state.cell !== undefined || (!onTree && !state.inspecting);
+  const across =
+    selected &&
+    (state.cell !== undefined || inMatrix || (!onTree && !state.inspecting));
   const acceptable = record?.status === "changed" || record?.status === "new";
   // A mode's picture equal to the base's keeps no golden, so `A` says why
   // instead of asking.
@@ -55,7 +59,14 @@ export default function useGalleryKeys({
   });
   const moveAcross = (name: string, by: number) => ({
     name,
-    desc: state.cell ? "move the cursor" : "choose a story beside",
+    desc: state.cell
+      ? "move the cursor"
+      : inMatrix
+        ? "choose a size and mode"
+        : "choose a story beside",
+    // The matrix's columns are moved through as its rows are, so the key
+    // bar names both.
+    ...(inMatrix && { hint: "column" }),
     group: "Move",
     enabled: free && across,
     run: () => act({ type: "moveAcross", by, limit: limits.x }),
@@ -65,7 +76,9 @@ export default function useGalleryKeys({
     desc: "next or previous match",
     hint: "match",
     group: "Find",
-    enabled: free && state.search !== "",
+    // A search kept from the stories is not stepped through in the matrix,
+    // whose status line names the chosen cell instead.
+    enabled: free && state.search !== "" && !inMatrix,
     run: () => act({ type: "nextHit", by }),
   });
   useBindings(
@@ -77,7 +90,11 @@ export default function useGalleryKeys({
         moveAcross("move.right", 1),
         {
           name: "open",
-          desc: onTree ? "open the component's stories" : "inspect the story",
+          desc: inMatrix
+            ? "open the cell's picture"
+            : onTree
+              ? "open the component's stories"
+              : "inspect the story",
           hint: "open",
           group: "Move",
           enabled: free && selected && !state.inspecting,
@@ -96,7 +113,7 @@ export default function useGalleryKeys({
           desc: onTree ? "filter the components" : "search the stories",
           hint: "find",
           group: "Find",
-          enabled: free,
+          enabled: free && !inMatrix,
           run: () => act({ type: onTree ? "startFilter" : "startSearch" }),
         },
         stepMatch("match.next", 1),
@@ -121,7 +138,7 @@ export default function useGalleryKeys({
           desc: "show the next viewport",
           hint: "viewport",
           group: "Picture",
-          enabled: free && viewports > 1,
+          enabled: free && viewports > 1 && !inMatrix,
           run: () => act({ type: "nextViewport" }),
         },
         ...(modes.length > 0
@@ -132,8 +149,18 @@ export default function useGalleryKeys({
                 hint: "mode",
                 group: "Picture",
                 notes: describeModes(modes, globals),
-                enabled: free,
+                enabled: free && !inMatrix,
                 run: () => act({ type: "nextMode" }),
+              },
+              {
+                name: "matrix",
+                desc: state.matrix
+                  ? "hide the matrix"
+                  : "show every story in every size and mode",
+                hint: "matrix",
+                group: "Picture",
+                enabled: free && selected && !state.inspecting,
+                run: () => act({ type: "toggleMatrix" }),
               },
             ]
           : []),
@@ -142,7 +169,7 @@ export default function useGalleryKeys({
           desc: "set the stories as the room allows, in rows, or side by side",
           hint: "layout",
           group: "Picture",
-          enabled: free && selected && !state.inspecting,
+          enabled: free && selected && !state.inspecting && !state.matrix,
           run: () => act({ type: "nextArrangement" }),
         },
         {
@@ -234,7 +261,12 @@ export default function useGalleryKeys({
         { key: "return", cmd: "finish" },
         { key: "backspace", cmd: "erase" },
         { key: "p", cmd: "viewport" },
-        ...(modes.length > 0 ? [{ key: "m", cmd: "mode" }] : []),
+        ...(modes.length > 0
+          ? [
+              { key: "m", cmd: "mode" },
+              { key: "x", cmd: "matrix" },
+            ]
+          : []),
         { key: "v", cmd: "arrangement" },
         { key: "d", cmd: "difference" },
         { key: "c", cmd: "cell" },

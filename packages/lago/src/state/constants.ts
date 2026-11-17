@@ -8,6 +8,7 @@ export const openingState: GalleryState = {
   viewport: 0,
   mode: 0,
   arrangement: "auto",
+  matrix: false,
   inspecting: false,
   scroll: 0,
   difference: false,

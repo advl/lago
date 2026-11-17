@@ -1,0 +1,133 @@
+80x24
+|project                                             at wide · as the room allows
+|┌─matrix · 24 stories in 12 columns · stories 6–19, columns 5–9────────────────┐
+|│               terminal              wide                                     │
+|│story          high-cont… truecolor  base       dark       ascii              │
+|│  Badge Story6  ✓          ✓          ✓          =          ±                 │
+|│  Badge Story7  ✓          =          ✓          ±          +                 │
+|│  Badge Story8  =          ±          ±          +          ✓                 │
+|│  Field Story1  ✓          =          ✓          ±          +                 │
+|│  Field Story2  =          ±          ±          +          ✓                 │
+|│  Field Story3  ±          +          +          ✓          ✓                 │
+|│  Field Story4  +          ✓          ✓          ✓          =                 │
+|│  Field Story5  ✓          ✓          ✓          =          ±                 │
+|│  Field Story6  ✓          =          ✓          ±          +                 │
+|│  Field Story7  =          ±          ±          +          ✓                 │
+|│  Field Story8  ±          +          +          ✓          ✓                 │
+|│  Pane Story1   =          ±          ±          +          ✓                 │
+|│  Pane Story2   ±          +          +          ✓          ✓                 │
+|│▸ Pane Story3   +          ✓          ✓          ✓         [=]                │
+|│✓ pass  ± changed  + new  = equal to the base  ! expected but equal  ✗ error  │
+|│blank not covered                                                             │
+|└──────────────────────────────────────────────────────────────────────────────┘
+|✓ 170 pass · ± 60 changed · + 58 new · ✗ 0 error
+|Pane Story3 at wide in ascii: equal to the base                     wide · ascii
+|↑↓ move ←→ column ⏎ open esc back x matrix ? q quit
+
+1:1 "project                                             at wide ·"
+1:63 "as the room allows" fg=7
+2:1 "┌─matrix · 24 stories in 12 columns · stories 6–19, columns 5–9────────────────┐"
+3:1 "│               terminal              wide                                     │"
+4:1 "│"
+4:2 "story          high-cont… truecolor  base       dark       ascii" fg=7
+4:80 "│"
+5:1 "│  Badge Story6"
+5:18 "✓          ✓          ✓" fg=2
+5:51 "=" fg=7
+5:62 "±" fg=3
+5:80 "│"
+6:1 "│  Badge Story7"
+6:18 "✓" fg=2
+6:29 "=" fg=7
+6:40 "✓" fg=2
+6:51 "±          +" fg=3
+6:80 "│"
+7:1 "│  Badge Story8"
+7:18 "=" fg=7
+7:29 "±          ±          +" fg=3
+7:62 "✓" fg=2
+7:80 "│"
+8:1 "│  Field Story1"
+8:18 "✓" fg=2
+8:29 "=" fg=7
+8:40 "✓" fg=2
+8:51 "±          +" fg=3
+8:80 "│"
+9:1 "│  Field Story2"
+9:18 "=" fg=7
+9:29 "±          ±          +" fg=3
+9:62 "✓" fg=2
+9:80 "│"
+10:1 "│  Field Story3"
+10:18 "±          +          +" fg=3
+10:51 "✓          ✓" fg=2
+10:80 "│"
+11:1 "│  Field Story4"
+11:18 "+" fg=3
+11:29 "✓          ✓          ✓" fg=2
+11:62 "=" fg=7
+11:80 "│"
+12:1 "│  Field Story5"
+12:18 "✓          ✓          ✓" fg=2
+12:51 "=" fg=7
+12:62 "±" fg=3
+12:80 "│"
+13:1 "│  Field Story6"
+13:18 "✓" fg=2
+13:29 "=" fg=7
+13:40 "✓" fg=2
+13:51 "±          +" fg=3
+13:80 "│"
+14:1 "│  Field Story7"
+14:18 "=" fg=7
+14:29 "±          ±          +" fg=3
+14:62 "✓" fg=2
+14:80 "│"
+15:1 "│  Field Story8"
+15:18 "±          +          +" fg=3
+15:51 "✓          ✓" fg=2
+15:80 "│"
+16:1 "│  Pane Story1"
+16:18 "=" fg=7
+16:29 "±          ±          +" fg=3
+16:62 "✓" fg=2
+16:80 "│"
+17:1 "│  Pane Story2"
+17:18 "±          +          +" fg=3
+17:51 "✓          ✓" fg=2
+17:80 "│"
+18:1 "│▸ Pane Story3"
+18:18 "+" fg=3
+18:29 "✓          ✓          ✓" fg=2
+18:61 "[=]        " fg=7 bg=8
+18:80 "│"
+19:1 "│"
+19:2 "✓ pass" fg=2
+19:10 "± changed  + new" fg=3
+19:28 "= equal to the base" fg=7
+19:49 "! expected but equal  ✗ error" fg=1
+19:80 "│"
+20:1 "│"
+20:2 "blank not covered" fg=7
+20:80 "│"
+21:1 "└──────────────────────────────────────────────────────────────────────────────┘"
+22:1 "✓ 170 pass"
+22:12 "·" fg=7
+22:14 "± 60 changed" fg=3
+22:27 "·" fg=7
+22:29 "+ 58 new" fg=3
+22:38 "·" fg=7
+22:40 "✗ 0 error"
+23:1 "Pane Story3 at wide in ascii: equal to the base                     wide · ascii" fg=7
+24:1 "↑↓"
+24:4 "move" fg=7
+24:9 "←→"
+24:12 "column" fg=7
+24:19 "⏎"
+24:21 "open" fg=7
+24:26 "esc"
+24:30 "back" fg=7
+24:35 "x"
+24:37 "matrix" fg=7
+24:44 "? q"
+24:48 "quit" fg=7

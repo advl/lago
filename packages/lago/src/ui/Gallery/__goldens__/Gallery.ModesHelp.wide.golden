@@ -1,7 +1,6 @@
 120x30
 |project                                                                                 at terminal · as the room allows
-|Move · 1 of 4 ──────────────────────────────────────────────────────────────────────────────────────────────────────────
-|  ↑ ↓  k j scroll the help
+|Move · 2 of 4 ──────────────────────────────────────────────────────────────────────────────────────────────────────────
 |  ← →  h l choose a story beside
 |  ⏎        open the component's stories
 |  esc      leave the help
@@ -19,6 +18,7 @@
 |           dark: sets scheme dark
 |           ascii: sets glyphs ascii
 |           globals drawn: scheme light, dark; glyphs unicode, ascii
+|  x        show every story in every size and mode
 |  v        set the stories as the room allows, in rows, or side by side
 |  d        show the golden over the picture
 |  c        read the cells under a cursor
@@ -32,23 +32,23 @@
 
 1:1 "project                                                                                 at terminal ·"
 1:103 "as the room allows" fg=7
-2:1 "Move · 1 of 4 ──────────────────────────────────────────────────────────────────────────────────────────────────────────"
-3:3 "↑ ↓  k j scroll the help"
-4:3 "← →  h l choose a story beside"
-5:3 "⏎        open the component's stories"
-6:3 "esc      leave the help"
-8:1 "Find ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────"
-9:3 "/        filter the components"
-10:3 "n N      next or previous match"
-11:3 "⏎        keep what is typed"
-12:3 "backspace erase the last character"
-14:1 "Picture ────────────────────────────────────────────────────────────────────────────────────────────────────────────────"
-15:3 "p        show the next viewport"
-16:3 "m        show the next mode"
-17:12 "base: sets no global"
-18:12 "dark: sets scheme dark"
-19:12 "ascii: sets glyphs ascii"
-20:12 "globals drawn: scheme light, dark; glyphs unicode, ascii"
+2:1 "Move · 2 of 4 ──────────────────────────────────────────────────────────────────────────────────────────────────────────"
+3:3 "← →  h l choose a story beside"
+4:3 "⏎        open the component's stories"
+5:3 "esc      leave the help"
+7:1 "Find ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────"
+8:3 "/        filter the components"
+9:3 "n N      next or previous match"
+10:3 "⏎        keep what is typed"
+11:3 "backspace erase the last character"
+13:1 "Picture ────────────────────────────────────────────────────────────────────────────────────────────────────────────────"
+14:3 "p        show the next viewport"
+15:3 "m        show the next mode"
+16:12 "base: sets no global"
+17:12 "dark: sets scheme dark"
+18:12 "ascii: sets glyphs ascii"
+19:12 "globals drawn: scheme light, dark; glyphs unicode, ascii"
+20:3 "x        show every story in every size and mode"
 21:3 "v        set the stories as the room allows, in rows, or side by side"
 22:3 "d        show the golden over the picture"
 23:3 "c        read the cells under a cursor"

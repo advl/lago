@@ -22,7 +22,7 @@
 |
 |✓ 16 pass · ± 2 changed · + 2 new · ✗ 8 error
 |watching the stories for changes                                 terminal · dark
-|↑↓ move ⏎ open esc back / find p viewport m mode v layout ? q quit
+|↑↓ move ⏎ open esc back / find p viewport m mode x matrix v layout ? q quit
 
 1:1 "component/Badge                                 at terminal ·"
 1:63 "as the room allows" fg=7
@@ -82,7 +82,9 @@
 24:34 "viewport" fg=7
 24:43 "m"
 24:45 "mode" fg=7
-24:50 "v"
-24:52 "layout" fg=7
-24:59 "? q"
-24:63 "quit" fg=7
+24:50 "x"
+24:52 "matrix" fg=7
+24:59 "v"
+24:61 "layout" fg=7
+24:68 "? q"
+24:72 "quit" fg=7

@@ -16,10 +16,15 @@ import {
   useRef,
   useState,
 } from "react";
-import { buildCatalog, type StoryRecord } from "../../catalog/index.js";
+import {
+  buildCatalog,
+  isLeftOut,
+  type StoryRecord,
+} from "../../catalog/index.js";
 import { chooseArrangement } from "../../layout/index.js";
 import {
   type GalleryAction,
+  listColumns,
   openingState,
   readSelection,
   reduceGallery,
@@ -28,6 +33,8 @@ import { barLines, minColumns, minLines, treeColumns } from "../constants.js";
 import describePlace from "../describePlace.js";
 import Inspect from "../Inspect/Inspect.js";
 import measureInspected from "../Inspect/measureInspected.js";
+import Matrix from "../Matrix/Matrix.js";
+import type { MatrixWindow } from "../Matrix/types.js";
 import StatusLine from "../StatusLine/StatusLine.js";
 import Tallies from "../Tallies/Tallies.js";
 import buildStoryBlocks from "./buildStoryBlocks.js";
@@ -76,6 +83,9 @@ const Gallery = ({
   const [helpFirst, setHelpFirst] = useState(0);
   const treeFirst = useRef(0);
   const storiesFirst = useRef(0);
+  // Kept here, where it outlives the matrix while a cell is open, so Esc
+  // comes back to the matrix scrolled as it was.
+  const matrixFirst = useRef<MatrixWindow>({ row: 0, column: 0 });
   const act = useCallback(
     (action: GalleryAction) => {
       setMessage(undefined);
@@ -86,10 +96,7 @@ const Gallery = ({
   const selection = readSelection(state, known);
   const { component, viewportName, modeName, record, confirming } = selection;
   const story = component?.stories.at(selection.story);
-  const leftOut =
-    story?.excluded.some(
-      (cell) => cell.viewportName === viewportName && cell.mode === modeName,
-    ) === true;
+  const leftOut = isLeftOut(story, viewportName, modeName);
   const lines = height - barLines;
   const inspected =
     state.inspecting && story && viewportName !== undefined
@@ -172,6 +179,29 @@ const Gallery = ({
         scroll={state.scroll}
         difference={state.difference}
         {...(state.cell && { cell: state.cell })}
+        width={width}
+        height={lines}
+      />
+    );
+  } else if (state.matrix && catalog) {
+    const columns = listColumns(catalog);
+    region = (
+      <Matrix
+        components={selection.components}
+        columns={columns}
+        selected={{
+          title: component?.title,
+          story: selection.story,
+          column: columns.findIndex(
+            (column) =>
+              column.viewportName === viewportName && column.mode === modeName,
+          ),
+        }}
+        filter={state.filter}
+        first={matrixFirst.current}
+        onShown={(first) => {
+          matrixFirst.current = first;
+        }}
         width={width}
         height={lines}
       />

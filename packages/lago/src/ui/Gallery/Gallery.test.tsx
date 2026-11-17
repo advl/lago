@@ -4,6 +4,7 @@ import { useKeyboard } from "@opentui/react";
 import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import {
+  crowdedCatalog,
   modesCatalog,
   passingCatalog,
   sampleCatalog,
@@ -426,5 +427,73 @@ describe("Gallery", () => {
     expect(help).toContain(
       "globals drawn: scheme light, dark; glyphs unicode, ascii",
     );
+  });
+
+  it("opens the matrix on x, a row for each story and a column for each size and mode, every cell in its state", async () => {
+    const { screen } = await open(modesCatalog);
+    const matrix = await press(screen, "x");
+    expect(matrix.at(1)).toMatch(/^┌─matrix · 5 stories in 6 columns─/);
+    expect(matrix.slice(2, 9)).toEqual([
+      "│                terminal          wide                                        │",
+      "│story           base  dark  ascii base  dark  ascii                           │",
+      "│▸ Badge Default [✓]    ✓     =     ✓     ✓     =                              │",
+      "│  Badge Loud     ✓     ±     +     ✓     ±     +                              │",
+      "│  Badge Quiet    ✓     !           ✓     !                                    │",
+      "│  Badge Thrown   ✗     ✗     ✗     ✗     ✗     ✗                              │",
+      "│  Card Default   ✓     =     ✓     ✓     =     ✓                              │",
+    ]);
+    expect(matrix.at(-2)).toMatch(
+      /^Badge Default at terminal: pass +terminal · base$/,
+    );
+    expect(matrix.at(-1)).toMatch(/^↑↓ move ←→ column ⏎ open esc back x /);
+    expect((await press(screen, "jjll")).at(-2)).toMatch(
+      /^Badge Quiet at terminal in ascii: left out +terminal · ascii$/,
+    );
+    expect((await press(screen, "x")).at(1)).toContain("= Default");
+  });
+
+  it("moves over the matrix's cells, opens one, and comes back to the matrix with Esc, then out of it", async () => {
+    const { screen } = await open(modesCatalog);
+    await press(screen, "xkhjl");
+    expect(screen.lines.at(-2)).toMatch(
+      /^Badge Loud at terminal in dark: changed/,
+    );
+    await press(screen, "jjjjjlllllll");
+    expect(screen.lines.at(-2)).toMatch(
+      /^Card Default at wide in ascii: pass +wide · ascii$/,
+    );
+    await press(screen, "kkkhhhh{Enter}");
+    expect(screen.lines.at(1)).toContain(
+      "± Loud at terminal in dark · changed",
+    );
+    expect(screen.lines.at(2)).toContain("1 line differs");
+    expect(screen.lines.at(-1)).toContain("esc back");
+    const back = await press(screen, "{Escape}");
+    expect(back.at(1)).toMatch(/^┌─matrix/);
+    expect(back.at(5)).toContain("[±]");
+    await press(screen, "j{Enter}");
+    expect(screen.lines.at(1)).toContain("! Quiet at terminal in dark");
+    expect(screen.lines.at(2)).toContain("The mode dark expects");
+    await press(screen, "{Escape}{Escape}");
+    expect(screen.lines.at(0)).toMatch(/^component\/Badge /);
+    expect(screen.lines.at(1)).not.toContain("matrix");
+  });
+
+  it("comes back from a cell to the matrix scrolled as it was", async () => {
+    const { screen } = await open(crowdedCatalog);
+    await press(screen, `x${"j".repeat(18)}${"k".repeat(10)}`);
+    const before = screen.lines.at(1);
+    expect(before).toMatch(/ · stories (?!1–)\d+–\d+/);
+    expect((await press(screen, "{Enter}{Escape}")).at(1)).toBe(before);
+  });
+
+  it("offers neither m nor x, in the key bar or the help, to a project with no modes", async () => {
+    const { screen } = await open(sampleCatalog, { rows: 40 });
+    expect(screen.lines.at(-1)).not.toMatch(/ [mx] /);
+    const help = await press(screen, "?");
+    expect(help.join("\n")).not.toContain("show the next mode");
+    expect(help.join("\n")).not.toContain("matrix");
+    await press(screen, "{Escape}xm");
+    expect(screen.lines.at(1)).toContain("▸ ✓ Default");
   });
 });

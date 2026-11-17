@@ -1,7 +1,9 @@
 import { fitField, Loading, measureText, useTokens } from "@aztlan/tui";
 import type { ReactNode } from "react";
+import { isLeftOut } from "../../catalog/index.js";
 import type { Selection } from "../../state/index.js";
 import describePlace from "../describePlace.js";
+import readMark from "../Matrix/readMark.js";
 import RunReader from "../RunReader/RunReader.js";
 import type { StatusLineProps } from "./types.js";
 
@@ -14,9 +16,9 @@ const describeMatches = (search: string, { hits, hit }: Selection) =>
 /**
  * What the status line says, in `width` columns: the question to accept,
  * what is being typed, the cell under the cursor, what the gallery last
- * did, the search's matches, that an inspected mode's picture is the base
- * picture, a stories file that failed to load, or that the gallery is
- * watching, in that order of precedence.
+ * did, the matrix's selected cell, the search's matches, that an inspected
+ * mode's picture is the base picture, a stories file that failed to load,
+ * or that the gallery is watching, in that order of precedence.
  */
 const Said = ({
   state,
@@ -49,6 +51,17 @@ const Said = ({
         label={{ text: "running the stories…", kind: "words" }}
         width={width}
       />
+    );
+  }
+  const { component, viewportName } = selection;
+  const story = component?.stories.at(selection.story);
+  if (state.matrix && !state.inspecting && story && viewportName) {
+    const place = describePlace(viewportName, selection.modeName);
+    const leftOut = isLeftOut(story, viewportName, selection.modeName);
+    const mark = readMark(record, leftOut);
+    return say(
+      `${component?.name} ${story.name} at ${place}: ${mark.word}`,
+      tokens[mark.color],
     );
   }
   if (state.search !== "") return say(describeMatches(state.search, selection));

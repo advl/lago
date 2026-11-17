@@ -345,4 +345,77 @@ describe("reduceGallery", () => {
       reduceGallery(loud, { type: "askAccept" }, modesCatalog).confirming,
     ).toMatchObject({ story: "Loud", mode: "dark" });
   });
+
+  it("opens the matrix on the selected story, moves across its rows and columns, and closes it", () => {
+    const step = (state: GalleryState, ...actions: GalleryAction[]) =>
+      actions.reduce(
+        (next, action) => reduceGallery(next, action, modesCatalog),
+        state,
+      );
+    const open = step(openingState, { type: "toggleMatrix" });
+    expect(open).toMatchObject({ matrix: true, title: "component/Badge" });
+    const moved = step(
+      open,
+      { type: "move", by: 4 },
+      { type: "moveAcross", by: 4 },
+    );
+    expect(moved).toMatchObject({
+      title: "layout/Card",
+      story: 0,
+      viewport: 1,
+      mode: 1,
+    });
+    expect(step(moved, { type: "move", by: 1 })).toBe(moved);
+    expect(step(moved, { type: "moveAcross", by: 9 })).toMatchObject({
+      viewport: 1,
+      mode: 2,
+    });
+    expect(step(moved, { type: "moveAcross", by: -9 })).toMatchObject({
+      viewport: 0,
+      mode: 0,
+    });
+    // A run that drops a viewport leaves the state naming one past the last.
+    const dropped = { ...open, viewport: 5, mode: 0 };
+    expect(step(dropped, { type: "moveAcross", by: -1 })).toMatchObject({
+      viewport: 0,
+      mode: 2,
+    });
+    expect(step(moved, { type: "toggleMatrix" }).matrix).toBe(false);
+    expect(step(open, { type: "back" }).matrix).toBe(false);
+  });
+
+  it("opens a matrix's cell, a changed one on its difference, and comes back to the matrix in one step", () => {
+    const step = (state: GalleryState, ...actions: GalleryAction[]) =>
+      actions.reduce(
+        (next, action) => reduceGallery(next, action, modesCatalog),
+        state,
+      );
+    const changed = step(
+      openingState,
+      { type: "toggleMatrix" },
+      { type: "move", by: 1 },
+      { type: "moveAcross", by: 1 },
+      { type: "open" },
+    );
+    expect(changed).toMatchObject({
+      inspecting: true,
+      difference: true,
+      focus: "stories",
+      matrix: true,
+    });
+    expect(step(changed, { type: "back" })).toMatchObject({
+      inspecting: false,
+      difference: false,
+      matrix: true,
+    });
+    const passing = step(
+      openingState,
+      { type: "toggleMatrix" },
+      { type: "open" },
+    );
+    expect(passing).toMatchObject({ inspecting: true, difference: false });
+    expect(
+      reduceGallery({ ...openingState, matrix: true }, { type: "open" }, empty),
+    ).toMatchObject({ inspecting: false });
+  });
 });

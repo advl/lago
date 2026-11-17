@@ -183,3 +183,41 @@ export const modesCatalog: Catalog = buildCatalog(
     })),
   },
 );
+
+/** The modes of `crowdedCatalog`, some with names longer than a column of the matrix. */
+const crowdedModes = [
+  "dark",
+  "ascii",
+  "solarized-light",
+  "high-contrast",
+  "truecolor",
+];
+
+/**
+ * A project whose matrix is larger than a terminal: three components of
+ * eight stories each, at two viewports, in the base and five modes, whose
+ * cells take every state in turn.
+ */
+export const crowdedCatalog: Catalog = buildCatalog(
+  ["component/Badge", "component/Field", "layout/Pane"].flatMap(
+    (title, component) =>
+      Array.from({ length: 8 }, (_, story) => `Story${story + 1}`).flatMap(
+        (name, story) =>
+          [undefined, ...crowdedModes].flatMap((mode, place) => {
+            const turn = (component + story + place) % 5;
+            return atBoth(title, name, {
+              mode,
+              ...(mode !== undefined && {
+                comparison: turn === 1 ? "equal" : "distinct",
+              }),
+              ...(turn === 2 && { status: "changed" as const }),
+              ...(turn === 3 && { status: "new" as const }),
+            });
+          }),
+      ),
+  ),
+  [],
+  {
+    modes: crowdedModes.map((name) => ({ name, globals: { scheme: name } })),
+  },
+);

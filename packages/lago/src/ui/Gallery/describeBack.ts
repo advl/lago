@@ -9,8 +9,10 @@ export default function describeBack(state: GalleryState): string | undefined {
   if (state.filtering) return "clear the filter";
   if (state.searching) return "cancel the search";
   if (state.cell) return "put the cursor away";
+  if (state.matrix && state.inspecting) return "back to the matrix";
   if (state.difference) return "back to the picture";
   if (state.inspecting) return "back to the stories";
+  if (state.matrix) return "close the matrix";
   if (state.focus === "stories") return "back to the tree";
   return undefined;
 }

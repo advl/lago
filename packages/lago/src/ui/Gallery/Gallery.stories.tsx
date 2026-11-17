@@ -1,5 +1,9 @@
 import type { Meta, StoryObj } from "@aztlan/lago-react";
-import { modesCatalog, sampleCatalog } from "../../../testing/catalogs.js";
+import {
+  crowdedCatalog,
+  modesCatalog,
+  sampleCatalog,
+} from "../../../testing/catalogs.js";
 import { buildCatalog } from "../../catalog/index.js";
 import Component from "./Gallery.js";
 
@@ -114,5 +118,29 @@ export const ModesHelp: Story = {
   args: { catalog: modesCatalog },
   play: async ({ userEvent }) => {
     await userEvent.keyboard("?jjjjjjjjj");
+  },
+};
+
+/** The matrix: every story in every size and mode, with a cell in each state and the first selected. */
+export const Matrix: Story = {
+  args: { catalog: modesCatalog },
+  play: async ({ userEvent }) => {
+    await userEvent.keyboard("x");
+  },
+};
+
+/** A changed cell of the matrix opened on its difference, which Esc leaves for the matrix. */
+export const MatrixCell: Story = {
+  args: { catalog: modesCatalog },
+  play: async ({ userEvent }) => {
+    await userEvent.keyboard("xjl{Enter}");
+  },
+};
+
+/** A matrix larger than the terminal, scrolled to a cell far down and to the right, its long mode names cut. */
+export const MatrixCrowded: Story = {
+  args: { catalog: crowdedCatalog },
+  play: async ({ userEvent }) => {
+    await userEvent.keyboard(`x${"j".repeat(18)}${"l".repeat(8)}`);
   },
 };

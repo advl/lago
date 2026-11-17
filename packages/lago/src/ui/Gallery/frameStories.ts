@@ -3,6 +3,7 @@ import {
   type CatalogComponent,
   type CatalogStory,
   findPicture,
+  isLeftOut,
 } from "../../catalog/index.js";
 import {
   frameCells,
@@ -19,12 +20,7 @@ const describeAbsence = (
   story: CatalogStory,
   viewportName: string | undefined,
   mode: string | undefined,
-) =>
-  story.excluded.some(
-    (cell) => cell.viewportName === viewportName && cell.mode === mode,
-  )
-    ? `left out of ${mode}`
-    : notDrawn;
+) => (isLeftOut(story, viewportName, mode) ? `left out of ${mode}` : notDrawn);
 
 /** The extent of a frame that shows text: an error, or the line that says why the story is not drawn. */
 function measureMessage(

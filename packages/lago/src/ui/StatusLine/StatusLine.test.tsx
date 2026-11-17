@@ -94,4 +94,11 @@ describe("StatusLine", () => {
       "equal to the base picture, so it keeps no golden of its own",
     );
   });
+
+  it("names the matrix's chosen cell before a search kept from the stories", async () => {
+    const state = { ...openingState, matrix: true, search: "o" };
+    expect(await draw(state, undefined, modesCatalog)).toBe(
+      "Badge Default at terminal: pass",
+    );
+  });
 });

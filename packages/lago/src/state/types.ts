@@ -1,4 +1,8 @@
-import type { CatalogComponent, StoryRecord } from "../catalog/index.js";
+import type {
+  CatalogComponent,
+  CatalogStory,
+  StoryRecord,
+} from "../catalog/index.js";
 import type { Arrangement } from "../layout/index.js";
 import type { Hit } from "../search/index.js";
 
@@ -16,6 +20,12 @@ export interface GalleryState {
   readonly mode: number;
   /** How the stories sit: as the room decides, or as the reader chose. */
   readonly arrangement: "auto" | Arrangement;
+  /**
+   * Whether the matrix is open: every story in every viewport and mode, with
+   * the selected story's picture at the viewport and in the mode shown as
+   * its selected cell.
+   */
+  readonly matrix: boolean;
   /** Whether the selected story is open on its own, at its whole size. */
   readonly inspecting: boolean;
   /** How far an inspected picture is scrolled, in lines. */
@@ -67,7 +77,7 @@ export type GalleryAction =
       readonly by: number;
       readonly limit?: number;
     }
-  /** In: from the tree to the stories, and from a story to it inspected. */
+  /** In: from the tree to the stories, and from a story, or the matrix's cell, to it inspected. */
   | { readonly type: "open" }
   /** Out, one step: what is being typed, the cursor, the difference, the inspected story, the stories. */
   | { readonly type: "back" }
@@ -75,6 +85,8 @@ export type GalleryAction =
   /** The next mode, the base first, then the catalog's in their order, round. */
   | { readonly type: "nextMode" }
   | { readonly type: "nextArrangement" }
+  /** Opens the matrix, or closes it. */
+  | { readonly type: "toggleMatrix" }
   | { readonly type: "startFilter" }
   | { readonly type: "startSearch" }
   /** Text typed into the filter or the search, whichever is being typed. */
@@ -108,4 +120,18 @@ export interface Selection {
   readonly hit: number;
   /** The picture the gallery asks to confirm accepting, while it is still the selected one. */
   readonly confirming: StoryRecord | undefined;
+}
+
+/** A column of the matrix: one viewport, in the base or in one mode. */
+export interface MatrixColumn {
+  readonly viewportName: string;
+  /** The mode; none for the base. */
+  readonly mode: string | undefined;
+}
+
+/** A row of the matrix: one story of a component, and its place among the component's. */
+export interface MatrixRow {
+  readonly component: CatalogComponent;
+  readonly story: CatalogStory;
+  readonly place: number;
 }

@@ -1,7 +1,6 @@
 80x24
 |project                                         at terminal · as the room allows
-|Find · 2 of 4 ──────────────────────────────────────────────────────────────────
-|  n N      next or previous match
+|Find · 3 of 4 ──────────────────────────────────────────────────────────────────
 |  ⏎        keep what is typed
 |  backspace erase the last character
 |
@@ -12,6 +11,7 @@
 |           dark: sets scheme dark
 |           ascii: sets glyphs ascii
 |           globals drawn: scheme light, dark; glyphs unicode, ascii
+|  x        show every story in every size and mode
 |  v        set the stories as the room allows, in rows, or side by side
 |  d        show the golden over the picture
 |  c        read the cells under a cursor
@@ -26,17 +26,17 @@
 
 1:1 "project                                         at terminal ·"
 1:63 "as the room allows" fg=7
-2:1 "Find · 2 of 4 ──────────────────────────────────────────────────────────────────"
-3:3 "n N      next or previous match"
-4:3 "⏎        keep what is typed"
-5:3 "backspace erase the last character"
-7:1 "Picture ────────────────────────────────────────────────────────────────────────"
-8:3 "p        show the next viewport"
-9:3 "m        show the next mode"
-10:12 "base: sets no global"
-11:12 "dark: sets scheme dark"
-12:12 "ascii: sets glyphs ascii"
-13:12 "globals drawn: scheme light, dark; glyphs unicode, ascii"
+2:1 "Find · 3 of 4 ──────────────────────────────────────────────────────────────────"
+3:3 "⏎        keep what is typed"
+4:3 "backspace erase the last character"
+6:1 "Picture ────────────────────────────────────────────────────────────────────────"
+7:3 "p        show the next viewport"
+8:3 "m        show the next mode"
+9:12 "base: sets no global"
+10:12 "dark: sets scheme dark"
+11:12 "ascii: sets glyphs ascii"
+12:12 "globals drawn: scheme light, dark; glyphs unicode, ascii"
+13:3 "x        show every story in every size and mode"
 14:3 "v        set the stories as the room allows, in rows, or side by side"
 15:3 "d        show the golden over the picture"
 16:3 "c        read the cells under a cursor"
