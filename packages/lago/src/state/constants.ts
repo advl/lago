@@ -6,6 +6,7 @@ export const openingState: GalleryState = {
   title: undefined,
   story: 0,
   viewport: 0,
+  mode: 0,
   arrangement: "auto",
   inspecting: false,
   scroll: 0,

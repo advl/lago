@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { modesCatalog } from "../../testing/catalogs.js";
 import { makeRecord } from "../../testing/records.js";
 import { buildCatalog } from "../catalog/index.js";
 import { openingState } from "./constants.js";
@@ -30,6 +31,7 @@ const key = {
   title: "component/KeyBar",
   story: "Long",
   viewportName: "narrow",
+  mode: undefined,
   text: "a long bar\nwith keys",
 };
 
@@ -313,5 +315,34 @@ describe("reduceGallery", () => {
         { type: "moveAcross", by: 9, limit: 5 },
       ).cell,
     ).toEqual({ x: 5, y: 2 });
+  });
+
+  it("steps through the modes round, the base first, setting the cursor and the scroll back", () => {
+    const modes: number[] = [];
+    let state: GalleryState = {
+      ...inspecting,
+      scroll: 2,
+      cell: { x: 1, y: 0 },
+    };
+    for (let step = 0; step < 3; step += 1) {
+      state = reduceGallery(state, { type: "nextMode" }, modesCatalog);
+      modes.push(state.mode);
+      expect(state).toMatchObject({ scroll: 0, cell: undefined, hit: 0 });
+    }
+    expect(modes).toEqual([1, 2, 0]);
+    expect(play(openingState, { type: "nextMode" }).mode).toBe(0);
+  });
+
+  it("asks to accept a mode's picture by its mode", () => {
+    const loud = {
+      ...openingState,
+      title: "component/Badge",
+      story: 1,
+      mode: 1,
+      inspecting: true,
+    };
+    expect(
+      reduceGallery(loud, { type: "askAccept" }, modesCatalog).confirming,
+    ).toMatchObject({ story: "Loud", mode: "dark" });
   });
 });

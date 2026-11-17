@@ -1,5 +1,5 @@
 import type { Tokens } from "@aztlan/tui";
-import type { Status } from "../catalog/index.js";
+import type { Comparison, Status } from "../catalog/index.js";
 
 /**
  * How each status is shown: a glyph and a word, in a colour that only
@@ -14,6 +14,23 @@ export const statusLooks = {
   error: { glyph: "✗", word: "error", color: "color.text.error" },
 } as const satisfies Record<
   Status,
+  { glyph: string; word: string; color: keyof Tokens }
+>;
+
+/**
+ * How a mode's picture equal to the base's is shown, in the same way: a
+ * glyph and words, in a colour that only repeats them. One the mode
+ * expected to change is a failure.
+ */
+export const comparisonLooks = {
+  equal: { glyph: "=", word: "equal to the base", color: "color.text.muted" },
+  unreached: {
+    glyph: "!",
+    word: "equal where a change was expected",
+    color: "color.text.error",
+  },
+} as const satisfies Record<
+  Exclude<Comparison, "distinct">,
   { glyph: string; word: string; color: keyof Tokens }
 >;
 

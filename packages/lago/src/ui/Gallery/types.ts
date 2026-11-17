@@ -1,4 +1,9 @@
-import type { Catalog, StoryRecord } from "../../catalog/index.js";
+import type {
+  Catalog,
+  CatalogGlobal,
+  CatalogMode,
+  StoryRecord,
+} from "../../catalog/index.js";
 import type { GalleryAction, GalleryState } from "../../state/index.js";
 
 /** Props for the Gallery component. */
@@ -28,6 +33,10 @@ export interface UseGalleryKeysProps {
   readonly selected: boolean;
   /** How many viewports the stories are drawn at. */
   readonly viewports: number;
+  /** The project's modes, which `m` steps through after the base. */
+  readonly modes: readonly CatalogMode[];
+  /** The globals the stories were drawn with, which the help lists under `m`. */
+  readonly globals: readonly CatalogGlobal[];
   /** The furthest an inspected story scrolls, and the furthest cell its cursor reaches. */
   readonly limits: {
     readonly scroll: number;
@@ -41,5 +50,7 @@ export interface UseGalleryKeysProps {
   readonly scrollHelp: (by: number) => void;
   /** Accepts the picture asked about, once confirmed. */
   readonly accept: (record: StoryRecord) => void;
+  /** Says something in the status line, until the next key. */
+  readonly say: (message: string) => void;
   readonly quit: () => void;
 }

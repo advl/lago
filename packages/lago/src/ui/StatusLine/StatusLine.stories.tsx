@@ -41,3 +41,6 @@ export const Matches: Story = {
 
 /** Before the first run ends. */
 export const Running: Story = { args: { catalog: undefined } };
+
+/** The size and the mode shown, named after what the line says. */
+export const Items: Story = { args: { items: ["terminal", "dark"] } };

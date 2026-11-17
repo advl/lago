@@ -12,6 +12,8 @@ export interface GalleryState {
   readonly story: number;
   /** The viewport shown, as its place among the catalog's. */
   readonly viewport: number;
+  /** The mode shown: 0 for the base, else the place among the catalog's modes after it. */
+  readonly mode: number;
   /** How the stories sit: as the room decides, or as the reader chose. */
   readonly arrangement: "auto" | Arrangement;
   /** Whether the selected story is open on its own, at its whole size. */
@@ -31,22 +33,23 @@ export interface GalleryState {
   readonly hit: number;
   /**
    * The picture the gallery asks to confirm accepting, by its component,
-   * story and viewport, so a run that changes the selection cannot turn
-   * the answer to another picture.
+   * story, viewport and mode, so a run that changes the selection cannot
+   * turn the answer to another picture.
    */
   readonly confirming: PictureKey | undefined;
   readonly help: boolean;
 }
 
 /**
- * A picture, by what names it, its component's title, its story's name and
- * its viewport, and by what it draws, so a run that draws it otherwise is
- * told apart.
+ * A picture, by what names it, its component's title, its story's name, its
+ * viewport and its mode, and by what it draws, so a run that draws it
+ * otherwise is told apart.
  */
 export interface PictureKey {
   readonly title: string;
   readonly story: string;
   readonly viewportName: string;
+  readonly mode: string | undefined;
   readonly text: string | undefined;
 }
 
@@ -69,6 +72,8 @@ export type GalleryAction =
   /** Out, one step: what is being typed, the cursor, the difference, the inspected story, the stories. */
   | { readonly type: "back" }
   | { readonly type: "nextViewport" }
+  /** The next mode, the base first, then the catalog's in their order, round. */
+  | { readonly type: "nextMode" }
   | { readonly type: "nextArrangement" }
   | { readonly type: "startFilter" }
   | { readonly type: "startSearch" }
@@ -93,7 +98,9 @@ export interface Selection {
   readonly story: number;
   /** The viewport shown, by name. */
   readonly viewportName: string | undefined;
-  /** The selected story's picture at the viewport shown; absent where it is not drawn there. */
+  /** The mode shown, by name; none for the base. */
+  readonly modeName: string | undefined;
+  /** The selected story's picture at the viewport and in the mode shown; absent where it is not drawn there. */
   readonly record: StoryRecord | undefined;
   /** Where the search was found, in the stories' order. */
   readonly hits: readonly Hit[];

@@ -191,4 +191,51 @@ describe("Inspect", () => {
     );
     expect(screen.lines.at(1)).toBe(`│[${"=".repeat(77)}│`);
   });
+
+  it("titles a mode's picture with its mode, and one equal to the base as equal", async () => {
+    const equal = makeRecord("layout/Pane", "Tall", {
+      mode: "dark",
+      comparison: "equal",
+    });
+    const screen = await render(
+      <Inspect
+        name="Tall"
+        viewportName="terminal"
+        mode="dark"
+        record={equal}
+        scroll={0}
+        difference={false}
+        width={60}
+        height={4}
+      />,
+      { cols: 60, rows: 4 },
+    );
+    expect(screen.lines.at(0)).toMatch(
+      /^┌─= Tall at terminal in dark · equal to the base─/,
+    );
+  });
+
+  it("says a story is not drawn in a mode, or that its file leaves the mode out", async () => {
+    const draw = (leftOut: boolean) =>
+      render(
+        <Inspect
+          name="Tall"
+          viewportName="terminal"
+          mode="dark"
+          leftOut={leftOut}
+          record={undefined}
+          scroll={0}
+          difference={false}
+          width={60}
+          height={4}
+        />,
+        { cols: 60, rows: 4 },
+      ).then((screen) => screen.lines.at(1));
+    expect(await draw(false)).toContain(
+      "This story is not drawn at terminal in dark.",
+    );
+    expect(await draw(true)).toContain(
+      "This story's parameters.modes leaves dark out.",
+    );
+  });
 });

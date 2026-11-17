@@ -5,9 +5,10 @@ import type { GalleryState, Selection } from "./types.js";
 /**
  * What `state` selects in `catalog`: the components the filter leaves, the
  * selected one, or the first when it is gone, its story, held within its
- * stories, the viewport, the story's picture there, where the search is
- * found, and the picture asked to be accepted while it is still selected
- * and still draws what it drew when asked.
+ * stories, the viewport, the mode, held within the catalog's, the story's
+ * picture there, where the search is found, and the picture asked to be
+ * accepted while it is still selected and still draws what it drew when
+ * asked.
  */
 export default function readSelection(
   state: GalleryState,
@@ -21,14 +22,18 @@ export default function readSelection(
     Math.min(state.viewport, catalog.viewports.length - 1),
   );
   const story = Math.min(state.story, last);
+  const modeName =
+    state.mode === 0
+      ? undefined
+      : catalog.modes.at(Math.min(state.mode, catalog.modes.length) - 1)?.name;
   const record = findPicture(
     component?.stories.at(story),
     viewportName,
-    undefined,
+    modeName,
   );
   const hits =
     component && viewportName
-      ? findHits(component, viewportName, state.search)
+      ? findHits(component, viewportName, state.search, modeName)
       : [];
   const asked = state.confirming;
   return {
@@ -36,6 +41,7 @@ export default function readSelection(
     component,
     story,
     viewportName,
+    modeName,
     record,
     hits,
     hit: Math.min(state.hit, Math.max(0, hits.length - 1)),
@@ -44,6 +50,7 @@ export default function readSelection(
       asked?.title === record.title &&
       asked.story === record.name &&
       asked.viewportName === record.viewportName &&
+      asked.mode === record.mode &&
       asked.text === record.text
         ? record
         : undefined,

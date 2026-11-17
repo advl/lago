@@ -25,6 +25,7 @@ import {
   reduceGallery,
 } from "../../state/index.js";
 import { barLines, minColumns, minLines, treeColumns } from "../constants.js";
+import describePlace from "../describePlace.js";
 import Inspect from "../Inspect/Inspect.js";
 import measureInspected from "../Inspect/measureInspected.js";
 import StatusLine from "../StatusLine/StatusLine.js";
@@ -83,14 +84,20 @@ const Gallery = ({
     [known],
   );
   const selection = readSelection(state, known);
-  const { component, viewportName, record, confirming } = selection;
+  const { component, viewportName, modeName, record, confirming } = selection;
   const story = component?.stories.at(selection.story);
+  const leftOut =
+    story?.excluded.some(
+      (cell) => cell.viewportName === viewportName && cell.mode === modeName,
+    ) === true;
   const lines = height - barLines;
   const inspected =
     state.inspecting && story && viewportName !== undefined
       ? measureInspected({
           record,
           viewportName,
+          ...(modeName !== undefined && { mode: modeName }),
+          leftOut,
           difference: state.difference,
           width,
           height: lines,
@@ -108,7 +115,7 @@ const Gallery = ({
   const accept = useCallback(
     (asked: StoryRecord) => {
       act({ type: "cancel" });
-      const where = `${asked.name} at ${asked.viewportName}`;
+      const where = `${asked.name} at ${describePlace(asked.viewportName, asked.mode)}`;
       onAccept(asked).then(
         () => setMessage(`accepted ${where}`),
         (error: unknown) =>
@@ -129,11 +136,14 @@ const Gallery = ({
     asking: confirming,
     selected: component !== undefined,
     viewports: known.viewports.length,
+    modes: known.modes,
+    globals: known.globals,
     limits,
     tooSmall: width < minColumns || height < minLines,
     act,
     scrollHelp,
     accept,
+    say: setMessage,
     quit: onQuit,
   });
   useKeyboard((key) => {
@@ -156,6 +166,8 @@ const Gallery = ({
       <Inspect
         name={story.name}
         viewportName={viewportName}
+        {...(modeName !== undefined && { mode: modeName })}
+        leftOut={leftOut}
         record={record}
         scroll={state.scroll}
         difference={state.difference}
@@ -204,6 +216,7 @@ const Gallery = ({
       const frames = frameStories(
         component,
         viewportName,
+        modeName,
         selection.story,
         selection.hits,
         room,
@@ -275,6 +288,13 @@ const Gallery = ({
           selection={selection}
           catalog={catalog}
           message={message}
+          // The size and the mode name where the pictures are drawn, once
+          // there is a mode to tell the base from.
+          items={
+            known.modes.length > 0 && viewportName !== undefined
+              ? [viewportName, modeName ?? "base"]
+              : []
+          }
           width={width}
         />
       }

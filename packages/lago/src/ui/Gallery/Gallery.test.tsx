@@ -3,7 +3,11 @@ import { Keys } from "@aztlan/tui";
 import { useKeyboard } from "@opentui/react";
 import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
-import { passingCatalog, sampleCatalog } from "../../../testing/catalogs.js";
+import {
+  modesCatalog,
+  passingCatalog,
+  sampleCatalog,
+} from "../../../testing/catalogs.js";
 import { drawPicture } from "../../../testing/records.js";
 import type { Catalog, StoryRecord } from "../../catalog/index.js";
 import Gallery from "./Gallery.js";
@@ -343,5 +347,84 @@ describe("Gallery", () => {
   it("offers no move and no layout while there is nothing to move through", async () => {
     const { screen } = await open(undefined);
     expect(screen.lines.at(-1)).toBe("/ find ? q quit");
+  });
+
+  it("steps through the modes with m, the base first, naming the size and the mode after the status", async () => {
+    const { screen } = await open(modesCatalog);
+    await press(screen, "{Enter}");
+    expect(screen.lines.at(-2)).toMatch(
+      /^watching the stories for changes +terminal · base$/,
+    );
+    expect(screen.lines.at(-1)).toContain("m mode");
+    const dark = await press(screen, "m");
+    expect(dark.at(-2)).toMatch(/ terminal · dark$/);
+    expect(dark.at(2)).toContain("● dark badge");
+    expect(dark.join("\n")).toContain("! Quiet");
+    expect(dark.join("\n")).toContain("scheme dark did not reach");
+    const ascii = await press(screen, "m");
+    expect(ascii.at(-2)).toMatch(/ terminal · ascii$/);
+    expect(ascii.at(1)).toContain("= Default");
+    expect(ascii.join("\n")).toContain("left out of ascii");
+    expect((await press(screen, "m")).at(-2)).toMatch(/ terminal · base$/);
+  });
+
+  it("shows a mode's picture equal to the base as the base picture, and says why there is nothing to accept", async () => {
+    const { screen, onAccept } = await open(modesCatalog);
+    await press(screen, "{Enter}mm{Enter}");
+    expect(screen.lines.at(1)).toContain(
+      "= Default at terminal in ascii · equal to the base",
+    );
+    expect(screen.lines.at(2)).toContain("● badge");
+    expect(screen.lines.at(-2)).toMatch(
+      /^equal to the base picture, so it keeps no golden of its own +terminal · ascii$/,
+    );
+    await press(screen, "{Shift>}a{/Shift}");
+    expect(screen.lines.at(-2)).toMatch(
+      /^nothing to accept: the base picture's golden covers it +terminal/,
+    );
+    await press(screen, "{Escape}jjmm{Enter}");
+    expect(screen.lines.at(1)).toContain(
+      "! Quiet at terminal in dark · equal where a change was expected",
+    );
+    await press(screen, "{Shift>}a{/Shift}");
+    expect(screen.lines.at(-2)).toMatch(
+      /^nothing to accept: it draws the base picture, which dark should/,
+    );
+    expect(onAccept).not.toHaveBeenCalled();
+  });
+
+  it("accepts a mode's picture as that mode's golden, naming the mode", async () => {
+    const { screen, onAccept } = await open(modesCatalog);
+    await press(screen, "{Enter}jm{Enter}{Shift>}a{/Shift}");
+    expect(screen.lines.at(-2)).toMatch(
+      /^accept Loud at terminal in dark as its golden\? y accepts/,
+    );
+    await press(screen, "y");
+    expect(onAccept).toHaveBeenCalledWith(
+      expect.objectContaining({ name: "Loud", mode: "dark" }),
+    );
+    expect(
+      await screen.findByText("accepted Loud at terminal in dark"),
+    ).toBeDefined();
+  });
+
+  it("says a story leaves a mode out when it is inspected there", async () => {
+    const { screen } = await open(modesCatalog);
+    await press(screen, "{Enter}jjmm{Enter}");
+    expect(screen.lines.at(1)).toContain("Quiet at terminal in ascii");
+    expect(screen.lines.at(2)).toContain(
+      "This story's parameters.modes leaves ascii out.",
+    );
+  });
+
+  it("lists the modes and the globals drawn under m in the help", async () => {
+    const { screen } = await open(modesCatalog, { rows: 40 });
+    const help = (await press(screen, "?")).join("\n");
+    expect(help).toContain("m        show the next mode");
+    expect(help).toContain("base: sets no global");
+    expect(help).toContain("dark: sets scheme dark");
+    expect(help).toContain(
+      "globals drawn: scheme light, dark; glyphs unicode, ascii",
+    );
   });
 });

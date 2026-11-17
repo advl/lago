@@ -1,5 +1,6 @@
 import { useBindings } from "@opentui/keymap/react";
 import describeBack from "./describeBack.js";
+import describeModes from "./describeModes.js";
 import type { UseGalleryKeysProps } from "./types.js";
 
 /**
@@ -14,11 +15,14 @@ export default function useGalleryKeys({
   asking,
   selected,
   viewports,
+  modes,
+  globals,
   limits,
   tooSmall,
   act,
   scrollHelp,
   accept,
+  say,
   quit,
 }: UseGalleryKeysProps) {
   const typing = state.filtering || state.searching;
@@ -36,6 +40,10 @@ export default function useGalleryKeys({
       : act({ type: "move", by, limit: state.cell ? limits.y : limits.scroll });
   const across = state.cell !== undefined || (!onTree && !state.inspecting);
   const acceptable = record?.status === "changed" || record?.status === "new";
+  // A mode's picture equal to the base's keeps no golden, so `A` says why
+  // instead of asking.
+  const equal =
+    record?.comparison === "equal" || record?.comparison === "unreached";
   const moveBy = (name: string, by: number) => ({
     name,
     desc: moveLabel,
@@ -116,6 +124,19 @@ export default function useGalleryKeys({
           enabled: free && viewports > 1,
           run: () => act({ type: "nextViewport" }),
         },
+        ...(modes.length > 0
+          ? [
+              {
+                name: "mode",
+                desc: "show the next mode",
+                hint: "mode",
+                group: "Picture",
+                notes: describeModes(modes, globals),
+                enabled: free,
+                run: () => act({ type: "nextMode" }),
+              },
+            ]
+          : []),
         {
           name: "arrangement",
           desc: "set the stories as the room allows, in rows, or side by side",
@@ -154,8 +175,18 @@ export default function useGalleryKeys({
           desc: "accept the picture as its golden",
           hint: "accept",
           group: "Picture",
-          enabled: free && state.inspecting && acceptable,
-          run: () => act({ type: "askAccept" }),
+          enabled: free && state.inspecting && (acceptable || equal),
+          run: () => {
+            if (!equal) {
+              act({ type: "askAccept" });
+              return;
+            }
+            say(
+              record.comparison === "equal"
+                ? "nothing to accept: the base picture's golden covers it"
+                : `nothing to accept: it draws the base picture, which ${record.mode} should change`,
+            );
+          },
         },
         // While the gallery asks, y accepts the very picture asked about.
         ...(asking && !tooSmall
@@ -203,6 +234,7 @@ export default function useGalleryKeys({
         { key: "return", cmd: "finish" },
         { key: "backspace", cmd: "erase" },
         { key: "p", cmd: "viewport" },
+        ...(modes.length > 0 ? [{ key: "m", cmd: "mode" }] : []),
         { key: "v", cmd: "arrangement" },
         { key: "d", cmd: "difference" },
         { key: "c", cmd: "cell" },
@@ -218,6 +250,8 @@ export default function useGalleryKeys({
       asking,
       selected,
       viewports,
+      modes,
+      globals,
       // The limits by their values: a new object each draw is the same limits.
       limits.scroll,
       limits.x,
@@ -226,6 +260,7 @@ export default function useGalleryKeys({
       act,
       scrollHelp,
       accept,
+      say,
       quit,
     ],
   );

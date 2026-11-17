@@ -154,6 +154,14 @@ export default function reduceGallery(
         scroll: 0,
         hit: 0,
       };
+    case "nextMode":
+      return {
+        ...state,
+        mode: (state.mode + 1) % (catalog.modes.length + 1),
+        cell: undefined,
+        scroll: 0,
+        hit: 0,
+      };
     case "nextArrangement":
       return { ...state, arrangement: nextArrangement[state.arrangement] };
     case "startFilter":
@@ -181,6 +189,7 @@ export default function reduceGallery(
               title: record.title,
               story: record.name,
               viewportName: record.viewportName,
+              mode: record.mode,
               text: record.text,
             },
           }

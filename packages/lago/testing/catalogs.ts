@@ -6,7 +6,7 @@ import { drawPicture, makeRecord } from "./records.js";
 const atBoth = (
   title: string,
   name: string,
-  overrides: Partial<StoryRecord>,
+  overrides: Partial<StoryRecord> & { lines?: string[] },
 ): StoryRecord[] => [
   makeRecord(title, name, { viewportName: "terminal", ...overrides }),
   makeRecord(title, name, { viewportName: "wide", ...overrides }),
@@ -69,4 +69,117 @@ export const passingCatalog: Catalog = buildCatalog(
     actual: keysPicture,
     expected: keysPicture,
   }),
+);
+
+/** The globals each mode of `modesCatalog` draws with. */
+const drawnWith = {
+  base: { scheme: "light", glyphs: "unicode" },
+  dark: { scheme: "dark", glyphs: "unicode" },
+  ascii: { scheme: "light", glyphs: "ascii" },
+} as const;
+
+/** A story's pictures at both viewports in one mode, the base when it is none. */
+const inMode = (
+  title: string,
+  name: string,
+  mode: "dark" | "ascii" | undefined,
+  overrides: Partial<StoryRecord> & { lines?: string[] },
+): StoryRecord[] =>
+  atBoth(title, name, {
+    mode,
+    globals: drawnWith[mode ?? "base"],
+    ...overrides,
+  });
+
+/**
+ * A project with two modes, `dark` and `ascii`, whose matrix holds every
+ * state a cell takes: passing, changed, new, equal to the base, equal where
+ * a change was expected, an error, and a cell its story leaves out.
+ */
+export const modesCatalog: Catalog = buildCatalog(
+  [
+    ...inMode("component/Badge", "Default", undefined, {
+      description: "A badge in the project's colours.",
+      lines: ["● badge"],
+    }),
+    ...inMode("component/Badge", "Default", "dark", {
+      comparison: "distinct",
+      lines: ["● dark badge"],
+    }),
+    ...inMode("component/Badge", "Default", "ascii", {
+      comparison: "equal",
+      expected: undefined,
+      lines: ["● badge"],
+    }),
+    ...inMode("component/Badge", "Loud", undefined, { lines: ["▲ LOUD"] }),
+    ...inMode("component/Badge", "Loud", "dark", {
+      comparison: "distinct",
+      status: "changed",
+      actual: drawPicture(["▲ LOUD in dark"]),
+      expected: drawPicture(["▲ LOUD, darker"]),
+      text: "▲ LOUD in dark",
+    }),
+    ...inMode("component/Badge", "Loud", "ascii", {
+      comparison: "distinct",
+      status: "new",
+      expected: undefined,
+      lines: ["^ LOUD"],
+    }),
+    ...inMode("component/Badge", "Quiet", undefined, { lines: ["· quiet"] }),
+    ...inMode("component/Badge", "Quiet", "dark", {
+      comparison: "unreached",
+      status: "error",
+      actual: undefined,
+      expected: undefined,
+      text: undefined,
+      error:
+        "The mode dark expects to change the stories tagged coloured, but component/Badge Quiet at terminal draws the base picture: scheme dark did not reach the story.",
+    }),
+    ...inMode("component/Badge", "Thrown", undefined, {
+      status: "error",
+      actual: undefined,
+      expected: undefined,
+      text: undefined,
+      error: "TypeError: no badge\n  at src/Badge.tsx:3:9",
+    }),
+    ...inMode("component/Badge", "Thrown", "dark", {
+      status: "error",
+      actual: undefined,
+      expected: undefined,
+      text: undefined,
+      globals: undefined,
+      error: "TypeError: no badge\n  at src/Badge.tsx:3:9",
+    }),
+    ...inMode("component/Badge", "Thrown", "ascii", {
+      status: "error",
+      actual: undefined,
+      expected: undefined,
+      text: undefined,
+      globals: undefined,
+      error: "TypeError: no badge\n  at src/Badge.tsx:3:9",
+    }),
+    ...inMode("layout/Card", "Default", undefined, { lines: ["┌ card ┐"] }),
+    ...inMode("layout/Card", "Default", "dark", {
+      comparison: "equal",
+      expected: undefined,
+      lines: ["┌ card ┐"],
+    }),
+    ...inMode("layout/Card", "Default", "ascii", {
+      comparison: "distinct",
+      lines: ["+ card +"],
+    }),
+  ],
+  [],
+  {
+    modes: [
+      { name: "dark", globals: { scheme: "dark" } },
+      { name: "ascii", globals: { glyphs: "ascii" } },
+    ],
+    excluded: ["terminal", "wide"].map((viewportName) => ({
+      title: "component/Badge",
+      name: "Quiet",
+      viewportName,
+      mode: "ascii",
+    })),
+  },
 );

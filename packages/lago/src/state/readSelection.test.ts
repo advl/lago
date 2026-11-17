@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { modesCatalog } from "../../testing/catalogs.js";
 import { makeRecord } from "../../testing/records.js";
 import { buildCatalog } from "../catalog/index.js";
 import { openingState } from "./constants.js";
@@ -86,6 +87,7 @@ describe("readSelection", () => {
         title: "component/KeyBar",
         story: "Long",
         viewportName: "narrow",
+        mode: undefined,
         text: "a long bar",
       },
     };
@@ -113,9 +115,38 @@ describe("readSelection", () => {
     ).toBeUndefined();
     expect(
       readSelection(
+        { ...asked, confirming: { ...asked.confirming, mode: "dark" } },
+        catalog,
+      ).confirming,
+    ).toBeUndefined();
+    expect(
+      readSelection(
         { ...asked, confirming: { ...asked.confirming, text: "drawn before" } },
         catalog,
       ).confirming,
+    ).toBeUndefined();
+  });
+
+  it("selects the mode shown, the base first, its pictures and its search, and holds it within the catalog's modes", () => {
+    const opened = { ...openingState, title: "component/Badge" };
+    expect(readSelection(opened, modesCatalog)).toMatchObject({
+      modeName: undefined,
+      record: { mode: undefined, text: "● badge" },
+    });
+    const dark = readSelection(
+      { ...opened, mode: 1, search: "dark badge" },
+      modesCatalog,
+    );
+    expect(dark).toMatchObject({
+      modeName: "dark",
+      record: { mode: "dark", text: "● dark badge" },
+    });
+    expect(dark.hits).toEqual([{ story: 0, field: "picture", line: 0 }]);
+    expect(readSelection({ ...opened, mode: 9 }, modesCatalog).modeName).toBe(
+      "ascii",
+    );
+    expect(
+      readSelection({ ...opened, mode: 1 }, catalog).modeName,
     ).toBeUndefined();
   });
 });

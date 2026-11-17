@@ -224,7 +224,7 @@ It is called in the test files that compose stories, not in a setup file: a setu
 
 ## The gallery
 
-`lago` in a project's folder, or `lago <folder>`, opens the gallery. It runs the project's own vitest on the stories project, never writing, and draws a stories file again when it is saved. It reads every story at each viewport in the base and in each mode the configuration names, and shows the base pictures; the counts take in a mode's pictures with them.
+`lago` in a project's folder, or `lago <folder>`, opens the gallery. It runs the project's own vitest on the stories project, never writing, and draws a stories file again when it is saved. It reads every story at each viewport in the base and in each mode the configuration names. It opens on the base pictures, and the counts take in every mode's pictures with them.
 
 | Key | What it does |
 |---|---|
@@ -235,12 +235,22 @@ It is called in the test files that compose stories, not in a setup file: a setu
 | `/` | filter the components, or search the stories' names, descriptions and drawn text |
 | `n` `N` | the next and the previous match |
 | `p` | the next viewport |
+| `m` | the next mode, the base first and then the configuration's in its order; only in a project with modes |
 | `v` | set the stories as the room allows, in rows, or side by side |
 | `d` | show the golden over a changed picture, the difference in words |
 | `c` | read the cell under a cursor: its text, both colours as asked, its attributes |
 | `A`, then `y` | accept the picture as its golden |
 | `?` | every key |
 | `q` | quit |
+
+In a project with modes, the status line names the size and the mode shown after what it says, as `narrow · dark`, and each frame and inspected picture is titled with its state in that mode:
+
+- a picture of its own, kept as `<file>.<Story>.<viewport>@<mode>.golden`, is passing, changed or new like any other, and `A` accepts it as that mode's golden;
+- `=` is a picture equal to the base picture at the same size, which keeps no golden: it shows the base picture and says so, and `A` says there is nothing to accept;
+- `!` is a picture equal to the base where the mode expects a change, a failure shown by its message, which says whether the mode's globals did not reach the story or the story fixes them itself;
+- a story that leaves the mode out with `parameters.modes` says so in its frame.
+
+Help lists, under `m`, the base, each mode with the globals it sets, and each global with the values the stories were drawn at. A project with no modes has no `m`, and its status line names no size or mode.
 
 A story that throws shows every error its test failed with, each with its place in the source, and a timeout after the error that says why, such as loaders that never finish on the stopped clock; no other story is affected. A stories file that fails to load is named in the status line.
 

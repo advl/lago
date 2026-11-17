@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@aztlan/lago-react";
-import { sampleCatalog } from "../../../testing/catalogs.js";
+import { modesCatalog, sampleCatalog } from "../../../testing/catalogs.js";
 import { buildCatalog } from "../../catalog/index.js";
 import Component from "./Gallery.js";
 
@@ -91,4 +91,28 @@ export const Empty: Story = { args: { catalog: buildCatalog([]) } };
 /** A terminal a column narrower than the gallery needs, and one a line shorter. */
 export const TooSmall: Story = {
   parameters: { viewports: { terminal: { cols: 79 }, wide: { rows: 23 } } },
+};
+
+/** A component's stories in a mode, which the status line names after the size: a picture of its own, a changed one, and one equal where a change was expected. */
+export const Modes: Story = {
+  args: { catalog: modesCatalog },
+  play: async ({ userEvent }) => {
+    await userEvent.keyboard("{Enter}m");
+  },
+};
+
+/** A mode's picture equal to the base's, inspected: the base picture, which keeps no golden of its own. */
+export const Equal: Story = {
+  args: { catalog: modesCatalog },
+  play: async ({ userEvent }) => {
+    await userEvent.keyboard("{Enter}mm{Enter}");
+  },
+};
+
+/** Every key of a project with modes: `m` with the modes and the globals drawn. */
+export const ModesHelp: Story = {
+  args: { catalog: modesCatalog },
+  play: async ({ userEvent }) => {
+    await userEvent.keyboard("?jjjjjjjjj");
+  },
 };

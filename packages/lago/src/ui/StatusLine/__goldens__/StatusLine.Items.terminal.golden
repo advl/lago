@@ -1,0 +1,5 @@
+80x24
+|/project/src/Broken.stories.tsx: Cannot find module './Missing.… terminal · dark
+
+1:1 "/project/src/Broken.stories.tsx: Cannot find module './Missing.…" fg=1
+1:66 "terminal · dark" fg=7

@@ -2,7 +2,9 @@ import { fitField, useTokens } from "@aztlan/tui";
 import type { ReactNode } from "react";
 import { statusLooks } from "../constants.js";
 import Difference from "../Difference/Difference.js";
+import describePlace from "../describePlace.js";
 import Picture from "../Picture/Picture.js";
+import readLook from "../readLook.js";
 import measureInspected from "./measureInspected.js";
 import type { InspectProps } from "./types.js";
 
@@ -11,22 +13,26 @@ import type { InspectProps } from "./types.js";
  * was drawn, cut at the region's with the cut said in the title, scrolled
  * when it is taller than the region, with the cursor's cell inverted; or
  * the golden over it; or the error it threw, with its place in the source.
+ * A mode's picture equal to the base's is the base picture, and its title
+ * says so.
  * The scroll is held within what is shown.
  */
 const Inspect = (props: InspectProps): ReactNode => {
   const tokens = useTokens();
-  const { name, viewportName, record, scroll, cell, width, height } = props;
+  const { name, viewportName, mode, record, scroll, cell, width, height } =
+    props;
   const view = measureInspected(props);
   const { room } = view;
-  const look = record ? statusLooks[record.status] : undefined;
+  const look = record ? readLook(record) : undefined;
+  const place = describePlace(viewportName, mode);
   const actual = record?.actual;
   const cut =
     actual && actual.cols > room.cols
       ? ` · ${room.cols} of ${actual.cols} columns`
       : "";
   const title = look
-    ? `${look.glyph} ${name} at ${viewportName} · ${look.word}${cut}`
-    : `${name} at ${viewportName}`;
+    ? `${look.glyph} ${name} at ${place} · ${look.word}${cut}`
+    : `${name} at ${place}`;
   let from = Math.min(scroll, view.scroll);
   let inside: ReactNode;
   if (view.shown === "difference" && actual && record?.expected) {

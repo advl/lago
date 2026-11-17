@@ -5,8 +5,10 @@ import type { Extent } from "../../layout/index.js";
 export interface StoryFrame {
   readonly name: string;
   readonly description: string | undefined;
-  /** The story's picture at the viewport shown; absent where the story is not drawn at it. */
+  /** The story's picture at the viewport and in the mode shown; absent where the story is not drawn there. */
   readonly record: StoryRecord | undefined;
+  /** What the frame says when there is no picture and no error: why the story is not drawn there. */
+  readonly absent: string;
   /** The columns and lines inside the frame. */
   readonly extent: Extent;
   readonly selected: boolean;

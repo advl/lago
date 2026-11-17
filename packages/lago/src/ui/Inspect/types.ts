@@ -7,7 +7,11 @@ export interface InspectProps {
   name: string;
   /** The viewport shown, by name. */
   viewportName: string;
-  /** The story's picture at that viewport; absent where the story is not drawn at it. */
+  /** The mode shown, by name; none for the base. */
+  mode?: string;
+  /** Whether the story's file leaves the mode out. */
+  leftOut?: boolean;
+  /** The story's picture at that viewport in that mode; absent where the story is not drawn there. */
   record: StoryRecord | undefined;
   /** How far what is shown is scrolled, in lines; it is held within what is shown. */
   scroll: number;

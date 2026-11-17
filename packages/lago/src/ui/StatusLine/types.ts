@@ -11,6 +11,11 @@ export interface StatusLineProps {
   catalog: Catalog | undefined;
   /** What the gallery last did, until the next key. */
   message: string | undefined;
+  /**
+   * What the line names after what it says, in order, as the size and the
+   * mode shown: `narrow`, `dark`. None leaves the whole line to what is said.
+   */
+  items?: readonly string[];
   /** The width of the pane, in display cells. */
   width: number;
 }
