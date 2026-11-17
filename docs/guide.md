@@ -289,6 +289,24 @@ The chrome colours the gallery around the pictures and never a picture itself: a
 
 A plugin is what a project adds to every story, and to the gallery, by naming one package: a theme switch, a baseline grid, request mocking. Its package is named `@aztlan/lago-plugin-<name>` and exports a function that takes the project's options and gives `definePlugin`'s result.
 
+### Adding a plugin
+
+A project installs the plugin's package and gives it to `createConfig`, once, with its options:
+
+```ts
+// vitest.config.ts
+import { createConfig } from "@aztlan/lago-config";
+import schemes from "@aztlan/lago-plugin-schemes";
+
+export default createConfig({
+  viewports,
+  preview: "./src/lago.preview.tsx",
+  plugins: [schemes({ include: ["dracula", "iceberg"] })],
+});
+```
+
+That one entry configures both of the plugin's sides: the stories are set inside its preview and drawn in its modes, and the gallery takes what it adds there. Its globals are read as the project's own, with `context.globals`, `globals` on a story and `parameters.modes`, and its modes' goldens are named as the project's are.
+
 ### Writing a plugin
 
 ```ts

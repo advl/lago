@@ -90,6 +90,44 @@ describe("createConfig", () => {
     expect(createConfig({ viewports }).plugins).toHaveLength(2);
   });
 
+  it("hands the plugins to the plugin, which draws their modes, and carries their gallery parts to the gallery", () => {
+    const plugins = [
+      {
+        name: "schemes",
+        modes: { dark: { globals: { scheme: "dark" } } },
+        gallery: { module: "/plugin/gallery.js", options: { all: true } },
+      },
+    ];
+    const config = createConfig({ viewports, plugins });
+    const [stories] = config.plugins as {
+      transform: (...given: unknown[]) => unknown;
+    }[];
+    expect(
+      stories?.transform.call(
+        { environment: { config: { root: "/project" } } },
+        "export const Default = {};\n",
+        "/project/src/Row.stories.tsx",
+      ),
+    ).toMatchObject({
+      code: expect.stringContaining('"plugins":[{"name":"schemes"}]'),
+    });
+    expect(config.plugins?.at(-1)).toEqual({
+      name: "lago:gallery",
+      api: {
+        plugins: [
+          {
+            name: "schemes",
+            module: "/plugin/gallery.js",
+            options: { all: true },
+          },
+        ],
+      },
+    });
+    expect(
+      createConfig({ viewports, plugins: [{ name: "grid" }] }).plugins,
+    ).toHaveLength(2);
+  });
+
   it("keeps tests and stories in a project each, so a run can leave one out", () => {
     expect(createConfig({ viewports }).test?.projects).toEqual([
       {

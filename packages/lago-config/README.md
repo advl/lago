@@ -2,7 +2,7 @@
 
 The vitest configuration a project with OpenTUI components and Lago stories needs.
 
-`createConfig({ viewports, coverage, preview, modes, matrix, gallery })` gives a project its vitest configuration: JSX against `@opentui/react`, the renderer's Bun build, faked timers, a `unit` and a `stories` project, and the plugin, which sets every story inside the project's preview when one is named, draws it in each mode as well as the base, and refuses a matrix past `matrix.max`. `gallery.chrome` names the gallery's own look, `terminal` by default, which `lago` reads from the configuration.
+`createConfig({ viewports, coverage, preview, modes, matrix, gallery, plugins })` gives a project its vitest configuration: JSX against `@opentui/react`, the renderer's Bun build, faked timers, a `unit` and a `stories` project, and the plugin, which sets every story inside the project's preview when one is named, draws it in each mode as well as the base, and refuses a matrix past `matrix.max`. `gallery.chrome` names the gallery's own look, `terminal` by default, which `lago` reads from the configuration. Each of `plugins`, made by `definePlugin`, is given once and configures both of its sides: its preview is set around every story before the project's, its globals and modes join the project's, and its gallery part reaches `lago` with the options the project gave it.
 
 See [the guide](../../docs/guide.md).
 

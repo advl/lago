@@ -55,6 +55,7 @@
       "name": "@aztlan/lago-config",
       "version": "0.1.0-rc.1",
       "dependencies": {
+        "@aztlan/lago-core": "^0.1.0-rc.1",
         "@aztlan/lago-react": "^0.1.0-rc.1",
       },
       "devDependencies": {

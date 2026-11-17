@@ -1,3 +1,4 @@
+import type { Plugin } from "@aztlan/lago-core";
 import type { Mode } from "@aztlan/lago-react/vitest";
 
 /** What `createConfig` is given. */
@@ -35,6 +36,13 @@ export interface Options {
   readonly matrix?: { readonly max: number };
   /** How the gallery, `lago`, looks when it opens on the project. */
   readonly gallery?: GalleryOptions;
+  /**
+   * Lago plugins, each made by `definePlugin` and given once, which
+   * configures both of its sides: its preview is set around every story
+   * before the project's, its globals and modes join the project's, and its
+   * gallery part reaches the gallery with the options the project gave it.
+   */
+  readonly plugins?: readonly Plugin[];
 }
 
 /**
